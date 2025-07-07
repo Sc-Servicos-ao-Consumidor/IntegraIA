@@ -4,12 +4,14 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Pgvector\Laravel\HasNeighbors;
 use Pgvector\Laravel\Vector;
 
 class Recipe extends Model
 {
     /** @use HasFactory<\Database\Factories\RecipeFactory> */
     use HasFactory;
+    use HasNeighbors;
 
     protected $fillable = [
         'title',
