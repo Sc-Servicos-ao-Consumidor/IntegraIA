@@ -11,7 +11,7 @@
             @keyup.enter="search"
             type="text"
             placeholder="e.g. creamy vegan pasta"
-            class="flex-1 px-4 py-2 border rounded"
+            class="flex-1 px-4 py-2 border rounded border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
             />
             <button @click="search" class="px-4 py-2 bg-blue-600 text-blue rounded hover:bg-blue-700">
                 Search
