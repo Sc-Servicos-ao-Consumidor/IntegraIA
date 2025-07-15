@@ -11,10 +11,16 @@ class RecipeEmbeddingService
 {
     public function generateEmbedding(Recipe $recipe)
     {
+        $embeddingInput = collect([
+            $recipe->title,
+            implode(', ', $recipe->tags ?? []),
+            $recipe->raw_text,
+        ])->filter()->implode("\n");
+
         try{
             $response = Prism::embeddings()
                 ->using(Provider::OpenAI, 'text-embedding-3-small')
-                ->fromInput($recipe->raw_text)
+                ->fromInput($embeddingInput)
                 ->asEmbeddings();
 
             return $response->embeddings[0]->embedding;
