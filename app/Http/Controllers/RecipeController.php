@@ -6,6 +6,7 @@ use App\Models\Recipe;
 use App\Services\PrismService;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Schema;
 use Inertia\Inertia;
 use Pgvector\Laravel\Distance;
 class RecipeController extends Controller
@@ -98,11 +99,16 @@ class RecipeController extends Controller
             throw new Exception();
         }
 
-        $results = Recipe::query()
+        $queryResults = Recipe::query()
             ->nearestNeighbors('embedding', $queryVector, Distance::Cosine)
-            ->take(1)
-        ->get();
+            ->take(3)
+            ->get()
+            ->map(function ($recipe) {
+                return collect($recipe)->except('embedding');
+            });
 
-        return response()->json($results);
+        $result = $prism->getResponse($query, json_encode($queryResults));
+        dd($result);
+        return response()->json($result);
     }
 }
