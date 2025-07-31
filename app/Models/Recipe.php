@@ -16,11 +16,13 @@ class Recipe extends Model
     protected $fillable = [
         'title',
         'raw_text',
+        'metadata',
         'tags',
         'embedding',
     ];
 
     protected $casts = [
+        'metadata' => 'array',
         'tags' => 'array',
     ];
 

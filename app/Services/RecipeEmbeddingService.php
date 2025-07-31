@@ -14,6 +14,9 @@ class RecipeEmbeddingService
         $embeddingInput = collect([
             $recipe->title,
             implode(', ', $recipe->tags ?? []),
+            collect($recipe->metadata)
+                ->map(fn($value, $key) => $key . ': ' . (is_array($value) ? implode(', ', $value) : $value))
+                ->implode("\n"),
             $recipe->raw_text,
         ])->filter()->implode("\n");
 

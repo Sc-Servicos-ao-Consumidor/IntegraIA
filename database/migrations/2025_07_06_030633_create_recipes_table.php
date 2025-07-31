@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('title');
             $table->text('raw_text');
+            $table->json('metadata')->nullable();
             $table->json('tags')->nullable();
             $table->vector('embedding', 1536)->nullable();
             $table->timestamps();
