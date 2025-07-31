@@ -15,4 +15,12 @@ class PrismService
             ->fromInput($query)
             ->asEmbeddings();
     }
+
+    public function getResponse(string $text){
+            return Prism::text()
+                ->using(Provider::OpenAI, 'gpt-4o-mini')
+                ->withSystemPrompt("You are a helpful chef assistant.")
+                ->withPrompt($text)
+                ->asText();
+    }
 }
