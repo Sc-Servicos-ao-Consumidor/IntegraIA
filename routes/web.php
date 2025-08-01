@@ -15,6 +15,7 @@ Route::get('dashboard', function () {
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/recipes/search', [RecipeController::class, 'search']);
     Route::resource('recipes', RecipeController::class);
+    Route::post('/recipes/assistant', [RecipeController::class, 'assistant']);
 });
 
 require __DIR__.'/settings.php';

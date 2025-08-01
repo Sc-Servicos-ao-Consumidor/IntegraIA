@@ -107,8 +107,22 @@ class RecipeController extends Controller
                 return collect($recipe)->except('embedding');
             });
 
-        $result = $prism->getResponse($query, json_encode($queryResults));
-        dd($result);
-        return response()->json($result);
+        return response()->json($queryResults);
+    }
+    
+    public function assistant(Request $request)
+    {
+        $text = $request->text ?? '';
+        $context = $request->context ?? null;
+
+        if (!$text) {
+            return response()->json(['error' => 'Missing text.'], 422);
+        }
+
+        $prism = new PrismService();
+        
+        $response = $prism->getResponse($text, json_encode($context));
+
+        return response()->json($response->text);
     }
 }
