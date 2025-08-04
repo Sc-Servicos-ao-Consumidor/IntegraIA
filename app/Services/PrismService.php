@@ -19,10 +19,10 @@ class PrismService
     public function getResponse(string $text, $context=null){
             return Prism::text()
                 ->using(Provider::OpenAI, 'gpt-4o-mini')
-                ->withSystemPrompt("Você é um assistente virtual especializado em receitas de culinária Unilever.
-                Sua tarefa é ajudar os usuários a encontrar receitas com base em ingredientes, técnicas de cozinha e preferências alimentares.
+                ->withSystemPrompt("Você é um assistente virtual da empresa Unilever, especializado em receitas e produtos da empresa.
+                Sua tarefa é ajudar os usuários a encontrar receitas com base em ingredientes, técnicas de cozinha, preferências alimentares, informações de produtos e entre outras informações.
 
-                Você deve fornecer respostas claras e concisas, sugerindo receitas relevantes e úteis.
+                Você deve fornecer respostas claras e concisas, sugerindo respostas relevantes ao contexto e úteis.
                 Responda o usuário baseado no contexto abaixo:
                 $context
                 ")
