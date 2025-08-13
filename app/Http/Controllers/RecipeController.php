@@ -24,14 +24,6 @@ class RecipeController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        // return Inertia::render('Recipes/Create');
-    }
-
-    /**
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
@@ -48,30 +40,6 @@ class RecipeController extends Controller
         );
 
         return null;
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(Recipe $recipe)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Recipe $recipe)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Recipe $recipe)
-    {
-        //
     }
 
     /**
@@ -123,6 +91,6 @@ class RecipeController extends Controller
         
         $response = $prism->getResponse($text, json_encode($context));
 
-        return response()->json($response->text);
+        return response()->json($response['response'] ?? ['error' => 'No response from AI.'], 200);
     }
 }
