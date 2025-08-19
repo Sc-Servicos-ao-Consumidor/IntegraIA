@@ -19,7 +19,6 @@ class Recipe extends Model
         'metadata',
         'tags',
         'embedding',
-        // New columns added from migration
         'recipe_code',
         'recipe_name', 
         'cuisine',

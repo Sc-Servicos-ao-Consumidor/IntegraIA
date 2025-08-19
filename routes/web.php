@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\RecipeController;
+use App\Http\Controllers\ProductController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -16,6 +17,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/recipes/search', [RecipeController::class, 'search']);
     Route::resource('recipes', RecipeController::class);
     Route::post('/recipes/assistant', [RecipeController::class, 'assistant']);
+    
+    // Products management
+    Route::resource('products', ProductController::class);
+    Route::post('/products/groups', [ProductController::class, 'storeGroup'])->name('products.groups.store');
 });
 
 require __DIR__.'/settings.php';

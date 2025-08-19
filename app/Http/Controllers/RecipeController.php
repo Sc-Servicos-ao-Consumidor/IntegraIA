@@ -29,9 +29,39 @@ class RecipeController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'title' => 'required|string|max:255',
-            'raw_text' => 'required|string|min:30',
-            'tags' => 'nullable|array'
+            // Legacy fields
+            'title' => 'nullable|string|max:255',
+            'raw_text' => 'nullable|string',
+            'metadata' => 'nullable|array',
+            'tags' => 'nullable|array',
+            
+            // New recipe fields
+            'recipe_code' => 'nullable|string|max:255',
+            'recipe_name' => 'nullable|string|max:255',
+            'cuisine' => 'nullable|string|max:255',
+            'recipe_type' => 'nullable|string|max:255',
+            'service_order' => 'nullable|string|max:255',
+            'preparation_time' => 'nullable|integer|min:1',
+            'difficulty_level' => 'nullable|string|in:easy,medium,hard,expert',
+            'yield' => 'nullable|string|max:255',
+            'channel' => 'nullable|string|max:255',
+            
+            // Content fields
+            'recipe_description' => 'nullable|string',
+            'ingredients_description' => 'nullable|string',
+            'preparation_method' => 'nullable|string',
+            
+            // Array fields (stored as JSON)
+            'main_ingredients' => 'nullable|array',
+            'supporting_ingredients' => 'nullable|array',
+            'usage_groups' => 'nullable|array',
+            'preparation_techniques' => 'nullable|array',
+            'consumption_occasion' => 'nullable|array',
+            
+            // Reference fields
+            'general_images_link' => 'nullable|url',
+            'product_code' => 'nullable|string|max:255',
+            'content_code' => 'nullable|string|max:255',
         ]);
 
         Recipe::updateOrCreate(

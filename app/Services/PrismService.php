@@ -34,7 +34,7 @@ class PrismService
         ];
 
         return Http::withHeaders([
-            'Authorization' => 'Bearer 4|S8wUJmPov32a0gI8wSx6Wh1lYm9IhrDKO3sFpLEU822cbbf3',
+            'Authorization' => 'Bearer 1|LLN6SZtHWuZb6I9XY8h56Eq85YXcWZqgEBbwNcZL204db036',
             'Content-Type' => 'application/json',
         ])
         ->withoutVerifying()
