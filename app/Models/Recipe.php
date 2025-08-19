@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Pgvector\Laravel\HasNeighbors;
 use Pgvector\Laravel\Vector;
 
@@ -54,5 +55,39 @@ class Recipe extends Model
     public function getEmbeddingVector(): ?Vector
     {
         return $this->embedding ? new Vector($this->embedding) : null;
+    }
+
+    /**
+     * The products that belong to this recipe.
+     */
+    public function products(): BelongsToMany
+    {
+        return $this->belongsToMany(Product::class)
+            ->withPivot([
+                'quantity',
+                'unit', 
+                'ingredient_type',
+                'preparation_notes',
+                'optional',
+                'order'
+            ])
+            ->withTimestamps()
+            ->orderByPivot('order');
+    }
+
+    /**
+     * Get only main ingredient products.
+     */
+    public function mainProducts(): BelongsToMany
+    {
+        return $this->products()->wherePivot('ingredient_type', 'main');
+    }
+
+    /**
+     * Get only supporting ingredient products.
+     */
+    public function supportingProducts(): BelongsToMany
+    {
+        return $this->products()->wherePivot('ingredient_type', 'supporting');
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Recipe;
+use App\Models\Product;
 use App\Services\PrismService;
 use Exception;
 use Illuminate\Http\Request;
@@ -16,10 +17,12 @@ class RecipeController extends Controller
      */
     public function index()
     {
-        $recipes = Recipe::latest()->get();
+        $recipes = Recipe::with('products')->latest()->get();
+        $products = Product::where('status', true)->orderBy('descricao')->get();
 
         return Inertia::render('Recipes/Manage', [
-            'recipes' => $recipes
+            'recipes' => $recipes,
+            'products' => $products
         ]);
     }
 
@@ -62,12 +65,37 @@ class RecipeController extends Controller
             'general_images_link' => 'nullable|url',
             'product_code' => 'nullable|string|max:255',
             'content_code' => 'nullable|string|max:255',
+            
+            // Product associations
+            'selected_products' => 'nullable|array',
+            'selected_products.*.product_id' => 'required_with:selected_products|exists:products,id',
+            'selected_products.*.quantity' => 'nullable|numeric|min:0',
+            'selected_products.*.unit' => 'nullable|string|max:50',
+            'selected_products.*.ingredient_type' => 'nullable|in:main,supporting',
+            'selected_products.*.preparation_notes' => 'nullable|string',
+            'selected_products.*.optional' => 'nullable|boolean',
         ]);
 
-        Recipe::updateOrCreate(
+        $recipe = Recipe::updateOrCreate(
             ['id' => $request->id],
-            $data
+            collect($data)->except('selected_products')->toArray()
         );
+
+        // Sync products if provided
+        if ($request->has('selected_products') && is_array($request->selected_products)) {
+            $productData = [];
+            foreach ($request->selected_products as $index => $productInfo) {
+                $productData[$productInfo['product_id']] = [
+                    'quantity' => $productInfo['quantity'] ?? null,
+                    'unit' => $productInfo['unit'] ?? null,
+                    'ingredient_type' => $productInfo['ingredient_type'] ?? 'main',
+                    'preparation_notes' => $productInfo['preparation_notes'] ?? null,
+                    'optional' => $productInfo['optional'] ?? false,
+                    'order' => $index + 1,
+                ];
+            }
+            $recipe->products()->sync($productData);
+        }
 
         return null;
     }

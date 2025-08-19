@@ -487,6 +487,140 @@
             </div>
         </div>
 
+        <!-- Products Section -->
+        <div class="bg-gray-50 rounded-lg p-6">
+            <h3 class="text-lg font-semibold text-gray-800 mb-4">🛒 Produtos Associados</h3>
+            
+            <!-- Add Product Button -->
+            <div class="mb-4">
+                <button
+                    type="button"
+                    @click="addNewProduct"
+                    class="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                    <Plus class="h-4 w-4" />
+                    Adicionar Produto
+                </button>
+            </div>
+
+            <!-- Selected Products List -->
+            <div v-if="form.selected_products.length > 0" class="space-y-3">
+                <div
+                    v-for="(selectedProduct, index) in form.selected_products"
+                    :key="index"
+                    class="border border-gray-200 rounded-lg p-4 bg-white"
+                >
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+                        <!-- Product Selection -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Produto</label>
+                            <select
+                                v-model="selectedProduct.product_id"
+                                class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                            >
+                                <option value="">Selecione um produto</option>
+                                <option
+                                    v-for="product in props.products"
+                                    :key="product.id"
+                                    :value="product.id"
+                                >
+                                    {{ product.descricao }}
+                                </option>
+                            </select>
+                        </div>
+
+                        <!-- Quantity -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Quantidade</label>
+                            <input
+                                v-model.number="selectedProduct.quantity"
+                                type="number"
+                                step="0.001"
+                                min="0"
+                                placeholder="0"
+                                class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                            />
+                        </div>
+
+                        <!-- Unit -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Unidade</label>
+                            <select
+                                v-model="selectedProduct.unit"
+                                class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                            >
+                                <option value="">Selecione</option>
+                                <option value="g">Gramas (g)</option>
+                                <option value="kg">Quilogramas (kg)</option>
+                                <option value="ml">Mililitros (ml)</option>
+                                <option value="l">Litros (l)</option>
+                                <option value="unidade">Unidade</option>
+                                <option value="xícara">Xícara</option>
+                                <option value="colher de sopa">Colher de sopa</option>
+                                <option value="colher de chá">Colher de chá</option>
+                                <option value="pitada">Pitada</option>
+                                <option value="a gosto">A gosto</option>
+                            </select>
+                        </div>
+
+                        <!-- Type -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Tipo</label>
+                            <select
+                                v-model="selectedProduct.ingredient_type"
+                                class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                            >
+                                <option value="main">Ingrediente Principal</option>
+                                <option value="supporting">Ingrediente de Apoio</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Additional Options -->
+                    <div class="mt-3 grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <!-- Preparation Notes -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Notas de Preparo</label>
+                            <input
+                                v-model="selectedProduct.preparation_notes"
+                                type="text"
+                                placeholder="ex: picado fino, refogado..."
+                                class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                            />
+                        </div>
+
+                        <!-- Optional checkbox and Remove button -->
+                        <div class="flex items-center justify-between">
+                            <label class="flex items-center gap-2">
+                                <input
+                                    v-model="selectedProduct.optional"
+                                    type="checkbox"
+                                    class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                />
+                                <span class="text-sm text-gray-700">Ingrediente opcional</span>
+                            </label>
+                            
+                            <button
+                                type="button"
+                                @click="removeProduct(index)"
+                                class="flex items-center gap-1 px-3 py-1 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                            >
+                                <X class="h-4 w-4" />
+                                Remover
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Empty State -->
+            <div v-else class="text-center py-8 text-gray-500">
+                <Package class="h-12 w-12 mx-auto mb-2 text-gray-300" />
+                <p>Nenhum produto adicionado</p>
+                <p class="text-sm">Clique em "Adicionar Produto" para começar</p>
+            </div>
+        </div>
+
         <!-- Media & References Section -->
         <div class="bg-gray-50 rounded-lg p-6">
             <h3 class="text-lg font-semibold text-gray-800 mb-4">📸 Mídia e Referências</h3>
@@ -582,6 +716,7 @@ import { router, useForm, Head } from '@inertiajs/vue3'
 import {ref} from 'vue'
 import axios from 'axios'
 import AppLayout from '@/layouts/AppLayout.vue'
+import { Plus, X, Package } from 'lucide-vue-next'
 
 const query = ref('')
 const results = ref([])
@@ -598,7 +733,8 @@ const breadcrumbs = [
 ]
 
 const props = defineProps({
-    recipes: Array
+    recipes: Array,
+    products: Array
 })
 const form = useForm({
     id: null,
@@ -626,7 +762,9 @@ const form = useForm({
     consumption_occasion: [],
     general_images_link: null,
     product_code: null,
-    content_code: null
+    content_code: null,
+    // Product associations
+    selected_products: []
 })
 const search = async () => {
     if (!query.value.trim()) return
@@ -746,6 +884,21 @@ function removeConsumptionOccasion(index) {
     form.consumption_occasion.splice(index, 1)
 }
 
+function addNewProduct() {
+    form.selected_products.push({
+        product_id: '',
+        quantity: null,
+        unit: '',
+        ingredient_type: 'main',
+        preparation_notes: '',
+        optional: false
+    })
+}
+
+function removeProduct(index) {
+    form.selected_products.splice(index, 1)
+}
+
 function updateMetadata() {
     try {
         if (metadataString.value.trim()) {
@@ -787,6 +940,16 @@ function editRecipe(recipe) {
     form.general_images_link = recipe.general_images_link
     form.product_code = recipe.product_code
     form.content_code = recipe.content_code
+    
+    // Load associated products
+    form.selected_products = recipe.products ? recipe.products.map(product => ({
+        product_id: product.id,
+        quantity: product.pivot.quantity,
+        unit: product.pivot.unit,
+        ingredient_type: product.pivot.ingredient_type,
+        preparation_notes: product.pivot.preparation_notes,
+        optional: product.pivot.optional
+    })) : []
 }
 
 function deleteRecipe(recipe) {
