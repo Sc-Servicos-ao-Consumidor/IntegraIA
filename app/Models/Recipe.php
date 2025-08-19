@@ -90,4 +90,15 @@ class Recipe extends Model
     {
         return $this->products()->wherePivot('ingredient_type', 'supporting');
     }
+
+    /**
+     * The contents that belong to this recipe.
+     */
+    public function contents(): BelongsToMany
+    {
+        return $this->belongsToMany(Content::class)
+            ->withPivot(['top_dish', 'order'])
+            ->withTimestamps()
+            ->orderByPivot('order');
+    }
 }

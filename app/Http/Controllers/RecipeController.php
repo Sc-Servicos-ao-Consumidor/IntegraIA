@@ -45,7 +45,7 @@ class RecipeController extends Controller
             'recipe_type' => 'nullable|string|max:255',
             'service_order' => 'nullable|string|max:255',
             'preparation_time' => 'nullable|integer|min:1',
-            'difficulty_level' => 'nullable|string|in:easy,medium,hard,expert',
+            'difficulty_level' => 'nullable|string|in:facil,medio,dificil,expert',
             'yield' => 'nullable|string|max:255',
             'channel' => 'nullable|string|max:255',
             

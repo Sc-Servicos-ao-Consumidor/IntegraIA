@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\RecipeController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\ContentController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -21,6 +22,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Products management
     Route::resource('products', ProductController::class);
     Route::post('/products/groups', [ProductController::class, 'storeGroup'])->name('products.groups.store');
+    
+    // Contents management
+    Route::resource('contents', ContentController::class);
 });
 
 require __DIR__.'/settings.php';

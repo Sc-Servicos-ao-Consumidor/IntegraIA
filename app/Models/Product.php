@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Product extends Model
 {
@@ -17,39 +19,86 @@ class Product extends Model
         'codigo_padrao',
         'sku',
         'group_product_id',
-        'url_imagem_principal',
+        'marca',
         'descricao',
-        'descricao_breve',
-        'informacao_adicional',
-        'ean',
-        'qr_code',
-        'url_rede_social',
-        'quantidade_caixa',
-        'embalagem_tipo',
-        'embalagem_descricao',
-        'peso_liquido',
-        'peso_bruto',
-        'validade',
-        'valor',
-        'desconto',
-        'catalogo',
-        'lancamento',
         'status',
     ];
 
     protected $casts = [
-        'peso_liquido' => 'decimal:2',
-        'peso_bruto' => 'decimal:2',
-        'valor' => 'decimal:2',
-        'desconto' => 'decimal:2',
-        'catalogo' => 'boolean',
-        'lancamento' => 'boolean',
         'status' => 'boolean',
     ];
 
     public function groupProduct(): BelongsTo
     {
         return $this->belongsTo(GroupProduct::class);
+    }
+
+    /**
+     * Get the product details.
+     */
+    public function detail(): HasOne
+    {
+        return $this->hasOne(ProductDetail::class);
+    }
+
+    /**
+     * Get all product images.
+     */
+    public function images(): HasMany
+    {
+        return $this->hasMany(ProductImage::class)->ordered();
+    }
+
+    /**
+     * Get active product images.
+     */
+    public function activeImages(): HasMany
+    {
+        return $this->hasMany(ProductImage::class)->active()->ordered();
+    }
+
+    /**
+     * Get main product image.
+     */
+    public function mainImage(): HasOne
+    {
+        return $this->hasOne(ProductImage::class)
+            ->ofType('principal')
+            ->active()
+            ->ordered();
+    }
+
+    /**
+     * Get packaging images.
+     */
+    public function packagingImages(): HasMany
+    {
+        return $this->hasMany(ProductImage::class)
+            ->ofType('embalagem')
+            ->active()
+            ->ordered();
+    }
+
+    /**
+     * Get nutritional table image.
+     */
+    public function nutritionalImage(): HasOne
+    {
+        return $this->hasOne(ProductImage::class)
+            ->ofType('tabela_nutricional')
+            ->active()
+            ->ordered();
+    }
+
+    /**
+     * Get ingredients list image.
+     */
+    public function ingredientsImage(): HasOne
+    {
+        return $this->hasOne(ProductImage::class)
+            ->ofType('lista_ingredientes')
+            ->active()
+            ->ordered();
     }
 
     /**
@@ -84,5 +133,24 @@ class Product extends Model
     public function supportingRecipes(): BelongsToMany
     {
         return $this->recipes()->wherePivot('ingredient_type', 'supporting');
+    }
+
+    /**
+     * The contents that feature this product.
+     */
+    public function contents(): BelongsToMany
+    {
+        return $this->belongsToMany(Content::class)
+            ->withPivot(['featured', 'order', 'notes'])
+            ->withTimestamps()
+            ->orderByPivot('order');
+    }
+
+    /**
+     * Get contents where this product is featured.
+     */
+    public function featuredContents(): BelongsToMany
+    {
+        return $this->contents()->wherePivot('featured', 'sim');
     }
 }

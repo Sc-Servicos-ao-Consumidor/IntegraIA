@@ -22,7 +22,10 @@ class DatabaseSeeder extends Seeder
         ]);
 
         $this->call([
+            GroupProductSeeder::class,
+            ProductSeeder::class,
             RecipeSeeder::class,
+            ContentSeeder::class,
         ]);
     }
 }

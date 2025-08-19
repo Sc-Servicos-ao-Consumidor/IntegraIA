@@ -2,164 +2,220 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use Illuminate\Database\Seeder;
+use App\Models\Product;
 use App\Models\Recipe;
-use Pgvector\Laravel\Vector;
+use Illuminate\Database\Seeder;
 
 class RecipeSeeder extends Seeder
 {
     public function run(): void
     {
+        // Get products for relationships
+        $baseTomateKnorr = Product::where('descricao', 'Base de Tomate Knorr Professional')->first();
+        $caldoCarneKnorr = Product::where('descricao', 'Caldo de Carne Knorr Professional')->first();
+        $meuTemperoKnorr = Product::where('descricao', 'Meu Tempero Knorr Professional')->first();
+        $carneMoida = Product::where('descricao', 'Carne Moída Bovina')->first();
+        $carneDesfiada = Product::where('descricao', 'Carne Bovina Desfiada')->first();
+        $oregano = Product::where('descricao', 'Orégano Desidratado')->first();
+
         $recipes = [
+            // Molho à Bolonhesa com Base de Tomate Knorr
             [
-                'title' => 'Base de Tomate Knorr - Embalagem',
-                'raw_text' => 'EMBALAGEM FRONT KNORR BASE TOMATE DESIDRATADO BAG 6X750G FRONT.jpg',
+                'recipe_code' => 'REC-001',
+                'recipe_name' => 'Molho à Bolonhesa com Base de Tomate Knorr',
+                'title' => 'Molho à Bolonhesa Profissional',
+                'raw_text' => 'Receita completa de molho à bolonhesa utilizando Base de Tomate Knorr Professional para obter consistência e sabor excepcionais.',
+                'cuisine' => 'Italiana',
+                'recipe_type' => 'Molho',
+                'service_order' => 'Acompanhamento',
+                'preparation_time' => 30,
+                'difficulty_level' => 'Médio',
+                'yield' => '50 porções',
+                'channel' => 'Restaurante',
+                'recipe_description' => 'Molho à bolonhesa cremoso e saboroso, preparado com Base de Tomate Knorr Professional, garantindo qualidade e consistência em cada preparo.',
+                'ingredients_description' => 'Base de Tomate Knorr Professional, carne moída bovina, água, Meu Tempero Knorr',
+                'preparation_method' => "1. Refogue a carne moída até dourar\n2. Adicione 6L de água e 1 embalagem de Base de Tomate Knorr (750g)\n3. Adicione 100g de Meu Tempero Knorr\n4. Cozinhe em fogo baixo por 15 minutos mexendo ocasionalmente\n5. Ajuste o tempero se necessário\n6. Sirva quente",
+                'main_ingredients' => ['Base de Tomate Knorr Professional', 'Carne Moída Bovina'],
+                'supporting_ingredients' => ['Meu Tempero Knorr'],
+                'usage_groups' => ['Restaurantes', 'Food Service'],
+                'preparation_techniques' => ['Refogado', 'Cozimento lento'],
+                'consumption_occasion' => ['Almoço', 'Jantar'],
+                'general_images_link' => 'https://example.com/images/molho-bolonhesa.jpg',
+                'product_code' => 'KNR-BT-750',
+                'content_code' => 'CNT-001',
                 'metadata' => [
                     'brand' => 'Knorr Professional',
                     'product' => 'Base de Tomate Knorr',
-                    'type' => 'Embalagem',
-                    'audience' => ['Compradores', 'Gerentes', 'Administradores'],
-                    'usage' => 'É a frente da embalagem, nela contém as informações: feito com 88 tomates, preparo em 1 minuto, rende mais que 2 latas (de 3,1 kg) de molho de tomate pronto para consumo, uma embalagem rende 6,7 kg de molho.',
+                    'type' => 'Receita',
+                    'audience' => ['Cozinheiros', 'Chefs'],
+                    'usage' => 'Receita completa para molho à bolonhesa utilizando produtos Knorr Professional.',
                 ],
-                'tags' => ['embalagem', 'informacao-produto', 'destaque']
+                'tags' => ['molho', 'bolonhesa', 'italiana', 'knorr-professional']
             ],
+
+            // Ragú de Carne com Base de Tomate Knorr
             [
-                'title' => 'Base de Tomate Knorr - Tabela Nutricional',
-                'raw_text' => "Informação Nutricional:  \n\nPorções per embalagem: cerca de 341 \n\nPorção:2,2 g (1/2 colher de chá) - prepara 2 colheres de sopa \n\nValor energético (kcal): 37/ 100 ml**, 7/ 2,2 g, 0/ %VD* \n\nCarboidratos (g): 7,2/ 100 ml**, 1,4/ 2,2 g, 0/ %VD* \n\nAçúcares totais (g): 1,4/ 100 ml**, 0,9/ 2,2 g, 0/ %VD* \n\nAçúcares adicionados (g): 1,9/ 100 ml**, 0,4/ 2,2 g, 1/ %VD* \n\nProteínas (g): 0,9/ 100 ml**, 0,2/ 2,2 g, 0/ %VD* \n\nGorduras totais (g): 0/ 100 ml**, 0/ 2,2 g, 0/ %VD* \n\nGorduras saturadas (g): 0,3/ 100 ml**, 0/ 2,2 g, 0/ %VD* \n\nGorduras trans (g): 0/ 100 ml**, 0/ 2,2 g, 0/ %VD* \n\nFibras alimentares (g): 0,9/ 100 ml**, 0,2 / 2,2 g, 1/ %VD* \n\nSódio (mg): 228/ 100 ml**, 0/ 45 g, 2/ %VD* \n\n*Percentual de valores diários fornecidos pela porção. \n\n**No alimento pronto para consumo.",
+                'recipe_code' => 'REC-002',
+                'recipe_name' => 'Ragú de Carne com Base de Tomate Knorr',
+                'title' => 'Ragú de Carne Profissional',
+                'raw_text' => 'Receita tradicional de ragú de carne desfiada com Base de Tomate Knorr Professional, ideal para massas e risotos.',
+                'cuisine' => 'Italiana',
+                'recipe_type' => 'Molho',
+                'service_order' => 'Acompanhamento',
+                'preparation_time' => 45,
+                'difficulty_level' => 'Médio',
+                'yield' => '45 porções',
+                'channel' => 'Restaurante',
+                'recipe_description' => 'Ragú tradicional com carne bovina desfiada e molho de tomate encorpado, preparado com Base de Tomate Knorr Professional.',
+                'ingredients_description' => 'Base de Tomate Knorr Professional, carne bovina desfiada, água, Caldo de Carne Knorr',
+                'preparation_method' => "1. Aqueça a carne bovina desfiada\n2. Adicione 6L de água e 1 embalagem de Base de Tomate Knorr (750g)\n3. Adicione 160g de Caldo de Carne Knorr\n4. Cozinhe em fogo baixo por 25 minutos\n5. Mexe ocasionalmente até obter consistência cremosa\n6. Ajuste o tempero\n7. Sirva sobre massas ou risotos",
+                'main_ingredients' => ['Base de Tomate Knorr Professional', 'Carne Bovina Desfiada'],
+                'supporting_ingredients' => ['Caldo de Carne Knorr Professional'],
+                'usage_groups' => ['Restaurantes', 'Food Service'],
+                'preparation_techniques' => ['Cozimento lento', 'Redução'],
+                'consumption_occasion' => ['Almoço', 'Jantar'],
+                'general_images_link' => 'https://example.com/images/ragu-carne.jpg',
+                'product_code' => 'KNR-BT-750',
+                'content_code' => 'CNT-002',
                 'metadata' => [
                     'brand' => 'Knorr Professional',
                     'product' => 'Base de Tomate Knorr',
-                    'type' => 'Tabela Nutricional',
-                    'audience' => ['Compradores', 'Gerentes', 'Administradores'],
-                    'usage' => 'Essa informação pode ser utilizada caso perguntem sobre algum nutriente ou informação da tabela nutricional específico.',
+                    'type' => 'Receita',
+                    'audience' => ['Cozinheiros', 'Chefs'],
+                    'usage' => 'Receita de ragú de carne com Base de Tomate Knorr Professional.',
                 ],
-                'tags' => ['nutricao', 'informacao-tecnica', 'especificacoes']
+                'tags' => ['ragu', 'carne-desfiada', 'italiana', 'knorr-professional']
             ],
+
+            // Molho de Pizza com Base de Tomate Knorr
             [
-                'title' => 'Base de Tomate Knorr - Dicas de uso',
-                'raw_text' => "Como substituir outros tipos de atomatados: \n\n1 Embalagem de Base de Tomate de 750g: \n\nTextura de molho: use 6L de água \n\nTextura de passata, molho mais denso: 4,5 L  \n\nTextura de Extrato, mais concentrado: 3,4 L",
+                'recipe_code' => 'REC-003',
+                'recipe_name' => 'Molho de Pizza com Base de Tomate Knorr',
+                'title' => 'Molho de Pizza Profissional',
+                'raw_text' => 'Molho especial para pizza com Base de Tomate Knorr Professional e orégano, ideal para pizzarias.',
+                'cuisine' => 'Italiana',
+                'recipe_type' => 'Molho',
+                'service_order' => 'Base',
+                'preparation_time' => 15,
+                'difficulty_level' => 'Fácil',
+                'yield' => '40 pizzas',
+                'channel' => 'Pizzaria',
+                'recipe_description' => 'Molho de pizza aromático e saboroso, preparado com Base de Tomate Knorr Professional e orégano fresco.',
+                'ingredients_description' => 'Base de Tomate Knorr Professional, água, orégano desidratado',
+                'preparation_method' => "1. Misture 1 embalagem de Base de Tomate Knorr (750g) com 5L de água\n2. Adicione 10g de orégano desidratado\n3. Misture bem até obter consistência homogênea\n4. Deixe repousar por 5 minutos\n5. Está pronto para usar nas pizzas",
+                'main_ingredients' => ['Base de Tomate Knorr Professional'],
+                'supporting_ingredients' => ['Orégano Desidratado'],
+                'usage_groups' => ['Pizzarias', 'Food Service'],
+                'preparation_techniques' => ['Mistura simples'],
+                'consumption_occasion' => ['Almoço', 'Jantar', 'Lanche'],
+                'general_images_link' => 'https://example.com/images/molho-pizza.jpg',
+                'product_code' => 'KNR-BT-750',
+                'content_code' => 'CNT-003',
                 'metadata' => [
                     'brand' => 'Knorr Professional',
                     'product' => 'Base de Tomate Knorr',
-                    'type' => 'Dicas de uso',
-                    'audience' => ['Cozinheiros'],
-                    'usage' => 'Essa informação pode ser útil se o cozinheiro utilizava outro atomatado na receita, como extrato ou passata, aqui temos a indicação de quanto usar de água por embalagem de produto para obter diferentes texturas de molho.',
+                    'type' => 'Receita',
+                    'audience' => ['Pizzaiolos', 'Cozinheiros'],
+                    'usage' => 'Molho especial para pizza com Base de Tomate Knorr Professional.',
                 ],
-                'tags' => ['dicas-preparo', 'substituicao', 'culinaria']
-            ],
-            [
-                'title' => 'Base de Tomate Knorr - Dicas de uso',
-                'raw_text' => "Como substituir outros tipos de atomatados: \n\n1 Embalagem de Base de Tomate de 750g: \n\nTextura de molho: use 6L de água \n\nTextura de passata, molho mais denso: 4,5 L  \n\nTextura de Extrato, mais concentrado: 3,4 L",
-                'metadata' => [    
-                    'brand' => 'Knorr Professional',
-                    'product' => 'Base de Tomate Knorr',
-                    'type' => 'Dicas de uso',
-                    'audience' => ['Compradores', 'Gerentes', 'Administradores'],
-                    'usage' => 'Caso a pessoa esteja interessada em substituir um outro atomatado pela Base de Tomate Knorr essa informação pode ser útil para ela saber quanto precisa comprar.',
-                ],
-                'tags' => ['comparacao', 'compra', 'estoque']
-            ],
-            [
-                'title' => 'Base de Tomate Knorr - Dicas de uso',
-                'raw_text' => "Variação de preparo - molho a bolonhesa: 1 embalagem de Base de Tomate (750g), 6 L de água, 3 kg Carne Moído e 100 g de Meu Tempero Knorr.",
-                'metadata' => [
-                    'brand' => 'Knorr Professional',
-                    'product' => 'Base de Tomate Knorr',
-                    'type' => 'Dicas de uso',
-                    'audience' => ['Cozinheiros'],
-                    'usage' => 'Proporções para fazer um molho a bolonhesa',
-                ],
-                'tags' => ['receita', 'bolonhesa', 'culinaria']
-            ],
-            [
-                'title' => 'Base de Tomate Knorr - Dicas de uso',
-                'raw_text' => "Variação de preparo- ragu: 1 embalagem de Base de Tomate (750g), 6 L de água, 3 kg Carne Bovina Desfiada e 160 g de Caldo de Carne  Knorr",
-                'metadata' => [
-                    'brand' => 'Knorr Professional',
-                    'product' => 'Base de Tomate Knorr',
-                    'type' => 'Dicas de uso',
-                    'audience' => ['Cozinheiros'],
-                    'usage' => 'Proporções para fazer ragu',
-                ],
-                'tags' => ['receita', 'ragu', 'culinaria']
-            ],
-            [
-                'title' => 'Base de Tomate Knorr - Dicas de uso',
-                'raw_text' => "Variação - molho de pizza: 1 embalagem de Base de Tomate (750g), 5 L de água e 10 g de orégano.",
-                'metadata' => [
-                    'brand' => 'Knorr Professional',
-                    'product' => 'Base de Tomate Knorr',
-                    'type' => 'Dicas de uso',
-                    'audience' => ['Cozinheiros'],
-                    'usage' => 'Proporções para molho de pizza',
-                ],
-                'tags' => ['receita', 'pizza', 'culinaria']
-            ],
-            [
-                'title' => 'Base de Tomate Knorr - Ingredientes',
-                'raw_text' => "Ingredientes: tomate desidratado, farinha de ervilha, açúcar, sal, gordura vegetal, alho, cebola, acidulante ácido cítrico e antiumectante dióxido de silício, Contém glúten. Alérgicos: contén derivados de soja. Pode conter aveia, centeio, cevada, crustáceos (camarão), triticale, leite, moluscos, peixes e trigo.",
-                'metadata' => [
-                    'brand' => 'Knorr Professional',
-                    'product' => 'Base de Tomate Knorr',
-                    'type' => 'Ingredientes',
-                    'audience' => ['Compradores', 'Gerentes', 'Administradores'],
-                    'usage' => 'Ingredientes escritos em texto, pode ser útil se perguntarem sobre algum item específico.',
-                ],
-                'tags' => ['composicao', 'alergicos', 'informacao-produto']
-            ],
-            [
-                'title' => 'Base de Tomate Knorr - Argumento de venda',
-                'raw_text' => "Nossas embalagens ficam no estoque seco, ocupando menos espaço que as latas tradicionais. E na hora do preparo, dão um show: 750 g fazem 6,7 kg de molho! 1 pacote de Base de Tomate rende mais que duas latas de 3,1 Kg.",
-                'metadata' => [
-                    'brand' => 'Knorr Professional',
-                    'product' => 'Base de Tomate Knorr',
-                    'type' => 'Argumento de venda',
-                    'audience' => ['Compradores', 'Gerentes', 'Administradores'],
-                    'usage' => 'Vantagem de ocupar menos espaço e sobre o rendimento do produto',
-                ],
-                'tags' => ['vantagens', 'estoque', 'rendimento']
-            ],
-            [
-                'title' => 'Base de Tomate Knorr - Argumento de venda',
-                'raw_text' => "Molho pronto em 1 minuto, trazendo mais economia para você: \n\nNo tempo de preparo:,  \n\nNo gás,  \n\nNa área de estoque",
-                'metadata' => [
-                    'brand' => 'Knorr Professional',
-                    'product' => 'Base de Tomate Knorr',
-                    'type' => 'Argumento de venda',
-                    'audience' => ['Compradores', 'Gerentes', 'Administradores'],
-                    'usage' => 'Resposta para caso perguntem sobre o que é possível economizar usando o produto.',
-                ],
-                'tags' => ['economia', 'praticidade', 'beneficios']
-            ],
-            [
-                'title' => 'Base de Tomate Knorr - Argumento de venda',
-                'raw_text' => "Dê adeus para a oscilação na qualidade: controle a acidez , a cor e a textura do molho com a Base de Tomate Desidratado Knorr Professional",
-                'metadata' => [  
-                    'brand' => 'Knorr Professional',
-                    'product' => 'Base de Tomate Knorr',
-                    'type' => 'Argumento de venda',
-                    'audience' => ['Compradores', 'Gerentes', 'Administradores'],
-                    'usage' => 'argumento sobre manter padrão.',
-                ],
-                'tags' => ['qualidade', 'consistencia', 'padronizacao']
-            ],
-            [
-                'title' => 'Base de Tomate Knorr - Argumento de venda',
-                'raw_text' => "VÍDEO GERAL _base de tomate.mp4",
-                'metadata' => [
-                    'brand' => 'Knorr Professional',
-                    'product' => 'Base de Tomate Knorr',
-                    'type' => 'Argumento de venda',
-                    'audience' => ['Compradores', 'Gerentes', 'Administradores'],
-                    'usage' => 'Caso queiram conhecer o produto, de forma geral, este vídeo pode ser enviado, fala que é feita com 88 tomates, que tem 100% de aproveitamento, 0 desperdício, pronto em 1 minuto, mostra o preparo',
-                ],
-                'tags' => ['video', 'apresentacao', 'destaque']
+                'tags' => ['molho-pizza', 'pizzaria', 'oregano', 'knorr-professional']
             ]
         ];
 
         foreach ($recipes as $data) {
-            Recipe::create($data);
+            $recipe = Recipe::create($data);
+
+            // Add product relationships based on recipe
+            switch ($recipe->recipe_code) {
+                case 'REC-001': // Molho à Bolonhesa
+                    if ($baseTomateKnorr) {
+                        $recipe->products()->attach($baseTomateKnorr->id, [
+                            'quantity' => 750,
+                            'unit' => 'g',
+                            'ingredient_type' => 'main',
+                            'preparation_notes' => 'Misturar com 6L de água',
+                            'optional' => false,
+                            'order' => 1
+                        ]);
+                    }
+                    if ($carneMoida) {
+                        $recipe->products()->attach($carneMoida->id, [
+                            'quantity' => 3000,
+                            'unit' => 'g',
+                            'ingredient_type' => 'main',
+                            'preparation_notes' => 'Refogar até dourar',
+                            'optional' => false,
+                            'order' => 2
+                        ]);
+                    }
+                    if ($meuTemperoKnorr) {
+                        $recipe->products()->attach($meuTemperoKnorr->id, [
+                            'quantity' => 100,
+                            'unit' => 'g',
+                            'ingredient_type' => 'supporting',
+                            'preparation_notes' => 'Adicionar no final do preparo',
+                            'optional' => false,
+                            'order' => 3
+                        ]);
+                    }
+                    break;
+
+                case 'REC-002': // Ragú de Carne
+                    if ($baseTomateKnorr) {
+                        $recipe->products()->attach($baseTomateKnorr->id, [
+                            'quantity' => 750,
+                            'unit' => 'g',
+                            'ingredient_type' => 'main',
+                            'preparation_notes' => 'Misturar com 6L de água',
+                            'optional' => false,
+                            'order' => 1
+                        ]);
+                    }
+                    if ($carneDesfiada) {
+                        $recipe->products()->attach($carneDesfiada->id, [
+                            'quantity' => 3000,
+                            'unit' => 'g',
+                            'ingredient_type' => 'main',
+                            'preparation_notes' => 'Carne já cozida e desfiada',
+                            'optional' => false,
+                            'order' => 2
+                        ]);
+                    }
+                    if ($caldoCarneKnorr) {
+                        $recipe->products()->attach($caldoCarneKnorr->id, [
+                            'quantity' => 160,
+                            'unit' => 'g',
+                            'ingredient_type' => 'supporting',
+                            'preparation_notes' => 'Realça o sabor da carne',
+                            'optional' => false,
+                            'order' => 3
+                        ]);
+                    }
+                    break;
+
+                case 'REC-003': // Molho de Pizza
+                    if ($baseTomateKnorr) {
+                        $recipe->products()->attach($baseTomateKnorr->id, [
+                            'quantity' => 750,
+                            'unit' => 'g',
+                            'ingredient_type' => 'main',
+                            'preparation_notes' => 'Misturar com 5L de água',
+                            'optional' => false,
+                            'order' => 1
+                        ]);
+                    }
+                    if ($oregano) {
+                        $recipe->products()->attach($oregano->id, [
+                            'quantity' => 10,
+                            'unit' => 'g',
+                            'ingredient_type' => 'supporting',
+                            'preparation_notes' => 'Adicionar para aromatizar',
+                            'optional' => false,
+                            'order' => 2
+                        ]);
+                    }
+                    break;
+            }
         }
     }
 }

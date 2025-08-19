@@ -1,722 +1,312 @@
 <template>
-    <Head title="Receitas" />
+    <Head title="Cadastros de Receitas" />
 
     <AppLayout :breadcrumbs="breadcrumbs">
-        <div class="max-w-2xl mx-auto p-6 rounded-lg shadow">
-        <h1 class="text-2xl font-bold mb-6 text-white-800">{{ header }}</h1>
-        <!-- Semantic Search -->
-        <div class="mb-10">
-            <h2 class="text-xl font-bold mb-4">🔍 Busca Semântica</h2>
-            
-            <div class="flex gap-2 mb-4">
-                <input
-                v-model="query"
-                @keyup.enter="search"
-                type="text"
-                placeholder="ex: massa cremosa vegana"
-                class="flex-1 px-4 py-2 border rounded border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                />
-                <button @click="search" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded-lg disabled:opacity-50">
-                    Buscar
-                </button>
-            </div>
-            
-            <div v-if="loading">Buscando...</div>
-            
-            <div v-if="assistantResponse" class="mt-10 rounded">
-                <h2 class="text-xl font-bold mb-2">Sugestão do Assistente</h2>
-                <p class="w-full border border-gray-500 text-white-700 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400">
-                    {{ assistantResponse || JSON.stringify(assistantResponse, null, 2) }}
-                </p>
+        <div class="max-w-7xl mx-auto">
+            <div class="mb-6">
+                <h1 class="text-2xl font-bold text-gray-900">Cadastros de Receitas</h1>
             </div>
 
-            <div v-if="results.length" class="mt-10">
-                <h2 class="text-xl font-bold mb-4">Resultados da Busca</h2>
+            <!-- Semantic Search Section -->
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">🔍 Busca Semântica</h2>
                 
-                <ul class="space-y-4">
-                    <li
-                    v-for="recipe in results"
-                    :key="recipe.id"
-                    class="border rounded p-4 shadow"
+                <div class="flex gap-3 mb-4">
+                    <input
+                        v-model="query"
+                        @keyup.enter="search"
+                        type="text"
+                        placeholder="ex: massa cremosa vegana"
+                        class="flex-1 border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                    />
+                    <button 
+                        @click="search" 
+                        class="bg-orange-600 hover:bg-orange-700 text-white font-medium px-6 py-2 rounded-md text-sm transition-colors"
                     >
-                    <h3 class="text-lg font-semibold">{{ recipe.title || 'Sem título' }}</h3>
-                    <p class="text-sm text-gray-500 italic mt-1">
-                        Tags: 
-                        <span v-if="recipe.tags?.length">{{ recipe.tags.join(', ') }}</span>
-                        <span v-else class="text-gray-400">Nenhuma</span>
-                    </p>
-                    
-                    <p class="text-sm text-white-600 line-clamp-2">
-                        {{ recipe.raw_text.slice(0, 150) }}...
-                    </p>
-                    
-                    
-                </li>
-            </ul>
-        </div>
+                        Buscar
+                    </button>
+                </div>
+                
+                <div v-if="loading" class="text-gray-600">Buscando...</div>
+                
+                <div v-if="assistantResponse" class="mt-6">
+                    <h3 class="font-medium text-gray-900 mb-2">Sugestão do Assistente</h3>
+                    <div class="bg-gray-50 border border-gray-200 rounded-md p-3 text-sm text-gray-700">
+                        {{ assistantResponse }}
+                    </div>
+                </div>
 
-        <div v-else-if="!loading && hasSearched" class="text-gray-600 italic mt-10">
-            Nenhuma receita encontrada.
-        </div>
+                <div v-if="results.length" class="mt-6">
+                    <h3 class="font-medium text-gray-900 mb-3">Resultados da Busca</h3>
+                    <div class="space-y-3">
+                        <div
+                            v-for="recipe in results"
+                            :key="recipe.id"
+                            class="border border-gray-200 rounded-md p-4 bg-gray-50"
+                        >
+                            <h4 class="font-medium text-gray-900">{{ recipe.title || 'Sem título' }}</h4>
+                            <p class="text-xs text-gray-500 mt-1">
+                                Tags: 
+                                <span v-if="recipe.tags?.length">{{ recipe.tags.join(', ') }}</span>
+                                <span v-else>Nenhuma</span>
+                            </p>
+                            <p class="text-sm text-gray-600 mt-2 line-clamp-2">
+                                {{ recipe.raw_text.slice(0, 150) }}...
+                            </p>
+                        </div>
+                    </div>
+                </div>
 
-    </div>
+                <div v-else-if="!loading && hasSearched" class="text-gray-500 text-sm mt-6">
+                    Nenhuma receita encontrada.
+                </div>
+            </div>
     
-    <form @submit.prevent="submit" class="space-y-8">
-        <!-- Basic Information Section -->
-        <div class="bg-gray-50 rounded-lg p-6">
-            <h3 class="text-lg font-semibold text-gray-800 mb-4">📝 Informações Básicas</h3>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <!-- Recipe Code -->
-                <div>
-                    <label for="recipe_code" class="block text-sm font-medium text-gray-700 mb-1">Código da Receita</label>
-                    <input
-                        v-model="form.recipe_code"
-                        id="recipe_code"
-                        type="text"
-                        placeholder="ex: REC001"
-                        class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                    />
-                    <p v-if="form.errors.recipe_code" class="text-red-500 text-sm mt-1">{{ form.errors.recipe_code }}</p>
-                </div>
-
-                <!-- Recipe Name -->
-                <div>
-                    <label for="recipe_name" class="block text-sm font-medium text-gray-700 mb-1">Nome da Receita</label>
-                    <input
-                        v-model="form.recipe_name"
-                        id="recipe_name"
-                        type="text"
-                        placeholder="ex: Risotto Cremoso de Cogumelos"
-                        class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                    />
-                    <p v-if="form.errors.recipe_name" class="text-red-500 text-sm mt-1">{{ form.errors.recipe_name }}</p>
-                </div>
-
-                <!-- Title (Legacy) -->
-                <div>
-                    <label for="title" class="block text-sm font-medium text-gray-700 mb-1">Título (Legado)</label>
-                    <input
-                        v-model="form.title"
-                        id="title"
-                        type="text"
-                        placeholder="Título da sua receita"
-                        class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                    />
-                    <p v-if="form.errors.title" class="text-red-500 text-sm mt-1">{{ form.errors.title }}</p>
-                </div>
-
-                <!-- Metadata -->
-                <div class="md:col-span-2">
-                    <label for="metadata" class="block text-sm font-medium text-gray-700 mb-1">Metadados (JSON)</label>
-                    <textarea
-                        v-model="metadataString"
-                        @input="updateMetadata"
-                        id="metadata"
-                        rows="2"
-                        placeholder='{"chave": "valor", "nutricao": {...}}'
-                        class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 font-mono text-sm"
-                    ></textarea>
-                    <p v-if="form.errors.metadata" class="text-red-500 text-sm mt-1">{{ form.errors.metadata }}</p>
-                    <p class="text-gray-500 text-xs mt-1">Metadados JSON opcionais para informações adicionais da receita</p>
-                </div>
-
-                <!-- Cuisine -->
-                <div>
-                    <label for="cuisine" class="block text-sm font-medium text-gray-700 mb-1">Culinária</label>
-                    <input
-                        v-model="form.cuisine"
-                        id="cuisine"
-                        type="text"
-                        placeholder="ex: Italiana, Mexicana, Asiática"
-                        class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                    />
-                    <p v-if="form.errors.cuisine" class="text-red-500 text-sm mt-1">{{ form.errors.cuisine }}</p>
-                </div>
-
-                <!-- Recipe Type -->
-                <div>
-                    <label for="recipe_type" class="block text-sm font-medium text-gray-700 mb-1">Tipo de Receita</label>
-                    <select
-                        v-model="form.recipe_type"
-                        id="recipe_type"
-                        class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                    >
-                        <option value="">Selecione o tipo</option>
-                        <option value="appetizer">Aperitivo</option>
-                        <option value="main_course">Prato Principal</option>
-                        <option value="dessert">Sobremesa</option>
-                        <option value="beverage">Bebida</option>
-                        <option value="side_dish">Acompanhamento</option>
-                        <option value="salad">Salada</option>
-                        <option value="soup">Sopa</option>
-                        <option value="snack">Lanche</option>
-                    </select>
-                    <p v-if="form.errors.recipe_type" class="text-red-500 text-sm mt-1">{{ form.errors.recipe_type }}</p>
-                </div>
-
-                <!-- Channel -->
-                <div>
-                    <label for="channel" class="block text-sm font-medium text-gray-700 mb-1">Canal</label>
-                    <input
-                        v-model="form.channel"
-                        id="channel"
-                        type="text"
-                        placeholder="ex: YouTube, Site, Blog"
-                        class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                    />
-                    <p v-if="form.errors.channel" class="text-red-500 text-sm mt-1">{{ form.errors.channel }}</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Recipe Details Section -->
-        <div class="bg-gray-50 rounded-lg p-6">
-            <h3 class="text-lg font-semibold text-gray-800 mb-4">⏱️ Detalhes da Receita</h3>
-            
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <!-- Preparation Time -->
-                <div>
-                    <label for="preparation_time" class="block text-sm font-medium text-gray-700 mb-1">Tempo de Preparo (minutos)</label>
-                    <input
-                        v-model.number="form.preparation_time"
-                        id="preparation_time"
-                        type="number"
-                        min="1"
-                        placeholder="ex: 30"
-                        class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                    />
-                    <p v-if="form.errors.preparation_time" class="text-red-500 text-sm mt-1">{{ form.errors.preparation_time }}</p>
-                </div>
-
-                <!-- Difficulty Level -->
-                <div>
-                    <label for="difficulty_level" class="block text-sm font-medium text-gray-700 mb-1">Nível de Dificuldade</label>
-                    <select
-                        v-model="form.difficulty_level"
-                        id="difficulty_level"
-                        class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                    >
-                        <option value="">Selecione a dificuldade</option>
-                        <option value="easy">Fácil</option>
-                        <option value="medium">Médio</option>
-                        <option value="hard">Difícil</option>
-                        <option value="expert">Especialista</option>
-                    </select>
-                    <p v-if="form.errors.difficulty_level" class="text-red-500 text-sm mt-1">{{ form.errors.difficulty_level }}</p>
-                </div>
-
-                <!-- Yield/Servings -->
-                <div>
-                    <label for="yield" class="block text-sm font-medium text-gray-700 mb-1">Rendimento/Porções</label>
-                    <input
-                        v-model="form.yield"
-                        id="yield"
-                        type="text"
-                        placeholder="ex: 4 porções"
-                        class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                    />
-                    <p v-if="form.errors.yield" class="text-red-500 text-sm mt-1">{{ form.errors.yield }}</p>
-                </div>
-            </div>
-
-            <div class="mt-4">
-                <!-- Service Order -->
-                <div>
-                    <label for="service_order" class="block text-sm font-medium text-gray-700 mb-1">Ordem de Serviço</label>
-                    <input
-                        v-model="form.service_order"
-                        id="service_order"
-                        type="text"
-                        placeholder="ex: Primeiro prato, Prato principal"
-                        class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                    />
-                    <p v-if="form.errors.service_order" class="text-red-500 text-sm mt-1">{{ form.errors.service_order }}</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Content Section -->
-        <div class="bg-gray-50 rounded-lg p-6">
-            <h3 class="text-lg font-semibold text-gray-800 mb-4">📖 Conteúdo</h3>
-            
-            <!-- Recipe Description -->
-            <div class="mb-4">
-                <label for="recipe_description" class="block text-sm font-medium text-gray-700 mb-1">Descrição da Receita</label>
-                <textarea
-                    v-model="form.recipe_description"
-                    id="recipe_description"
-                    rows="3"
-                    placeholder="Breve descrição da receita..."
-                    class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                ></textarea>
-                <p v-if="form.errors.recipe_description" class="text-red-500 text-sm mt-1">{{ form.errors.recipe_description }}</p>
-            </div>
-
-            <!-- Ingredients Description -->
-            <div class="mb-4">
-                <label for="ingredients_description" class="block text-sm font-medium text-gray-700 mb-1">Descrição dos Ingredientes</label>
-                <textarea
-                    v-model="form.ingredients_description"
-                    id="ingredients_description"
-                    rows="3"
-                    placeholder="Descrição dos ingredientes utilizados..."
-                    class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                ></textarea>
-                <p v-if="form.errors.ingredients_description" class="text-red-500 text-sm mt-1">{{ form.errors.ingredients_description }}</p>
-            </div>
-
-            <!-- Preparation Method -->
-            <div class="mb-4">
-                <label for="preparation_method" class="block text-sm font-medium text-gray-700 mb-1">Método de Preparo</label>
-                <textarea
-                    v-model="form.preparation_method"
-                    id="preparation_method"
-                    rows="6"
-                    placeholder="Instruções passo a passo do preparo..."
-                    class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                ></textarea>
-                <p v-if="form.errors.preparation_method" class="text-red-500 text-sm mt-1">{{ form.errors.preparation_method }}</p>
-            </div>
-
-            <!-- Raw Text (Legacy) -->
-            <div>
-                <label for="raw_text" class="block text-sm font-medium text-gray-700 mb-1">Texto da Receita (Legado)</label>
-                <textarea
-                    v-model="form.raw_text"
-                    id="raw_text"
-                    rows="4"
-                    placeholder="Cole o texto completo da receita aqui..."
-                    class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                ></textarea>
-                <p v-if="form.errors.raw_text" class="text-red-500 text-sm mt-1">{{ form.errors.raw_text }}</p>
-            </div>
-        </div>
-
-        <!-- Ingredients Section -->
-        <div class="bg-gray-50 rounded-lg p-6">
-            <h3 class="text-lg font-semibold text-gray-800 mb-4">🥘 Ingredientes</h3>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <!-- Main Ingredients -->
-                <div>
-                    <label for="main_ingredients_input" class="block text-sm font-medium text-gray-700 mb-1">Ingredientes Principais</label>
-                    <div class="flex flex-wrap gap-2 mb-2">
-                        <span
-                            v-for="(ingredient, index) in form.main_ingredients"
-                            :key="index"
-                            class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm flex items-center"
-                        >
-                            {{ ingredient }}
-                            <button
-                                type="button"
-                                @click="removeMainIngredient(index)"
-                                class="ml-2 text-green-600 hover:text-red-600 focus:outline-none"
-                            >
-                                &times;
-                            </button>
-                        </span>
-                    </div>
-                    <input
-                        v-model="newMainIngredient"
-                        @keydown.enter.prevent="addMainIngredient"
-                        id="main_ingredients_input"
-                        type="text"
-                        placeholder="Adicione ingrediente principal e pressione Enter"
-                        class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                    />
-                    <p v-if="form.errors.main_ingredients" class="text-red-500 text-sm mt-1">{{ form.errors.main_ingredients }}</p>
-                </div>
-
-                <!-- Supporting Ingredients -->
-                <div>
-                    <label for="supporting_ingredients_input" class="block text-sm font-medium text-gray-700 mb-1">Ingredientes de Apoio</label>
-                    <div class="flex flex-wrap gap-2 mb-2">
-                        <span
-                            v-for="(ingredient, index) in form.supporting_ingredients"
-                            :key="index"
-                            class="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm flex items-center"
-                        >
-                            {{ ingredient }}
-                            <button
-                                type="button"
-                                @click="removeSupportingIngredient(index)"
-                                class="ml-2 text-yellow-600 hover:text-red-600 focus:outline-none"
-                            >
-                                &times;
-                            </button>
-                        </span>
-                    </div>
-                    <input
-                        v-model="newSupportingIngredient"
-                        @keydown.enter.prevent="addSupportingIngredient"
-                        id="supporting_ingredients_input"
-                        type="text"
-                        placeholder="Adicione ingrediente de apoio e pressione Enter"
-                        class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                    />
-                    <p v-if="form.errors.supporting_ingredients" class="text-red-500 text-sm mt-1">{{ form.errors.supporting_ingredients }}</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Categories Section -->
-        <div class="bg-gray-50 rounded-lg p-6">
-            <h3 class="text-lg font-semibold text-gray-800 mb-4">🏷️ Categorias e Classificações</h3>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <!-- Usage Groups -->
-                <div>
-                    <label for="usage_groups_input" class="block text-sm font-medium text-gray-700 mb-1">Grupos de Uso</label>
-                    <div class="flex flex-wrap gap-2 mb-2">
-                        <span
-                            v-for="(group, index) in form.usage_groups"
-                            :key="index"
-                            class="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm flex items-center"
-                        >
-                            {{ group }}
-                            <button
-                                type="button"
-                                @click="removeUsageGroup(index)"
-                                class="ml-2 text-purple-600 hover:text-red-600 focus:outline-none"
-                            >
-                                &times;
-                            </button>
-                        </span>
-                    </div>
-                    <input
-                        v-model="newUsageGroup"
-                        @keydown.enter.prevent="addUsageGroup"
-                        id="usage_groups_input"
-                        type="text"
-                        placeholder="Adicione grupo de uso e pressione Enter"
-                        class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                    />
-                    <p v-if="form.errors.usage_groups" class="text-red-500 text-sm mt-1">{{ form.errors.usage_groups }}</p>
-                </div>
-
-                <!-- Preparation Techniques -->
-                <div>
-                    <label for="preparation_techniques_input" class="block text-sm font-medium text-gray-700 mb-1">Técnicas de Preparo</label>
-                    <div class="flex flex-wrap gap-2 mb-2">
-                        <span
-                            v-for="(technique, index) in form.preparation_techniques"
-                            :key="index"
-                            class="bg-orange-100 text-orange-800 px-3 py-1 rounded-full text-sm flex items-center"
-                        >
-                            {{ technique }}
-                            <button
-                                type="button"
-                                @click="removePreparationTechnique(index)"
-                                class="ml-2 text-orange-600 hover:text-red-600 focus:outline-none"
-                            >
-                                &times;
-                            </button>
-                        </span>
-                    </div>
-                    <input
-                        v-model="newPreparationTechnique"
-                        @keydown.enter.prevent="addPreparationTechnique"
-                        id="preparation_techniques_input"
-                        type="text"
-                        placeholder="Adicione técnica e pressione Enter"
-                        class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                    />
-                    <p v-if="form.errors.preparation_techniques" class="text-red-500 text-sm mt-1">{{ form.errors.preparation_techniques }}</p>
-                </div>
-
-                <!-- Consumption Occasion -->
-                <div>
-                    <label for="consumption_occasion_input" class="block text-sm font-medium text-gray-700 mb-1">Ocasião de Consumo</label>
-                    <div class="flex flex-wrap gap-2 mb-2">
-                        <span
-                            v-for="(occasion, index) in form.consumption_occasion"
-                            :key="index"
-                            class="bg-pink-100 text-pink-800 px-3 py-1 rounded-full text-sm flex items-center"
-                        >
-                            {{ occasion }}
-                            <button
-                                type="button"
-                                @click="removeConsumptionOccasion(index)"
-                                class="ml-2 text-pink-600 hover:text-red-600 focus:outline-none"
-                            >
-                                &times;
-                            </button>
-                        </span>
-                    </div>
-                    <input
-                        v-model="newConsumptionOccasion"
-                        @keydown.enter.prevent="addConsumptionOccasion"
-                        id="consumption_occasion_input"
-                        type="text"
-                        placeholder="Adicione ocasião e pressione Enter"
-                        class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                    />
-                    <p v-if="form.errors.consumption_occasion" class="text-red-500 text-sm mt-1">{{ form.errors.consumption_occasion }}</p>
-                </div>
-
-                <!-- Tags (Legacy) -->
-                <div>
-                    <label for="tags" class="block text-sm font-medium text-gray-700 mb-1">Tags (Legado)</label>
-                    <div class="flex flex-wrap gap-2 mb-2">
-                        <span
-                            v-for="(tag, index) in form.tags"
-                            :key="index"
-                            class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm flex items-center"
-                        >
-                            {{ tag }}
-                            <button
-                                type="button"
-                                @click="removeTag(index)"
-                                class="ml-2 text-blue-600 hover:text-red-600 focus:outline-none"
-                            >
-                                &times;
-                            </button>
-                        </span>
-                    </div>
-                    <input
-                        v-model="newTag"
-                        @keydown.enter.prevent="addTag"
-                        id="tags"
-                        type="text"
-                        placeholder="Digite uma tag e pressione Enter"
-                        class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                    />
-                    <p v-if="form.errors.tags" class="text-red-500 text-sm mt-1">{{ form.errors.tags }}</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Products Section -->
-        <div class="bg-gray-50 rounded-lg p-6">
-            <h3 class="text-lg font-semibold text-gray-800 mb-4">🛒 Produtos Associados</h3>
-            
-            <!-- Add Product Button -->
-            <div class="mb-4">
-                <button
-                    type="button"
-                    @click="addNewProduct"
-                    class="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                >
-                    <Plus class="h-4 w-4" />
-                    Adicionar Produto
-                </button>
-            </div>
-
-            <!-- Selected Products List -->
-            <div v-if="form.selected_products.length > 0" class="space-y-3">
-                <div
-                    v-for="(selectedProduct, index) in form.selected_products"
-                    :key="index"
-                    class="border border-gray-200 rounded-lg p-4 bg-white"
-                >
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
-                        <!-- Product Selection -->
+            <!-- Recipe Form -->
+            <form @submit.prevent="submit" class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Left Column -->
+                    <div class="space-y-4">
+                        <!-- Nome da Receita -->
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Produto</label>
-                            <select
-                                v-model="selectedProduct.product_id"
-                                class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                            >
-                                <option value="">Selecione um produto</option>
-                                <option
-                                    v-for="product in props.products"
-                                    :key="product.id"
-                                    :value="product.id"
-                                >
-                                    {{ product.descricao }}
-                                </option>
-                            </select>
-                        </div>
-
-                        <!-- Quantity -->
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Quantidade</label>
+                            <label for="recipe_name" class="block text-sm font-medium text-gray-700 mb-1">Nome da Receita</label>
                             <input
-                                v-model.number="selectedProduct.quantity"
-                                type="number"
-                                step="0.001"
-                                min="0"
-                                placeholder="0"
-                                class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                                v-model="form.recipe_name"
+                                id="recipe_name"
+                                type="text"
+                                class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                             />
+                            <p v-if="form.errors.recipe_name" class="text-red-500 text-xs mt-1">{{ form.errors.recipe_name }}</p>
                         </div>
 
-                        <!-- Unit -->
+                        <!-- Culinária -->
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Unidade</label>
+                            <label for="cuisine" class="block text-sm font-medium text-gray-700 mb-1">Culinária</label>
                             <select
-                                v-model="selectedProduct.unit"
-                                class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                                v-model="form.cuisine"
+                                id="cuisine"
+                                class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                             >
                                 <option value="">Selecione</option>
-                                <option value="g">Gramas (g)</option>
-                                <option value="kg">Quilogramas (kg)</option>
-                                <option value="ml">Mililitros (ml)</option>
-                                <option value="l">Litros (l)</option>
-                                <option value="unidade">Unidade</option>
-                                <option value="xícara">Xícara</option>
-                                <option value="colher de sopa">Colher de sopa</option>
-                                <option value="colher de chá">Colher de chá</option>
-                                <option value="pitada">Pitada</option>
-                                <option value="a gosto">A gosto</option>
+                                <option value="italiana">Italiana</option>
+                                <option value="mexicana">Mexicana</option>
+                                <option value="asiatica">Asiática</option>
+                                <option value="brasileira">Brasileira</option>
+                                <option value="francesa">Francesa</option>
                             </select>
+                            <p v-if="form.errors.cuisine" class="text-red-500 text-xs mt-1">{{ form.errors.cuisine }}</p>
                         </div>
 
-                        <!-- Type -->
+                        <!-- Prompt da Receita -->
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Tipo</label>
-                            <select
-                                v-model="selectedProduct.ingredient_type"
-                                class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                            >
-                                <option value="main">Ingrediente Principal</option>
-                                <option value="supporting">Ingrediente de Apoio</option>
-                            </select>
+                            <label for="recipe_description" class="block text-sm font-medium text-gray-700 mb-1">Prompt da Receita</label>
+                            <textarea
+                                v-model="form.recipe_description"
+                                id="recipe_description"
+                                rows="4"
+                                class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-none"
+                            ></textarea>
+                            <p v-if="form.errors.recipe_description" class="text-red-500 text-xs mt-1">{{ form.errors.recipe_description }}</p>
+                        </div>
+
+                        <!-- Descrição dos Ingredientes -->
+                        <div>
+                            <label for="ingredients_description" class="block text-sm font-medium text-gray-700 mb-1">Descrição dos Ingredientes</label>
+                            <textarea
+                                v-model="form.ingredients_description"
+                                id="ingredients_description"
+                                rows="8"
+                                class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-none"
+                            ></textarea>
+                            <p v-if="form.errors.ingredients_description" class="text-red-500 text-xs mt-1">{{ form.errors.ingredients_description }}</p>
                         </div>
                     </div>
 
-                    <!-- Additional Options -->
-                    <div class="mt-3 grid grid-cols-1 md:grid-cols-2 gap-3">
-                        <!-- Preparation Notes -->
+                    <!-- Right Column -->
+                    <div class="space-y-4">
+                        <!-- Tipo de Receita -->
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Notas de Preparo</label>
-                            <input
-                                v-model="selectedProduct.preparation_notes"
-                                type="text"
-                                placeholder="ex: picado fino, refogado..."
-                                class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                            />
+                            <label for="recipe_type" class="block text-sm font-medium text-gray-700 mb-1">Tipo de Receita</label>
+                            <select
+                                v-model="form.recipe_type"
+                                id="recipe_type"
+                                class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                            >
+                                <option value="">Doce ou Salgada</option>
+                                <option value="doce">Doce</option>
+                                <option value="salgada">Salgada</option>
+                            </select>
+                            <p v-if="form.errors.recipe_type" class="text-red-500 text-xs mt-1">{{ form.errors.recipe_type }}</p>
                         </div>
 
-                        <!-- Optional checkbox and Remove button -->
-                        <div class="flex items-center justify-between">
-                            <label class="flex items-center gap-2">
-                                <input
-                                    v-model="selectedProduct.optional"
-                                    type="checkbox"
-                                    class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                                />
-                                <span class="text-sm text-gray-700">Ingrediente opcional</span>
-                            </label>
-                            
-                            <button
-                                type="button"
-                                @click="removeProduct(index)"
-                                class="flex items-center gap-1 px-3 py-1 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                        <!-- Ordem de Serviço -->
+                        <div>
+                            <label for="service_order" class="block text-sm font-medium text-gray-700 mb-1">Ordem de Serviço</label>
+                            <select
+                                v-model="form.service_order"
+                                id="service_order"
+                                class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                             >
-                                <X class="h-4 w-4" />
-                                Remover
+                                <option value="">Selecione</option>
+                                <option value="entrada">Entrada</option>
+                                <option value="prato_principal">Prato Principal</option>
+                                <option value="sobremesa">Sobremesa</option>
+                                <option value="bebida">Bebida</option>
+                                <option value="acompanhamento">Acompanhamento</option>
+                            </select>
+                            <p v-if="form.errors.service_order" class="text-red-500 text-xs mt-1">{{ form.errors.service_order }}</p>
+                        </div>
+
+                        <!-- Tempo de Preparo -->
+                        <div>
+                            <label for="preparation_time" class="block text-sm font-medium text-gray-700 mb-1">Tempo de Preparo</label>
+                            <select
+                                v-model="form.preparation_time"
+                                id="preparation_time"
+                                class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                            >
+                                <option value="">Selecione</option>
+                                <option value="15">15 minutos</option>
+                                <option value="30">30 minutos</option>
+                                <option value="45">45 minutos</option>
+                                <option value="60">1 hora</option>
+                                <option value="90">1h 30min</option>
+                                <option value="120">2 horas</option>
+                                <option value="180">3 horas</option>
+                            </select>
+                            <p v-if="form.errors.preparation_time" class="text-red-500 text-xs mt-1">{{ form.errors.preparation_time }}</p>
+                        </div>
+
+                        <!-- Grau de Dificuldade -->
+                        <div>
+                            <label for="difficulty_level" class="block text-sm font-medium text-gray-700 mb-1">Grau de Dificuldade</label>
+                            <select
+                                v-model="form.difficulty_level"
+                                id="difficulty_level"
+                                class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                            >
+                                <option value="">Selecione</option>
+                                <option value="facil">Fácil</option>
+                                <option value="medio">Médio</option>
+                                <option value="dificil">Difícil</option>
+                            </select>
+                            <p v-if="form.errors.difficulty_level" class="text-red-500 text-xs mt-1">{{ form.errors.difficulty_level }}</p>
+                        </div>
+
+                        <!-- Rendimento -->
+                        <div>
+                            <label for="yield" class="block text-sm font-medium text-gray-700 mb-1">Rendimento</label>
+                            <select
+                                v-model="form.yield"
+                                id="yield"
+                                class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                            >
+                                <option value="">Selecione</option>
+                                <option value="1">1 porção</option>
+                                <option value="2">2 porções</option>
+                                <option value="4">4 porções</option>
+                                <option value="6">6 porções</option>
+                                <option value="8">8 porções</option>
+                                <option value="10">10 porções</option>
+                            </select>
+                            <p v-if="form.errors.yield" class="text-red-500 text-xs mt-1">{{ form.errors.yield }}</p>
+                        </div>
+
+                        <!-- Canal -->
+                        <div>
+                            <label for="channel" class="block text-sm font-medium text-gray-700 mb-1">Canal</label>
+                            <select
+                                v-model="form.channel"
+                                id="channel"
+                                class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                            >
+                                <option value="">Selecione</option>
+                                <option value="website">Website</option>
+                                <option value="youtube">YouTube</option>
+                                <option value="instagram">Instagram</option>
+                                <option value="blog">Blog</option>
+                            </select>
+                            <p v-if="form.errors.channel" class="text-red-500 text-xs mt-1">{{ form.errors.channel }}</p>
+                        </div>
+
+                        <!-- Modo de Preparo -->
+                        <div>
+                            <label for="preparation_method" class="block text-sm font-medium text-gray-700 mb-1">Modo de Preparo</label>
+                            <textarea
+                                v-model="form.preparation_method"
+                                id="preparation_method"
+                                rows="8"
+                                class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-none"
+                            ></textarea>
+                            <p v-if="form.errors.preparation_method" class="text-red-500 text-xs mt-1">{{ form.errors.preparation_method }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex gap-3 mt-8 pt-6 border-t border-gray-200">
+                    <button
+                        type="reset"
+                        @click="form.reset()"
+                        class="px-6 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"
+                    >
+                        Limpar
+                    </button>
+                    <button
+                        type="submit"
+                        :disabled="form.processing"
+                        class="px-6 py-2 text-sm font-medium text-white bg-orange-600 border border-transparent rounded-md hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                        {{ form.processing ? 'Salvando...' : 'Salvar Receita' }}
+                    </button>
+                </div>
+            </form>
+
+            <!-- Saved Recipes Section -->
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mt-6">
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">📋 Receitas Salvas</h2>
+                
+                <div v-if="props.recipes?.length" class="space-y-3">
+                    <div 
+                        v-for="recipe in props.recipes" 
+                        :key="recipe.id"
+                        class="border border-gray-200 rounded-md p-4 bg-gray-50"
+                    >
+                        <h3 class="font-medium text-gray-900">{{ recipe.title || recipe.recipe_name || 'Sem título' }}</h3>
+                        <p class="text-sm text-gray-600 mt-2 line-clamp-2">
+                            {{ recipe.recipe_description || recipe.raw_text?.slice(0, 150) || 'Sem descrição' }}...
+                        </p>
+                        
+                        <div class="mt-3 flex gap-2">
+                            <button 
+                                @click="editRecipe(recipe)" 
+                                class="text-sm text-orange-600 hover:text-orange-800 font-medium"
+                            >
+                                Editar
+                            </button>
+                            <button 
+                                @click="deleteRecipe(recipe)" 
+                                class="text-sm text-red-600 hover:text-red-800 font-medium"
+                            >
+                                Excluir
                             </button>
                         </div>
                     </div>
                 </div>
-            </div>
-
-            <!-- Empty State -->
-            <div v-else class="text-center py-8 text-gray-500">
-                <Package class="h-12 w-12 mx-auto mb-2 text-gray-300" />
-                <p>Nenhum produto adicionado</p>
-                <p class="text-sm">Clique em "Adicionar Produto" para começar</p>
-            </div>
-        </div>
-
-        <!-- Media & References Section -->
-        <div class="bg-gray-50 rounded-lg p-6">
-            <h3 class="text-lg font-semibold text-gray-800 mb-4">📸 Mídia e Referências</h3>
-            
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <!-- General Images Link -->
-                <div>
-                    <label for="general_images_link" class="block text-sm font-medium text-gray-700 mb-1">Link de Imagens Gerais</label>
-                    <input
-                        v-model="form.general_images_link"
-                        id="general_images_link"
-                        type="url"
-                        placeholder="https://exemplo.com/imagens"
-                        class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                    />
-                    <p v-if="form.errors.general_images_link" class="text-red-500 text-sm mt-1">{{ form.errors.general_images_link }}</p>
-                </div>
-
-                <!-- Product Code -->
-                <div>
-                    <label for="product_code" class="block text-sm font-medium text-gray-700 mb-1">Código do Produto</label>
-                    <input
-                        v-model="form.product_code"
-                        id="product_code"
-                        type="text"
-                        placeholder="ex: PROD001"
-                        class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                    />
-                    <p v-if="form.errors.product_code" class="text-red-500 text-sm mt-1">{{ form.errors.product_code }}</p>
-                </div>
-
-                <!-- Content Code -->
-                <div>
-                    <label for="content_code" class="block text-sm font-medium text-gray-700 mb-1">Código do Conteúdo</label>
-                    <input
-                        v-model="form.content_code"
-                        id="content_code"
-                        type="text"
-                        placeholder="ex: CONT001"
-                        class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                    />
-                    <p v-if="form.errors.content_code" class="text-red-500 text-sm mt-1">{{ form.errors.content_code }}</p>
+                
+                <div v-else class="text-center py-8 text-gray-500">
+                    <p>Nenhuma receita cadastrada</p>
                 </div>
             </div>
-        </div>
-
-<div class="flex justify-end gap-3 mt-6">
-    <!-- Reset Button -->
-    <button
-    type="reset"
-    @click="form.reset()"
-    class="bg-gray-600 hover:bg-gray-700 text-white font-semibold px-6 py-2 rounded-lg"
-    >
-    Limpar
-</button>
-
-<!-- Submit Button -->
-<button
-type="submit"
-:disabled="form.processing"
-class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded-lg disabled:opacity-50"
->
-{{ form.processing ? 'Salvando...' : 'Salvar Receita' }}
-</button>
-</div>
-
-</form>
-<!-- Saved Recipes -->
-<div class="mt-10">
-    <h2 class="text-xl font-bold mb-4">📋 Receitas Salvas</h2>
-    
-    <ul class="space-y-4">
-        <li class="border rounded p-4 shadow" v-for="recipe in props.recipes" :key="recipe.id">
-            <h3 class="text-lg font-semibold">{{ recipe.title || 'Sem título' }}</h3>
-            <p class="text-sm text-white-600 line-clamp-2">
-                {{ recipe.raw_text.slice(0, 150) }}...
-            </p>
-            
-            <div class="mt-2 flex gap-2">
-                <button @click="editRecipe  (recipe)" class="text-blue-600 hover:underline">Editar</button>
-                <button @click="deleteRecipe(recipe)" class="text-red-600 hover:underline">Excluir</button>
-            </div>
-        </li>
-    </ul>
-</div>
         </div>
     </AppLayout>
 </template>
-
 
 <script setup>
 import { router, useForm, Head } from '@inertiajs/vue3'
 import {ref} from 'vue'
 import axios from 'axios'
 import AppLayout from '@/layouts/AppLayout.vue'
-import { Plus, X, Package } from 'lucide-vue-next'
 
 const query = ref('')
 const results = ref([])
@@ -736,6 +326,7 @@ const props = defineProps({
     recipes: Array,
     products: Array
 })
+
 const form = useForm({
     id: null,
     title: null,
@@ -766,6 +357,7 @@ const form = useForm({
     // Product associations
     selected_products: []
 })
+
 const search = async () => {
     if (!query.value.trim()) return
     
@@ -792,132 +384,11 @@ const search = async () => {
     }
 }
 
-const newTag = ref('')
-const newMainIngredient = ref('')
-const newSupportingIngredient = ref('')
-const newUsageGroup = ref('')
-const newPreparationTechnique = ref('')
-const newConsumptionOccasion = ref('')
-const metadataString = ref('')
-
-function addTag() {
-    const tag = newTag.value.trim()
-
-    if (tag && !form.tags.includes(tag)) {
-        form.tags.push(tag)
-    }
-
-    newTag.value = ''
-}
-
-function removeTag(index) {
-    form.tags.splice(index, 1)
-}
-
-function addMainIngredient() {
-    const ingredient = newMainIngredient.value.trim()
-
-    if (ingredient && !form.main_ingredients.includes(ingredient)) {
-        form.main_ingredients.push(ingredient)
-    }
-
-    newMainIngredient.value = ''
-}
-
-function removeMainIngredient(index) {
-    form.main_ingredients.splice(index, 1)
-}
-
-function addSupportingIngredient() {
-    const ingredient = newSupportingIngredient.value.trim()
-
-    if (ingredient && !form.supporting_ingredients.includes(ingredient)) {
-        form.supporting_ingredients.push(ingredient)
-    }
-
-    newSupportingIngredient.value = ''
-}
-
-function removeSupportingIngredient(index) {
-    form.supporting_ingredients.splice(index, 1)
-}
-
-function addUsageGroup() {
-    const group = newUsageGroup.value.trim()
-
-    if (group && !form.usage_groups.includes(group)) {
-        form.usage_groups.push(group)
-    }
-
-    newUsageGroup.value = ''
-}
-
-function removeUsageGroup(index) {
-    form.usage_groups.splice(index, 1)
-}
-
-function addPreparationTechnique() {
-    const technique = newPreparationTechnique.value.trim()
-
-    if (technique && !form.preparation_techniques.includes(technique)) {
-        form.preparation_techniques.push(technique)
-    }
-
-    newPreparationTechnique.value = ''
-}
-
-function removePreparationTechnique(index) {
-    form.preparation_techniques.splice(index, 1)
-}
-
-function addConsumptionOccasion() {
-    const occasion = newConsumptionOccasion.value.trim()
-
-    if (occasion && !form.consumption_occasion.includes(occasion)) {
-        form.consumption_occasion.push(occasion)
-    }
-
-    newConsumptionOccasion.value = ''
-}
-
-function removeConsumptionOccasion(index) {
-    form.consumption_occasion.splice(index, 1)
-}
-
-function addNewProduct() {
-    form.selected_products.push({
-        product_id: '',
-        quantity: null,
-        unit: '',
-        ingredient_type: 'main',
-        preparation_notes: '',
-        optional: false
-    })
-}
-
-function removeProduct(index) {
-    form.selected_products.splice(index, 1)
-}
-
-function updateMetadata() {
-    try {
-        if (metadataString.value.trim()) {
-            form.metadata = JSON.parse(metadataString.value)
-        } else {
-            form.metadata = null
-        }
-    } catch (error) {
-        // Keep the string value if JSON is invalid, validation will handle it
-        console.warn('Invalid JSON in metadata field')
-    }
-}
-
 function editRecipe(recipe) {
     form.id = recipe.id
     form.title = recipe.title
     form.raw_text = recipe.raw_text
     form.metadata = recipe.metadata
-    metadataString.value = recipe.metadata ? JSON.stringify(recipe.metadata, null, 2) : ''
     form.tags = recipe.tags || []
     // New fields
     form.recipe_code = recipe.recipe_code
@@ -963,5 +434,4 @@ const submit = () => {
         }
     })
 }
-
 </script>
