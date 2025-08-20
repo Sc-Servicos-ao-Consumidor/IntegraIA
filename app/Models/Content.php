@@ -36,7 +36,7 @@ class Content extends Model
         'comprador',
         'administrador',
         'status',
-        'prompt_conteudo',
+        'descricao_conteudo',
         'embedding'
     ];
 
@@ -66,17 +66,9 @@ class Content extends Model
     public function recipes(): BelongsToMany
     {
         return $this->belongsToMany(Recipe::class)
-            ->withPivot(['top_dish', 'order'])
+            ->withPivot(['order'])
             ->withTimestamps()
             ->orderByPivot('order');
-    }
-
-    /**
-     * Get only recipes marked as top dish.
-     */
-    public function topDishRecipes(): BelongsToMany
-    {
-        return $this->recipes()->wherePivot('top_dish', 'sim');
     }
 
     /**

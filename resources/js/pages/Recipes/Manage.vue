@@ -97,9 +97,9 @@
                             <p v-if="form.errors.cuisine" class="text-red-500 text-xs mt-1">{{ form.errors.cuisine }}</p>
                         </div>
 
-                        <!-- Prompt da Receita -->
+                        <!-- Descrição da Receita -->
                         <div>
-                            <label for="recipe_description" class="block text-sm font-medium text-gray-700 mb-1">Prompt da Receita</label>
+                            <label for="recipe_description" class="block text-sm font-medium text-gray-700 mb-1">Descrição da Receita</label>
                             <textarea
                                 v-model="form.recipe_description"
                                 id="recipe_description"
@@ -229,6 +229,21 @@
                             <p v-if="form.errors.channel" class="text-red-500 text-xs mt-1">{{ form.errors.channel }}</p>
                         </div>
 
+                        <!-- Top Dish -->
+                        <div>
+                            <label for="top_dish" class="block text-sm font-medium text-gray-700 mb-1">Prato Principal</label>
+                            <select
+                                v-model="form.top_dish"
+                                id="top_dish"
+                                class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                            >
+                                <option value="">Selecione</option>
+                                <option value="sim">Sim</option>
+                                <option value="nao">Não</option>
+                            </select>
+                            <p v-if="form.errors.top_dish" class="text-red-500 text-xs mt-1">{{ form.errors.top_dish }}</p>
+                        </div>
+
                         <!-- Modo de Preparo -->
                         <div>
                             <label for="preparation_method" class="block text-sm font-medium text-gray-700 mb-1">Modo de Preparo</label>
@@ -343,6 +358,7 @@ const form = useForm({
     difficulty_level: null,
     yield: null,
     channel: null,
+    top_dish: null,
     recipe_description: null,
     ingredients_description: null,
     preparation_method: null,
@@ -400,6 +416,7 @@ function editRecipe(recipe) {
     form.difficulty_level = recipe.difficulty_level
     form.yield = recipe.yield
     form.channel = recipe.channel
+    form.top_dish = recipe.top_dish
     form.recipe_description = recipe.recipe_description
     form.ingredients_description = recipe.ingredients_description
     form.preparation_method = recipe.preparation_method

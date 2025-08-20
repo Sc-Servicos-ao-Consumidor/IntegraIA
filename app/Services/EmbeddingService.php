@@ -167,7 +167,7 @@ class EmbeddingService
             $content->tipo_conteudo,
             $content->pilares,
             $content->canal,
-            $content->prompt_conteudo,
+            $content->descricao_conteudo,
         ], function($value) {
             return !empty($value) && is_string($value);
         });

@@ -344,7 +344,6 @@ class AIToolService
                         'id' => $content->id,
                         'nome_conteudo' => $content->nome_conteudo,
                         'content_code' => $content->content_code,
-                        'top_dish' => $content->pivot->top_dish,
                     ];
                 }),
             ]

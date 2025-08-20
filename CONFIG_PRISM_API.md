@@ -15,7 +15,7 @@ PRISM_API_TOKEN=your-api-token-here
 PRISM_EMBEDDING_PROVIDER=openai
 PRISM_EMBEDDING_MODEL=text-embedding-3-small
 PRISM_CHAT_PROVIDER=openai
-PRISM_CHAT_MODEL=gpt-4
+PRISM_CHAT_MODEL=gpt-5-nano
 ```
 
 ## Available Commands

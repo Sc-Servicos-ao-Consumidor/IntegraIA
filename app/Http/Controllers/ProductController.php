@@ -11,6 +11,7 @@ use App\Models\Content;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 
 class ProductController extends Controller
@@ -20,9 +21,15 @@ class ProductController extends Controller
      */
     public function index()
     {
-        $products = Product::with(['groupProduct', 'detail', 'images' => function($query) {
-            $query->active()->ordered();
-        }])->latest()->get();
+        $products = Product::with([
+            'groupProduct', 
+            'detail', 
+            'images' => function($query) {
+                $query->active()->ordered();
+            },
+            'recipes:id,recipe_name as descricao',
+            'contents:id,nome_conteudo as descricao'
+        ])->latest()->get();
         
         $groupProducts = GroupProduct::where('status', true)->get();
         $recipes = Recipe::select('id', 'recipe_name as descricao')->get();
@@ -41,6 +48,9 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
+        // Debug: Log the incoming request data
+        Log::info('Product store request data:', $request->all());
+        
         // Validate product basic data
         $productData = $request->validate([
             'descricao' => 'required|string|max:255',
@@ -90,7 +100,16 @@ class ProductController extends Controller
             'images.*.valida_produtos_embalagem' => 'boolean',
         ]);
 
+        // Validate relationship data
+        $relationshipData = $request->validate([
+            'recipe_ids' => 'nullable|array',
+            'recipe_ids.*' => 'integer|exists:recipes,id',
+            'content_ids' => 'nullable|array',
+            'content_ids.*' => 'integer|exists:contents,id',
+        ]);
+
         try {
+            Log::info('Validation passed, starting database transaction');
             DB::beginTransaction();
 
             // Create or update product
@@ -124,16 +143,18 @@ class ProductController extends Controller
 
             // Handle recipe relationships
             if ($request->has('recipe_ids') && is_array($request->recipe_ids)) {
+                Log::info('Syncing recipes:', $request->recipe_ids);
                 $product->recipes()->sync($request->recipe_ids);
             }
 
             // Handle content relationships
             if ($request->has('content_ids') && is_array($request->content_ids)) {
+                Log::info('Syncing contents:', $request->content_ids);
                 $product->contents()->sync($request->content_ids);
             }
 
             DB::commit();
-            return redirect()->back()->with('success', 'Produto salvo com sucesso!');
+            return redirect()->route('products.index')->with('success', 'Produto salvo com sucesso!');
 
         } catch (\Exception $e) {
             DB::rollback();

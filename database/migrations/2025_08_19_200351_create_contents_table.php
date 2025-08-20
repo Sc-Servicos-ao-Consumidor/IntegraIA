@@ -51,7 +51,7 @@ return new class extends Migration
             $table->boolean('status')->default(true);
             
             // SEO and prompt content
-            $table->text('prompt_conteudo')->nullable();
+            $table->text('descricao_conteudo')->nullable();
             
             $table->timestamps();
         });

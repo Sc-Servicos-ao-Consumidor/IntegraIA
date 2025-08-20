@@ -81,16 +81,6 @@
                         <h3 class="text-base font-semibold text-gray-900 mb-4">Embalagens</h3>
                         
                         <div class="space-y-4">
-                            <!-- Buscar Produtos Existente -->
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Buscar Produtos Existente</label>
-                                <input
-                                    type="text"
-                                    placeholder="Buscar produtos existentes..."
-                                    class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-                                />
-                            </div>
-
                             <!-- Escolha a Embalagem -->
                             <div>
                                 <label for="escolha_embalagem" class="block text-sm font-medium text-gray-700 mb-1">Escolha a Embalagem</label>
@@ -129,7 +119,8 @@
                                     id="prompt_especificacao_embalagens"
                                     rows="4"
                                     placeholder="Descreva as especificações das embalagens..."
-                                    class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-none"
+                                    class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-none cursor-not-allowed"
+                                    disabled
                                 ></textarea>
                             </div>
 
@@ -141,7 +132,8 @@
                                     id="prompt_uso_informacoes_produto"
                                     rows="4"
                                     placeholder="Descreva como usar as informações do produto..."
-                                    class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-none"
+                                    class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-none cursor-not-allowed"
+                                    disabled
                                 ></textarea>
                             </div>
                         </div>
@@ -183,7 +175,8 @@
                                         v-model="nutritionalImageUrl"
                                         type="url"
                                         placeholder="Inserir Imagem..."
-                                        class="w-full border-0 text-center text-sm focus:outline-none"
+                                        class="w-full border-0 text-center text-sm focus:outline-none cursor-not-allowed"
+                                        disabled
                                     />
                                 </div>
                                 
@@ -260,7 +253,8 @@
                                         v-model="ingredientsImageUrl"
                                         type="url"
                                         placeholder="Inserir Imagem..."
-                                        class="w-full border-0 text-center text-sm focus:outline-none"
+                                        class="w-full border-0 text-center text-sm focus:outline-none cursor-not-allowed"
+                                        disabled
                                     />
                                 </div>
                                 
@@ -286,7 +280,8 @@
                                         v-model="preparationImageUrl"
                                         type="url"
                                         placeholder="Inserir Imagem..."
-                                        class="w-full border-0 text-center text-sm focus:outline-none"
+                                        class="w-full border-0 text-center text-sm focus:outline-none cursor-not-allowed"
+                                        disabled
                                     />
                                 </div>
                                 
@@ -312,7 +307,8 @@
                                         v-model="yieldsImageUrl"
                                         type="url"
                                         placeholder="Inserir Imagem..."
-                                        class="w-full border-0 text-center text-sm focus:outline-none"
+                                        class="w-full border-0 text-center text-sm focus:outline-none cursor-not-allowed"
+                                        disabled
                                     />
                                 </div>
                                 
@@ -353,12 +349,6 @@
                                                 class="h-4 w-4 text-orange-600 focus:ring-orange-500 border-gray-300 rounded mr-3"
                                             />
                                             <span class="text-sm text-gray-900">{{ recipe.descricao }}</span>
-                                        </div>
-                                        <div class="flex items-center gap-2">
-                                            <select class="text-xs border border-gray-300 rounded px-2 py-1">
-                                                <option value="sim">Sim ou Não</option>
-                                                <option value="nao">Não</option>
-                                            </select>
                                         </div>
                                     </div>
                                 </div>
@@ -609,7 +599,7 @@
 </template>
 
 <script setup>
-import { router, useForm, Head } from '@inertiajs/vue3'
+import { router, useForm, Head, usePage } from '@inertiajs/vue3'
 import { ref } from 'vue'
 import AppLayout from '@/layouts/AppLayout.vue'
 
@@ -665,6 +655,10 @@ const form = useForm({
     
     // Images will be handled separately
     images: [],
+    
+    // Relationships
+    recipe_ids: [],
+    content_ids: [],
 })
 
 // Separate refs for image URLs
@@ -722,19 +716,25 @@ function submit() {
     }
     
     // Add images and relationships to form data
-    const formData = {
-        ...form.data(),
-        images: images,
-        recipe_ids: selectedRecipes.value,
-        content_ids: selectedContents.value
-    }
+    form.images = images
+    form.recipe_ids = selectedRecipes.value
+    form.content_ids = selectedContents.value
+    
+    // Debug: Log what we're sending
+    console.log('Submitting form with data:', {
+        form: form.data(),
+        selectedRecipes: selectedRecipes.value,
+        selectedContents: selectedContents.value,
+        images: images
+    })
     
     form.post("/products", {
-        data: formData,
         onSuccess: () => {
-            if (!form.id) {
-                resetForm()
-            }
+            // Refresh the page to show updated data
+            router.reload()
+        },
+        onError: (errors) => {
+            console.error('Form submission errors:', errors)
         }
     })
 }
@@ -748,6 +748,8 @@ function resetForm() {
     yieldsImageUrl.value = ''
     selectedRecipes.value = []
     selectedContents.value = []
+    form.recipe_ids = []
+    form.content_ids = []
 }
 
 function editProduct(product) {
@@ -810,6 +812,8 @@ function editProduct(product) {
     // Load relationships
     selectedRecipes.value = product.recipes ? product.recipes.map(r => r.id) : []
     selectedContents.value = product.contents ? product.contents.map(c => c.id) : []
+    form.recipe_ids = selectedRecipes.value
+    form.content_ids = selectedContents.value
     
     // Scroll to form
     window.scrollTo({ top: 0, behavior: 'smooth' })

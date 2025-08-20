@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('contents', function (Blueprint $table) {
-            $table->vector('embedding', 1536)->nullable()->after('descricao_conteudo');
+        Schema::table('recipes', function (Blueprint $table) {
+            $table->string('top_dish')->nullable()->after('content_code');
         });
     }
 
@@ -21,8 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('contents', function (Blueprint $table) {
-            $table->dropColumn('embedding');
+        Schema::table('recipes', function (Blueprint $table) {
+            $table->dropColumn('top_dish');
         });
     }
 };

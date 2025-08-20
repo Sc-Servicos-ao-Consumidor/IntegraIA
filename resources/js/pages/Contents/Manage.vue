@@ -151,217 +151,16 @@
                     </div>
                 </div>
 
-                <!-- Main Content Grid -->
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                    <!-- Left Column -->
-                    <div class="space-y-6">
-                        <!-- Descrição Tabela da Nutricional -->
-                        <div>
-                            <label for="descricao_tabela_nutricional" class="block text-sm font-medium text-gray-700 mb-1">Descrição Tabela da Nutricional</label>
-                            <textarea
-                                v-model="form.descricao_tabela_nutricional"
-                                id="descricao_tabela_nutricional"
-                                rows="6"
-                                class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-none"
-                            ></textarea>
-                        </div>
-
-                        <!-- Imagem Tabela Nutricional -->
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Imagem Tabela Nutricional</label>
-                            <input
-                                v-model="form.imagem_tabela_nutricional"
-                                type="url"
-                                placeholder="Inserir Imagem..."
-                                class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-                            />
-                        </div>
-
-                        <!-- Imagens Cadastradas Nutricionais -->
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Imagens Cadastradas</label>
-                            <div class="space-y-2">
-                                <div v-for="(image, index) in form.imagens_nutricionais_cadastradas" :key="index" class="flex items-center gap-3 p-2 border border-gray-200 rounded">
-                                    <div class="w-8 h-8 bg-gray-200 rounded flex items-center justify-center">
-                                        <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                                        </svg>
-                                    </div>
-                                    <span class="flex-1 text-sm text-gray-600">{{ image.nome || 'Nome da Imagem ( configurado na inserção)' }}</span>
-                                    <button 
-                                        type="button"
-                                        @click="removeImageNutricional(index)"
-                                        class="text-red-600 hover:text-red-800 text-sm"
-                                    >
-                                        Remover
-                                    </button>
-                                </div>
-                                <button 
-                                    type="button"
-                                    @click="addImageNutricional"
-                                    class="text-orange-600 hover:text-orange-800 text-sm font-medium"
-                                >
-                                    + Adicionar Imagem
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Descrição dos Modos de Preparo -->
-                        <div>
-                            <label for="descricao_modos_preparo" class="block text-sm font-medium text-gray-700 mb-1">Descrição dos Modos de Preparo</label>
-                            <textarea
-                                v-model="form.descricao_modos_preparo"
-                                id="descricao_modos_preparo"
-                                rows="6"
-                                class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-none"
-                            ></textarea>
-                        </div>
-
-                        <!-- Imagem dos Modos de Preparo -->
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Imagem dos Modos de Preparo</label>
-                            <input
-                                v-model="form.imagem_modos_preparo"
-                                type="url"
-                                placeholder="Inserir Imagem..."
-                                class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-                            />
-                        </div>
-
-                        <!-- Imagens Cadastradas Preparo -->
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Imagens Cadastradas</label>
-                            <div class="space-y-2">
-                                <div v-for="(image, index) in form.imagens_preparo_cadastradas" :key="index" class="flex items-center gap-3 p-2 border border-gray-200 rounded">
-                                    <div class="w-8 h-8 bg-gray-200 rounded flex items-center justify-center">
-                                        <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                                        </svg>
-                                    </div>
-                                    <span class="flex-1 text-sm text-gray-600">{{ image.nome || 'Nome da Imagem ( configurado na inserção)' }}</span>
-                                    <button 
-                                        type="button"
-                                        @click="removeImagePreparo(index)"
-                                        class="text-red-600 hover:text-red-800 text-sm"
-                                    >
-                                        Remover
-                                    </button>
-                                </div>
-                                <button 
-                                    type="button"
-                                    @click="addImagePreparo"
-                                    class="text-orange-600 hover:text-orange-800 text-sm font-medium"
-                                >
-                                    + Adicionar Imagem
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Right Column -->
-                    <div class="space-y-6">
-                        <!-- Descrição Lista de Ingredientes -->
-                        <div>
-                            <label for="descricao_lista_ingredientes" class="block text-sm font-medium text-gray-700 mb-1">Descrição Lista de Ingredientes</label>
-                            <textarea
-                                v-model="form.descricao_lista_ingredientes"
-                                id="descricao_lista_ingredientes"
-                                rows="6"
-                                class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-none"
-                            ></textarea>
-                        </div>
-
-                        <!-- Imagem Lista de Ingredientes -->
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Imagem Lista de Ingredientes</label>
-                            <input
-                                v-model="form.imagem_lista_ingredientes"
-                                type="url"
-                                placeholder="Inserir Imagem..."
-                                class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-                            />
-                        </div>
-
-                        <!-- Imagens Cadastradas Ingredientes -->
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Imagens Cadastradas</label>
-                            <div class="space-y-2">
-                                <div v-for="(image, index) in form.imagens_ingredientes_cadastradas" :key="index" class="flex items-center gap-3 p-2 border border-gray-200 rounded">
-                                    <div class="w-8 h-8 bg-gray-200 rounded flex items-center justify-center">
-                                        <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                                        </svg>
-                                    </div>
-                                    <span class="flex-1 text-sm text-gray-600">{{ image.nome || 'Nome da Imagem ( configurado na inserção)' }}</span>
-                                    <button 
-                                        type="button"
-                                        @click="removeImageIngredientes(index)"
-                                        class="text-red-600 hover:text-red-800 text-sm"
-                                    >
-                                        Remover
-                                    </button>
-                                </div>
-                                <button 
-                                    type="button"
-                                    @click="addImageIngredientes"
-                                    class="text-orange-600 hover:text-orange-800 text-sm font-medium"
-                                >
-                                    + Adicionar Imagem
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Descrição dos Rendimentos -->
-                        <div>
-                            <label for="descricao_rendimentos" class="block text-sm font-medium text-gray-700 mb-1">Descrição dos Rendimentos</label>
-                            <textarea
-                                v-model="form.descricao_rendimentos"
-                                id="descricao_rendimentos"
-                                rows="6"
-                                class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-none"
-                            ></textarea>
-                        </div>
-
-                        <!-- Imagem dos Rendimentos -->
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Imagem dos Rendimentos</label>
-                            <input
-                                v-model="form.imagem_rendimentos"
-                                type="url"
-                                placeholder="Inserir Imagem..."
-                                class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-                            />
-                        </div>
-
-                        <!-- Imagens Cadastradas Rendimentos -->
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Imagens Cadastradas</label>
-                            <div class="space-y-2">
-                                <div v-for="(image, index) in form.imagens_rendimentos_cadastradas" :key="index" class="flex items-center gap-3 p-2 border border-gray-200 rounded">
-                                    <div class="w-8 h-8 bg-gray-200 rounded flex items-center justify-center">
-                                        <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                                        </svg>
-                                    </div>
-                                    <span class="flex-1 text-sm text-gray-600">{{ image.nome || 'Nome da Imagem ( configurado na inserção)' }}</span>
-                                    <button 
-                                        type="button"
-                                        @click="removeImageRendimentos(index)"
-                                        class="text-red-600 hover:text-red-800 text-sm"
-                                    >
-                                        Remover
-                                    </button>
-                                </div>
-                                <button 
-                                    type="button"
-                                    @click="addImageRendimentos"
-                                    class="text-orange-600 hover:text-orange-800 text-sm font-medium"
-                                >
-                                    + Adicionar Imagem
-                                </button>
-                            </div>
-                        </div>
-                    </div>
+                <!-- Descrição do Conteúdo -->
+                <div class="mt-8">
+                    <label for="descricao_conteudo" class="block text-sm font-medium text-gray-700 mb-1">Descrição do Conteúdo</label>
+                    <textarea
+                        v-model="form.descricao_conteudo"
+                        id="descricao_conteudo"
+                        rows="4"
+                        class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-none cursor-not-allowed"
+                        disabled
+                    ></textarea>
                 </div>
 
                 <!-- Recipe Linking Section -->
@@ -391,13 +190,7 @@
                                                 {{ availableRecipe.recipe_name || availableRecipe.title }}
                                             </option>
                                         </select>
-                                        <select
-                                            v-model="recipe.top_dish"
-                                            class="border border-gray-300 rounded px-2 py-1 text-sm"
-                                        >
-                                            <option value="nao">Não</option>
-                                            <option value="sim">Sim</option>
-                                        </select>
+
                                         <button 
                                             type="button"
                                             @click="removeRecipe(index)"
@@ -445,6 +238,7 @@
                                             v-model="product.featured"
                                             class="border border-gray-300 rounded px-2 py-1 text-sm"
                                         >
+                                            <option value="" selected>Principal? (Sim ou Não)</option>
                                             <option value="nao">Não</option>
                                             <option value="sim">Sim</option>
                                         </select>
@@ -469,16 +263,6 @@
                     </div>
                 </div>
 
-                <!-- Prompt do Conteúdo -->
-                <div class="mt-8">
-                    <label for="prompt_conteudo" class="block text-sm font-medium text-gray-700 mb-1">Prompt do Conteúdo</label>
-                    <textarea
-                        v-model="form.prompt_conteudo"
-                        id="prompt_conteudo"
-                        rows="4"
-                        class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-none"
-                    ></textarea>
-                </div>
 
                 <!-- Action Buttons -->
                 <div class="flex gap-3 mt-8 pt-6 border-t border-gray-200">
@@ -511,7 +295,7 @@
                     >
                         <h3 class="font-medium text-gray-900">{{ content.nome_conteudo || 'Sem título' }}</h3>
                         <p class="text-sm text-gray-600 mt-2 line-clamp-2">
-                            {{ content.prompt_conteudo || 'Sem descrição' }}
+                            {{ content.descricao_conteudo || 'Sem descrição' }}
                         </p>
                         
                         <div class="mt-3 flex gap-2">
@@ -580,7 +364,7 @@ const form = useForm({
     comprador: null,
     administrador: null,
     status: true,
-    prompt_conteudo: null,
+    descricao_conteudo: null,
     selected_recipes: [],
     selected_products: []
 })
@@ -629,7 +413,7 @@ const removeImageRendimentos = (index) => {
 
 // Recipe management functions
 const addRecipe = () => {
-    form.selected_recipes.push({ recipe_id: '', top_dish: 'nao' })
+    form.selected_recipes.push({ recipe_id: '' })
 }
 
 const removeRecipe = (index) => {
@@ -669,12 +453,11 @@ function editContent(content) {
     form.comprador = content.comprador
     form.administrador = content.administrador
     form.status = content.status
-    form.prompt_conteudo = content.prompt_conteudo
+    form.descricao_conteudo = content.descricao_conteudo
     
     // Load associated recipes
     form.selected_recipes = content.recipes ? content.recipes.map(recipe => ({
-        recipe_id: recipe.id,
-        top_dish: recipe.pivot.top_dish
+        recipe_id: recipe.id
     })) : []
     
     // Load associated products

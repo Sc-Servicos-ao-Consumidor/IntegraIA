@@ -51,6 +51,7 @@ class RecipeController extends Controller
             'difficulty_level' => 'nullable|string|in:facil,medio,dificil,expert',
             'yield' => 'nullable|string|max:255',
             'channel' => 'nullable|string|max:255',
+            'top_dish' => 'nullable|string|in:sim,nao',
             
             // Content fields
             'recipe_description' => 'nullable|string',

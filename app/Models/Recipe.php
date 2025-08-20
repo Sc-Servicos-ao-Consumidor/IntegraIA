@@ -39,7 +39,8 @@ class Recipe extends Model
         'consumption_occasion',
         'general_images_link',
         'product_code',
-        'content_code'
+        'content_code',
+        'top_dish'
     ];
 
     protected $casts = [
@@ -97,7 +98,7 @@ class Recipe extends Model
     public function contents(): BelongsToMany
     {
         return $this->belongsToMany(Content::class)
-            ->withPivot(['top_dish', 'order'])
+            ->withPivot(['order'])
             ->withTimestamps()
             ->orderByPivot('order');
     }

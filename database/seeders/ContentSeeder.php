@@ -35,23 +35,20 @@ class ContentSeeder extends Seeder
         $contents = Content::all();
 
         if ($recipes->count() > 0 && $contents->count() > 0) {
-            // Link first content with first recipe as top dish
+            // Link first content with first recipe
             $contents[0]->recipes()->attach($recipes[0]->id, [
-                'top_dish' => 'sim',
                 'order' => 1
             ]);
 
             // Link second content with multiple recipes
             if ($recipes->count() > 1) {
                 $contents[1]->recipes()->attach($recipes[1]->id, [
-                    'top_dish' => 'nao',
                     'order' => 1
                 ]);
             }
             
             if ($recipes->count() > 2) {
                 $contents[1]->recipes()->attach($recipes[2]->id, [
-                    'top_dish' => 'sim',
                     'order' => 2
                 ]);
             }
@@ -122,7 +119,7 @@ class ContentSeeder extends Seeder
                 'comprador' => false,
                 'administrador' => true,
                 'status' => true,
-                'prompt_conteudo' => 'Conteúdo educativo sobre preparação de massas artesanais para padarias.',
+                'descricao_conteudo' => 'Conteúdo educativo sobre preparação de massas artesanais para padarias.',
             ],
             [
                 'nome_conteudo' => 'Sobremesas Veganas Premium',
@@ -141,7 +138,7 @@ class ContentSeeder extends Seeder
                 'comprador' => true,
                 'administrador' => false,
                 'status' => true,
-                'prompt_conteudo' => 'Material especializado em sobremesas veganas premium.',
+                'descricao_conteudo' => 'Material especializado em sobremesas veganas premium.',
             ],
             [
                 'nome_conteudo' => 'Gestão de Custos em Buffets',
@@ -160,7 +157,7 @@ class ContentSeeder extends Seeder
                 'comprador' => true,
                 'administrador' => true,
                 'status' => true,
-                'prompt_conteudo' => 'Treinamento focado em gestão financeira para buffets.',
+                'descricao_conteudo' => 'Treinamento focado em gestão financeira para buffets.',
             ],
             [
                 'nome_conteudo' => 'Cardápio do Futuro: Tendências 2025',
@@ -179,7 +176,7 @@ class ContentSeeder extends Seeder
                 'comprador' => true,
                 'administrador' => true,
                 'status' => true,
-                'prompt_conteudo' => 'Estudo prospectivo sobre tendências culinárias do futuro.',
+                'descricao_conteudo' => 'Estudo prospectivo sobre tendências culinárias do futuro.',
             ],
             [
                 'nome_conteudo' => 'Atendimento de Excelência em SAC',
@@ -198,7 +195,7 @@ class ContentSeeder extends Seeder
                 'comprador' => false,
                 'administrador' => true,
                 'status' => true,
-                'prompt_conteudo' => 'Treinamento completo para equipes de atendimento ao cliente.',
+                'descricao_conteudo' => 'Treinamento completo para equipes de atendimento ao cliente.',
             ]
         ];
     }
