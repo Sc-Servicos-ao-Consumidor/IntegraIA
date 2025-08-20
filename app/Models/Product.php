@@ -8,10 +8,13 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Pgvector\Laravel\HasNeighbors;
+use Pgvector\Laravel\Vector;
 
 class Product extends Model
 {
     use HasFactory;
+    use HasNeighbors;
 
     protected $fillable = [
         'ulid',
@@ -22,11 +25,20 @@ class Product extends Model
         'marca',
         'descricao',
         'status',
+        'embedding',
     ];
 
     protected $casts = [
         'status' => 'boolean',
     ];
+
+    /**
+     * Get the embedding as a Vector object
+     */
+    public function getEmbeddingVector(): ?Vector
+    {
+        return $this->embedding ? new Vector($this->embedding) : null;
+    }
 
     public function groupProduct(): BelongsTo
     {

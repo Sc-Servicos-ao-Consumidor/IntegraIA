@@ -374,7 +374,7 @@ const search = async () => {
             text: query.value,
             context: results.value,
         })
-        assistantResponse.value = assistantRes.data
+        assistantResponse.value = assistantRes.data.response
 
     } catch (error) {
         console.error('Search error:', error)

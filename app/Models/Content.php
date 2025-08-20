@@ -5,10 +5,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Pgvector\Laravel\HasNeighbors;
+use Pgvector\Laravel\Vector;
 
 class Content extends Model
 {
     use HasFactory;
+    use HasNeighbors;
 
     protected $fillable = [
         'nome_conteudo',
@@ -33,7 +36,8 @@ class Content extends Model
         'comprador',
         'administrador',
         'status',
-        'prompt_conteudo'
+        'prompt_conteudo',
+        'embedding'
     ];
 
     protected $casts = [
@@ -47,6 +51,14 @@ class Content extends Model
         'administrador' => 'boolean',
         'status' => 'boolean',
     ];
+
+    /**
+     * Get the embedding as a Vector object
+     */
+    public function getEmbeddingVector(): ?Vector
+    {
+        return $this->embedding ? new Vector($this->embedding) : null;
+    }
 
     /**
      * The recipes that belong to this content.

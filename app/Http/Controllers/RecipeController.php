@@ -4,7 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Recipe;
 use App\Models\Product;
+use App\Models\Content;
 use App\Services\PrismService;
+use App\Services\EmbeddingService;
+use App\Services\AIToolService;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Schema;
@@ -110,45 +113,177 @@ class RecipeController extends Controller
 
     public function search(Request $request)
     {
+        $request->validate([
+            'query' => 'required|string|min:1',
+            'type' => 'nullable|string|in:recipes,products,content,all',
+            'limit' => 'nullable|integer|min:1|max:50'
+        ]);
+
         $query = $request->query('query');
+        $type = $request->query('type', 'all');
+        $limit = $request->query('limit', 5);
 
-        if (!$query) {
-            return response()->json(['error' => 'Missing query.'], 422);
+        try {
+            $prism = new PrismService();
+            $response = $prism->getEmbedding($query);
+
+            $embedding = $prism->extractEmbeddingFromResponse($response);
+
+            if (!$embedding || !is_array($embedding)) {
+                return response()->json(['error' => 'Failed to generate embedding for query.'], 500);
+            }
+
+            $results = [];
+
+            if ($type === 'all' || $type === 'recipes') {
+                $recipes = Recipe::query()
+                    ->nearestNeighbors('embedding', $embedding, Distance::Cosine)
+                    ->take($limit)
+                    ->with(['products'])
+                    ->get()
+                    ->map(function ($recipe) {
+                        return collect($recipe)->except('embedding')->toArray();
+                    });
+                $results['recipes'] = $recipes;
+            }
+
+            if ($type === 'all' || $type === 'products') {
+                $products = Product::query()
+                    ->nearestNeighbors('embedding', $embedding, Distance::Cosine)
+                    ->take($limit)
+                    ->where('status', true)
+                    ->with(['groupProduct', 'detail'])
+                    ->get()
+                    ->map(function ($product) {
+                        return collect($product)->except('embedding')->toArray();
+                    });
+                $results['products'] = $products;
+            }
+
+            if ($type === 'all' || $type === 'content') {
+                $contents = Content::query()
+                    ->nearestNeighbors('embedding', $embedding, Distance::Cosine)
+                    ->take($limit)
+                    ->where('status', true)
+                    ->get()
+                    ->map(function ($content) {
+                        return collect($content)->except('embedding')->toArray();
+                    });
+                $results['contents'] = $contents;
+            }
+
+            return response()->json($results);
+
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Search failed: ' . $e->getMessage()], 500);
         }
-
-        $prism = new PrismService();
-        $response = $prism->getEmbedding($query);
-
-        $queryVector = $response->embeddings[0]->embedding;
-
-        if (!$queryVector) {
-            throw new Exception();
-        }
-
-        $queryResults = Recipe::query()
-            ->nearestNeighbors('embedding', $queryVector, Distance::Cosine)
-            ->take(3)
-            ->get()
-            ->map(function ($recipe) {
-                return collect($recipe)->except('embedding');
-            });
-
-        return response()->json($queryResults);
     }
-    
+
     public function assistant(Request $request)
     {
-        $text = $request->text ?? '';
-        $context = $request->context ?? null;
+        $request->validate([
+            'text' => 'required|string|min:1',
+            'context' => 'nullable',
+            // 'use_tools' => 'nullable|boolean'
+        ]);
 
-        if (!$text) {
-            return response()->json(['error' => 'Missing text.'], 422);
+        $text = $request->text;
+        $context = $this->cleanResultFromEmbeddings($request->context);
+        // $useTools = $request->use_tools ?? false;
+
+        try {
+            $prism = new PrismService();
+            // $tools = [];
+
+            // Add tools if requested
+            // if ($useTools) {
+            //     $aiToolService = new AIToolService($prism, new EmbeddingService($prism));
+            //     $tools = $aiToolService->getTools();
+            // }
+
+            $response = $prism->getResponse($text, $context);
+
+            // // Handle tool calls if present
+            // if (isset($response['tool_calls']) && !empty($response['tool_calls'])) {
+            //     $aiToolService = new AIToolService($prism, new EmbeddingService($prism));
+            //     $toolResults = [];
+
+            //     foreach ($response['tool_calls'] as $toolCall) {
+            //         $functionName = $toolCall['function']['name'] ?? '';
+            //         $parameters = $toolCall['function']['arguments'] ?? [];
+                    
+            //         if (is_string($parameters)) {
+            //             $parameters = json_decode($parameters, true) ?? [];
+            //         }
+
+            //         $result = $aiToolService->executeTool($functionName, $parameters);
+                    
+            //         // Clean result to remove any embedding data
+            //         $cleanResult = $this->cleanResultFromEmbeddings($result);
+                    
+            //         $toolResults[] = [
+            //             'tool_call_id' => $toolCall['id'] ?? uniqid(),
+            //             'function_name' => $functionName,
+            //             'result' => $cleanResult
+            //         ];
+            //     }
+
+            //     // Send tool results back to AI for final response
+            //     $finalResponse = $prism->getResponse(
+            //         "Com base nos resultados das ferramentas, forneça uma resposta completa ao usuário.",
+            //         [
+            //             'original_query' => $text,
+            //             'tool_results' => $toolResults,
+            //             'context' => $context
+            //         ]
+            //     );
+
+            //     return response()->json([
+            //         'response' => $finalResponse['response'] ?? $finalResponse,
+            //         'tool_calls' => $toolResults
+            //     ], 200);
+            // }
+
+            if($response['status']){
+                    return response()->json([
+                    'response' => $response['response'] ?? $response
+                ], 200);
+            }else{
+                return response()->json([
+                    'error' => $response['error'] ?? 'Erro ao processar a solicitação'
+                ], 500);
+            }
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => 'Assistant failed: ' . $e->getMessage()
+            ], 500);
         }
+    }
 
-        $prism = new PrismService();
+    /**
+     * Clean result data to remove embedding values
+     */
+    private function cleanResultFromEmbeddings($data)
+    {
+        if (is_array($data)) {
+            $cleaned = [];
+            foreach ($data as $key => $value) {
+                // Skip embedding keys
+                if ($key === 'embedding') {
+                    continue;
+                }
+                
+                // Recursively clean nested arrays/objects
+                if (is_array($value)) {
+                    $cleaned[$key] = $this->cleanResultFromEmbeddings($value);
+                } else {
+                    $cleaned[$key] = $value;
+                }
+            }
+            return $cleaned;
+        }
         
-        $response = $prism->getResponse($text, json_encode($context));
-
-        return response()->json($response['response'] ?? ['error' => 'No response from AI.'], 200);
+        return $data;
     }
 }

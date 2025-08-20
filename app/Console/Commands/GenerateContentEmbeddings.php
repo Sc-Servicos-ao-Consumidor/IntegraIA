@@ -2,20 +2,20 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
-use App\Models\Recipe;
+use App\Models\Content;
 use App\Services\EmbeddingService;
 use App\Services\PrismService;
+use Illuminate\Console\Command;
 
-class GenerateRecipeEmbeddings extends Command
+class GenerateContentEmbeddings extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'embedding:generate-recipes 
-                            {--limit= : Limit the number of recipes to process}
+    protected $signature = 'embedding:generate-content 
+                            {--limit= : Limit the number of content items to process}
                             {--force : Regenerate embeddings even if they already exist}';
 
     /**
@@ -23,14 +23,14 @@ class GenerateRecipeEmbeddings extends Command
      *
      * @var string
      */
-    protected $description = 'Generate embeddings for recipes using the AI service';
+    protected $description = 'Generate embeddings for content using the AI service';
 
     /**
      * Execute the console command.
      */
     public function handle()
     {
-        $this->info('Starting recipe embedding generation...');
+        $this->info('Starting content embedding generation...');
 
         $limit = $this->option('limit');
         $force = $this->option('force');
@@ -38,7 +38,7 @@ class GenerateRecipeEmbeddings extends Command
         try {
             $embeddingService = new EmbeddingService(new PrismService());
 
-            $query = Recipe::query();
+            $query = Content::query();
 
             if (!$force) {
                 $query->whereNull('embedding');
@@ -48,27 +48,27 @@ class GenerateRecipeEmbeddings extends Command
                 $query->limit((int) $limit);
             }
 
-            $recipes = $query->get();
+            $contents = $query->get();
 
-            if ($recipes->isEmpty()) {
-                $this->info('No recipes to process.');
+            if ($contents->isEmpty()) {
+                $this->info('No content items to process.');
                 return Command::SUCCESS;
             }
 
-            $this->info("Processing {$recipes->count()} recipes...");
+            $this->info("Processing {$contents->count()} content items...");
 
-            $progressBar = $this->output->createProgressBar($recipes->count());
+            $progressBar = $this->output->createProgressBar($contents->count());
             $progressBar->start();
 
             $successCount = 0;
             $errorCount = 0;
 
-            foreach ($recipes as $recipe) {
-                if ($embeddingService->generateEmbedding($recipe)) {
+            foreach ($contents as $content) {
+                if ($embeddingService->generateEmbedding($content)) {
                     $successCount++;
                 } else {
                     $errorCount++;
-                    $this->warn("\nFailed to generate embedding for recipe ID: {$recipe->id}");
+                    $this->warn("\nFailed to generate embedding for content ID: {$content->id}");
                 }
                 
                 $progressBar->advance();
@@ -77,20 +77,20 @@ class GenerateRecipeEmbeddings extends Command
             $progressBar->finish();
 
             $this->newLine(2);
-            $this->info("Recipe embedding generation completed!");
+            $this->info("Content embedding generation completed!");
             $this->table(
                 ['Status', 'Count'],
                 [
                     ['Success', $successCount],
                     ['Failed', $errorCount],
-                    ['Total', $recipes->count()]
+                    ['Total', $contents->count()]
                 ]
             );
 
             return Command::SUCCESS;
 
         } catch (\Exception $e) {
-            $this->error('Error generating recipe embeddings: ' . $e->getMessage());
+            $this->error('Error generating content embeddings: ' . $e->getMessage());
             return Command::FAILURE;
         }
     }
