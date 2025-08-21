@@ -22,6 +22,10 @@ class GroupProduct extends Model
         'status' => 'boolean',
     ];
 
+    protected $attributes = [
+        'status' => true,
+    ];
+
     public function products(): HasMany
     {
         return $this->hasMany(Product::class);

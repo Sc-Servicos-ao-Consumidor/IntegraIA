@@ -31,7 +31,7 @@ class ProductController extends Controller
             'contents:id,nome_conteudo as descricao'
         ])->latest()->get();
         
-        $groupProducts = GroupProduct::where('status', true)->get();
+        $groupProducts = GroupProduct::all();
         $recipes = Recipe::select('id', 'recipe_name as descricao')->get();
         $contents = Content::where('status', true)->select('id', 'nome_conteudo as descricao')->get();
 
@@ -168,25 +168,6 @@ class ProductController extends Controller
     public function destroy(Product $product)
     {
         $product->delete();
-        return redirect()->back();
-    }
-
-    /**
-     * Store a newly created group product.
-     */
-    public function storeGroup(Request $request)
-    {
-        $data = $request->validate([
-            'descricao' => 'required|string|max:255|unique:group_products,descricao',
-            'codigo_padrao' => 'nullable|string|max:255',
-            'observacao' => 'nullable|string|max:255',
-            'status' => 'boolean',
-        ]);
-
-        $data['ulid'] = Str::ulid();
-
-        GroupProduct::create($data);
-
         return redirect()->back();
     }
 }

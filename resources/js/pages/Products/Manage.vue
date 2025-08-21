@@ -7,6 +7,117 @@
                 <h1 class="text-2xl font-bold text-gray-900">Cadastro de Produtos</h1>
             </div>
 
+            <!-- Product Groups Management Section -->
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 mb-6">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h2 class="text-lg font-semibold text-gray-900">🏷️ Grupos de Produtos</h2>
+                </div>
+                
+                <div class="p-6">
+                    <!-- Add/Edit Group Form -->
+                    <form @submit.prevent="submitGroup" class="mb-6">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div>
+                                <label for="group_descricao" class="block text-sm font-medium text-gray-700 mb-1">Nome do Grupo*</label>
+                                <input
+                                    v-model="groupForm.descricao"
+                                    id="group_descricao"
+                                    type="text"
+                                    placeholder="Ex: Condimentos, Laticínios..."
+                                    class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                                    required
+                                />
+                            </div>
+                            
+                            <div>
+                                <label for="group_codigo_padrao" class="block text-sm font-medium text-gray-700 mb-1">Código Padrão</label>
+                                <input
+                                    v-model="groupForm.codigo_padrao"
+                                    id="group_codigo_padrao"
+                                    type="text"
+                                    placeholder="Código interno"
+                                    class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                                />
+                            </div>
+                            
+                            <div>
+                                <label for="group_observacao" class="block text-sm font-medium text-gray-700 mb-1">Observação</label>
+                                <input
+                                    v-model="groupForm.observacao"
+                                    id="group_observacao"
+                                    type="text"
+                                    placeholder="Observações adicionais"
+                                    class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                                />
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center gap-4 mt-4">
+                            <div class="flex gap-2">
+                                <button
+                                    type="submit"
+                                    :disabled="groupForm.processing"
+                                    class="px-4 py-2 text-sm font-medium text-white bg-orange-600 border border-transparent rounded-md hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                    {{ groupForm.processing ? 'Salvando...' : (groupForm.id ? 'Atualizar Grupo' : 'Adicionar Grupo') }}
+                                </button>
+                                
+                                <button
+                                    v-if="groupForm.id"
+                                    type="button"
+                                    @click="resetGroupForm"
+                                    class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"
+                                >
+                                    Cancelar
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+
+                    <!-- Groups List -->
+                    <div>
+                        <h3 class="text-sm font-medium text-gray-700 mb-3">Grupos Cadastrados</h3>
+                        
+                        <div v-if="props.groupProducts?.length" class="space-y-2">
+                            <div
+                                v-for="group in props.groupProducts"
+                                :key="group.id"
+                                class="flex items-center justify-between p-3 bg-gray-50 rounded border"
+                            >
+                                <div class="flex-1">
+                                    <div class="flex items-center gap-2">
+                                        <h4 class="font-medium text-gray-900">{{ group.descricao }}</h4>
+                                        <span v-if="group.codigo_padrao" class="text-sm text-gray-500">
+                                            ({{ group.codigo_padrao }})
+                                        </span>
+                                    </div>
+                                    <p v-if="group.observacao" class="text-sm text-gray-600 mt-1">{{ group.observacao }}</p>
+                                </div>
+                                
+                                <div class="flex gap-2 ml-4">
+                                    <button 
+                                        @click="editGroup(group)" 
+                                        class="text-sm text-orange-600 hover:text-orange-800 font-medium"
+                                    >
+                                        Editar
+                                    </button>
+                                    <button 
+                                        @click="deleteGroup(group)" 
+                                        class="text-sm text-red-600 hover:text-red-800 font-medium"
+                                    >
+                                        Excluir
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div v-else class="text-center py-4 text-gray-500 text-sm">
+                            Nenhum grupo cadastrado
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Product Form -->
             <form @submit.prevent="submit" class="bg-white rounded-lg shadow-sm border border-gray-200">
                 <!-- Form Header -->
@@ -89,7 +200,7 @@
                                     id="escolha_embalagem"
                                     class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                                 >
-                                    <option value="">Inserir Imagem...</option>
+                                    <option value="">Inserir Embalagem...</option>
                                     <option value="bag">Bag/Sachê</option>
                                     <option value="pote">Pote</option>
                                     <option value="lata">Lata</option>
@@ -476,26 +587,6 @@
                             <div class="flex flex-wrap gap-6">
                                 <div class="flex items-center">
                                     <input
-                                        v-model="form.catalogo"
-                                        id="catalogo"
-                                        type="checkbox"
-                                        class="h-4 w-4 text-orange-600 focus:ring-orange-500 border-gray-300 rounded"
-                                    />
-                                    <label for="catalogo" class="ml-2 text-sm text-gray-700">Mostrar no Catálogo</label>
-                                </div>
-                                
-                                <div class="flex items-center">
-                                    <input
-                                        v-model="form.lancamento"
-                                        id="lancamento"
-                                        type="checkbox"
-                                        class="h-4 w-4 text-orange-600 focus:ring-orange-500 border-gray-300 rounded"
-                                    />
-                                    <label for="lancamento" class="ml-2 text-sm text-gray-700">Produto em Lançamento</label>
-                                </div>
-                                
-                                <div class="flex items-center">
-                                    <input
                                         v-model="form.status"
                                         id="status"
                                         type="checkbox"
@@ -822,6 +913,66 @@ function editProduct(product) {
 function deleteProduct(product) {
     if (confirm(`Tem certeza que deseja excluir "${product.descricao}"?`)) {
         router.delete(`/products/${product.id}`)
+    }
+}
+
+// Group Form data
+const groupForm = useForm({
+    id: null,
+    descricao: '',
+    codigo_padrao: '',
+    observacao: '',
+    status: true,
+})
+
+function submitGroup() {
+    // Always ensure status is true
+    groupForm.status = true
+    
+    if (groupForm.id) {
+        // Update existing group
+        groupForm.put(`/group-products/${groupForm.id}`, {
+            onSuccess: () => {
+                router.reload()
+            },
+            onError: (errors) => {
+                console.error('Group update errors:', errors)
+            }
+        })
+    } else {
+        // Create new group
+        groupForm.post('/group-products', {
+            onSuccess: () => {
+                router.reload()
+            },
+            onError: (errors) => {
+                console.error('Group creation errors:', errors)
+            }
+        })
+    }
+}
+
+function editGroup(group) {
+    groupForm.id = group.id
+    groupForm.descricao = group.descricao
+    groupForm.codigo_padrao = group.codigo_padrao || ''
+    groupForm.observacao = group.observacao || ''
+    groupForm.status = true // Always set to true
+}
+
+function resetGroupForm() {
+    groupForm.reset()
+    groupForm.clearErrors()
+    groupForm.id = null
+    groupForm.descricao = ''
+    groupForm.codigo_padrao = ''
+    groupForm.observacao = ''
+    groupForm.status = true // Always set to true
+}
+
+function deleteGroup(group) {
+    if (confirm(`Tem certeza que deseja excluir o grupo "${group.descricao}"?`)) {
+        router.delete(`/group-products/${group.id}`)
     }
 }
 </script>

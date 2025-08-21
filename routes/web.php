@@ -3,6 +3,7 @@
 use App\Http\Controllers\RecipeController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ContentController;
+use App\Http\Controllers\GroupProductController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -21,7 +22,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     
     // Products management
     Route::resource('products', ProductController::class);
-    Route::post('/products/groups', [ProductController::class, 'storeGroup'])->name('products.groups.store');
+    
+    // Product Groups management
+    Route::resource('group-products', GroupProductController::class);
     
     // Contents management
     Route::resource('contents', ContentController::class);
