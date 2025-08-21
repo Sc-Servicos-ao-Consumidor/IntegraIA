@@ -199,7 +199,6 @@ class AIToolService
             ->map(function ($recipe) {
                 return [
                     'id' => $recipe->id,
-                    'title' => $recipe->title,
                     'recipe_name' => $recipe->recipe_name,
                     'cuisine' => $recipe->cuisine,
                     'recipe_type' => $recipe->recipe_type,
@@ -309,7 +308,6 @@ class AIToolService
         return [
             'recipe' => [
                 'id' => $recipe->id,
-                'title' => $recipe->title,
                 'recipe_name' => $recipe->recipe_name,
                 'recipe_code' => $recipe->recipe_code,
                 'cuisine' => $recipe->cuisine,
@@ -414,7 +412,6 @@ class AIToolService
         $recipes = $query->get()->map(function ($recipe) {
             return [
                 'id' => $recipe->id,
-                'title' => $recipe->title,
                 'recipe_name' => $recipe->recipe_name,
                 'cuisine' => $recipe->cuisine,
                 'difficulty_level' => $recipe->difficulty_level,

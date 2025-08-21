@@ -36,30 +36,7 @@
                     </div>
                 </div>
 
-                <div v-if="results.length" class="mt-6">
-                    <h3 class="font-medium text-gray-900 mb-3">Resultados da Busca</h3>
-                    <div class="space-y-3">
-                        <div
-                            v-for="recipe in results"
-                            :key="recipe.id"
-                            class="border border-gray-200 rounded-md p-4 bg-gray-50"
-                        >
-                            <h4 class="font-medium text-gray-900">{{ recipe.title || 'Sem título' }}</h4>
-                            <p class="text-xs text-gray-500 mt-1">
-                                Tags: 
-                                <span v-if="recipe.tags?.length">{{ recipe.tags.join(', ') }}</span>
-                                <span v-else>Nenhuma</span>
-                            </p>
-                            <p class="text-sm text-gray-600 mt-2 line-clamp-2">
-                                {{ recipe.raw_text.slice(0, 150) }}...
-                            </p>
-                        </div>
-                    </div>
-                </div>
 
-                <div v-else-if="!loading && hasSearched" class="text-gray-500 text-sm mt-6">
-                    Nenhuma receita encontrada.
-                </div>
             </div>
     
             <!-- Recipe Form -->
@@ -229,20 +206,7 @@
                             <p v-if="form.errors.channel" class="text-red-500 text-xs mt-1">{{ form.errors.channel }}</p>
                         </div>
 
-                        <!-- Top Dish -->
-                        <div>
-                            <label for="top_dish" class="block text-sm font-medium text-gray-700 mb-1">Prato Principal</label>
-                            <select
-                                v-model="form.top_dish"
-                                id="top_dish"
-                                class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-                            >
-                                <option value="">Selecione</option>
-                                <option value="sim">Sim</option>
-                                <option value="nao">Não</option>
-                            </select>
-                            <p v-if="form.errors.top_dish" class="text-red-500 text-xs mt-1">{{ form.errors.top_dish }}</p>
-                        </div>
+
 
                         <!-- Modo de Preparo -->
                         <div>
@@ -287,9 +251,9 @@
                         :key="recipe.id"
                         class="border border-gray-200 rounded-md p-4 bg-gray-50"
                     >
-                        <h3 class="font-medium text-gray-900">{{ recipe.title || recipe.recipe_name || 'Sem título' }}</h3>
+                        <h3 class="font-medium text-gray-900">{{ recipe.recipe_name || 'Sem título' }}</h3>
                         <p class="text-sm text-gray-600 mt-2 line-clamp-2">
-                            {{ recipe.recipe_description || recipe.raw_text?.slice(0, 150) || 'Sem descrição' }}...
+                            {{ recipe.recipe_description || 'Sem descrição' }}...
                         </p>
                         
                         <div class="mt-3 flex gap-2">
@@ -344,11 +308,6 @@ const props = defineProps({
 
 const form = useForm({
     id: null,
-    title: null,
-    raw_text: null,
-    metadata: null,
-    tags: [],
-    // New fields
     recipe_code: null,
     recipe_name: null,
     cuisine: null,
@@ -358,7 +317,6 @@ const form = useForm({
     difficulty_level: null,
     yield: null,
     channel: null,
-    top_dish: null,
     recipe_description: null,
     ingredients_description: null,
     preparation_method: null,
@@ -402,11 +360,6 @@ const search = async () => {
 
 function editRecipe(recipe) {
     form.id = recipe.id
-    form.title = recipe.title
-    form.raw_text = recipe.raw_text
-    form.metadata = recipe.metadata
-    form.tags = recipe.tags || []
-    // New fields
     form.recipe_code = recipe.recipe_code
     form.recipe_name = recipe.recipe_name
     form.cuisine = recipe.cuisine
@@ -416,7 +369,6 @@ function editRecipe(recipe) {
     form.difficulty_level = recipe.difficulty_level
     form.yield = recipe.yield
     form.channel = recipe.channel
-    form.top_dish = recipe.top_dish
     form.recipe_description = recipe.recipe_description
     form.ingredients_description = recipe.ingredients_description
     form.preparation_method = recipe.preparation_method

@@ -34,29 +34,39 @@ class GenerateRecipes extends Command
         $this->info("Generating $count recipes...");
 
         for ($i = 0; $i < $count; $i++) {
-            $prompt = "Create a realistic cooking recipe in this format:\n\nTitle:\nTags:\nInstructions:";
+            $prompt = "Create a realistic cooking recipe in this format:\n\nRecipe Name:\nCuisine:\nRecipe Type:\nDifficulty Level:\nYield:\nRecipe Description:\nIngredients Description:\nPreparation Method:";
 
             $prismService = new PrismService;
             $response = $prismService->getResponse($prompt);
 
-            $content = $response->content;
+            $content = $response['response'] ?? $response;
 
-            $title = $this->extractSection($content, 'Title');
-            $tags = explode(',', $this->extractSection($content, 'Tags'));
-            $rawText = $this->extractSection($content, 'Instructions');
+            $recipeName = $this->extractSection($content, 'Recipe Name');
+            $cuisine = $this->extractSection($content, 'Cuisine');
+            $recipeType = $this->extractSection($content, 'Recipe Type');
+            $difficultyLevel = $this->extractSection($content, 'Difficulty Level');
+            $yield = $this->extractSection($content, 'Yield');
+            $recipeDescription = $this->extractSection($content, 'Recipe Description');
+            $ingredientsDescription = $this->extractSection($content, 'Ingredients Description');
+            $preparationMethod = $this->extractSection($content, 'Preparation Method');
 
-            $embeddingInput = "$title\n" . implode(', ', $tags) . "\n$rawText";
+            $embeddingInput = "$recipeName\n$cuisine\n$recipeType\n$difficultyLevel\n$yield\n$recipeDescription\n$ingredientsDescription\n$preparationMethod";
 
             $embeddingResponse = $prismService->getEmbedding($embeddingInput);
 
             Recipe::create([
-                'title' => trim($title),
-                'raw_text' => trim($rawText),
-                'tags' => array_map('trim', $tags),
-                'embedding' => $embeddingResponse->embeddings[0]->embedding,
+                'recipe_name' => trim($recipeName),
+                'cuisine' => trim($cuisine),
+                'recipe_type' => trim($recipeType),
+                'difficulty_level' => trim($difficultyLevel),
+                'yield' => trim($yield),
+                'recipe_description' => trim($recipeDescription),
+                'ingredients_description' => trim($ingredientsDescription),
+                'preparation_method' => trim($preparationMethod),
+                'embedding' => $embeddingResponse['embeddings'][0]['embedding'] ?? $embeddingResponse,
             ]);
 
-            $this->info("✓ Added: $title");
+            $this->info("✓ Added: $recipeName");
         }
 
         $this->info("Done.");

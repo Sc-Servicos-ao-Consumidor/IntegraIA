@@ -23,8 +23,6 @@ class RecipeSeeder extends Seeder
             [
                 'recipe_code' => 'REC-001',
                 'recipe_name' => 'Molho à Bolonhesa com Base de Tomate Knorr',
-                'title' => 'Molho à Bolonhesa Profissional',
-                'raw_text' => 'Receita completa de molho à bolonhesa utilizando Base de Tomate Knorr Professional para obter consistência e sabor excepcionais.',
                 'cuisine' => 'Italiana',
                 'recipe_type' => 'Molho',
                 'service_order' => 'Acompanhamento',
@@ -42,23 +40,13 @@ class RecipeSeeder extends Seeder
                 'consumption_occasion' => ['Almoço', 'Jantar'],
                 'general_images_link' => 'https://example.com/images/molho-bolonhesa.jpg',
                 'product_code' => 'KNR-BT-750',
-                'content_code' => 'CNT-001',
-                'metadata' => [
-                    'brand' => 'Knorr Professional',
-                    'product' => 'Base de Tomate Knorr',
-                    'type' => 'Receita',
-                    'audience' => ['Cozinheiros', 'Chefs'],
-                    'usage' => 'Receita completa para molho à bolonhesa utilizando produtos Knorr Professional.',
-                ],
-                'tags' => ['molho', 'bolonhesa', 'italiana', 'knorr-professional']
+                'content_code' => 'CNT-001'
             ],
 
             // Ragú de Carne com Base de Tomate Knorr
             [
                 'recipe_code' => 'REC-002',
                 'recipe_name' => 'Ragú de Carne com Base de Tomate Knorr',
-                'title' => 'Ragú de Carne Profissional',
-                'raw_text' => 'Receita tradicional de ragú de carne desfiada com Base de Tomate Knorr Professional, ideal para massas e risotos.',
                 'cuisine' => 'Italiana',
                 'recipe_type' => 'Molho',
                 'service_order' => 'Acompanhamento',
@@ -76,23 +64,13 @@ class RecipeSeeder extends Seeder
                 'consumption_occasion' => ['Almoço', 'Jantar'],
                 'general_images_link' => 'https://example.com/images/ragu-carne.jpg',
                 'product_code' => 'KNR-BT-750',
-                'content_code' => 'CNT-002',
-                'metadata' => [
-                    'brand' => 'Knorr Professional',
-                    'product' => 'Base de Tomate Knorr',
-                    'type' => 'Receita',
-                    'audience' => ['Cozinheiros', 'Chefs'],
-                    'usage' => 'Receita de ragú de carne com Base de Tomate Knorr Professional.',
-                ],
-                'tags' => ['ragu', 'carne-desfiada', 'italiana', 'knorr-professional']
+                'content_code' => 'CNT-002'
             ],
 
             // Molho de Pizza com Base de Tomate Knorr
             [
                 'recipe_code' => 'REC-003',
                 'recipe_name' => 'Molho de Pizza com Base de Tomate Knorr',
-                'title' => 'Molho de Pizza Profissional',
-                'raw_text' => 'Molho especial para pizza com Base de Tomate Knorr Professional e orégano, ideal para pizzarias.',
                 'cuisine' => 'Italiana',
                 'recipe_type' => 'Molho',
                 'service_order' => 'Base',
@@ -110,15 +88,7 @@ class RecipeSeeder extends Seeder
                 'consumption_occasion' => ['Almoço', 'Jantar', 'Lanche'],
                 'general_images_link' => 'https://example.com/images/molho-pizza.jpg',
                 'product_code' => 'KNR-BT-750',
-                'content_code' => 'CNT-003',
-                'metadata' => [
-                    'brand' => 'Knorr Professional',
-                    'product' => 'Base de Tomate Knorr',
-                    'type' => 'Receita',
-                    'audience' => ['Pizzaiolos', 'Cozinheiros'],
-                    'usage' => 'Molho especial para pizza com Base de Tomate Knorr Professional.',
-                ],
-                'tags' => ['molho-pizza', 'pizzaria', 'oregano', 'knorr-professional']
+                'content_code' => 'CNT-003'
             ]
         ];
 

@@ -187,7 +187,7 @@
                                         >
                                             <option value="">Nome da Receita</option>
                                             <option v-for="availableRecipe in props.recipes" :key="availableRecipe.id" :value="availableRecipe.id">
-                                                {{ availableRecipe.recipe_name || availableRecipe.title }}
+                                                {{ availableRecipe.recipe_name }}
                                             </option>
                                         </select>
 

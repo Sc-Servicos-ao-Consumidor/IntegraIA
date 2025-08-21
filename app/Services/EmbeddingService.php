@@ -94,7 +94,6 @@ class EmbeddingService
     protected function getRecipeEmbeddingText(Recipe $recipe): string
     {
         $parts = array_filter([
-            $recipe->title,
             $recipe->recipe_name,
             $recipe->recipe_description,
             $recipe->ingredients_description,
@@ -103,22 +102,14 @@ class EmbeddingService
             $recipe->recipe_type,
             $recipe->channel,
             $recipe->difficulty_level,
-            implode(', ', $recipe->tags ?? []),
+            $recipe->yield,
+            $recipe->service_order,
             implode(', ', $recipe->main_ingredients ?? []),
             implode(', ', $recipe->supporting_ingredients ?? []),
             implode(', ', $recipe->usage_groups ?? []),
             implode(', ', $recipe->preparation_techniques ?? []),
             implode(', ', $recipe->consumption_occasion ?? []),
-            $recipe->raw_text,
         ]);
-
-        // Include metadata if present
-        if ($recipe->metadata) {
-            $metadataText = collect($recipe->metadata)
-                ->map(fn($value, $key) => $key . ': ' . (is_array($value) ? implode(', ', $value) : $value))
-                ->implode("\n");
-            $parts[] = $metadataText;
-        }
 
         return implode("\n", $parts);
     }

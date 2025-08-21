@@ -15,10 +15,6 @@ class Recipe extends Model
     use HasNeighbors;
 
     protected $fillable = [
-        'title',
-        'raw_text',
-        'metadata',
-        'tags',
         'embedding',
         'recipe_code',
         'recipe_name', 
@@ -39,13 +35,10 @@ class Recipe extends Model
         'consumption_occasion',
         'general_images_link',
         'product_code',
-        'content_code',
-        'top_dish'
+        'content_code'
     ];
 
     protected $casts = [
-        'metadata' => 'array',
-        'tags' => 'array',
         'main_ingredients' => 'array',
         'supporting_ingredients' => 'array',
         'usage_groups' => 'array',
