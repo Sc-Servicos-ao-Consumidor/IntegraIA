@@ -1,6 +1,38 @@
 <template>
     <Head title="Cadastro de Produtos" />
 
+    <!-- Toast Notifications -->
+    <div class="fixed top-4 right-4 z-50 space-y-2">
+        <div
+            v-for="toast in toasts"
+            :key="toast.id"
+            :class="[
+                'px-4 py-3 rounded-lg shadow-lg max-w-sm transform transition-all duration-300',
+                toast.type === 'success' ? 'bg-green-500 text-white' : '',
+                toast.type === 'error' ? 'bg-red-500 text-white' : '',
+                toast.type === 'warning' ? 'bg-yellow-500 text-white' : '',
+                toast.type === 'info' ? 'bg-blue-500 text-white' : '',
+                toast.visible ? 'translate-x-0 opacity-100' : 'translate-x-full opacity-0'
+            ]"
+        >
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-2">
+                    <span v-if="toast.type === 'success'" class="text-lg">✅</span>
+                    <span v-else-if="toast.type === 'error'" class="text-lg">❌</span>
+                    <span v-else-if="toast.type === 'warning'" class="text-lg">⚠️</span>
+                    <span v-else-if="toast.type === 'info'" class="text-lg">ℹ️</span>
+                    <span class="font-medium">{{ toast.message }}</span>
+                </div>
+                <button
+                    @click="removeToast(toast.id)"
+                    class="ml-2 text-white hover:text-gray-200 focus:outline-none"
+                >
+                    ×
+                </button>
+            </div>
+        </div>
+    </div>
+
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="max-w-7xl mx-auto">
             <div class="mb-6">
@@ -59,7 +91,14 @@
                                     :disabled="groupForm.processing"
                                     class="px-4 py-2 text-sm font-medium text-white bg-orange-600 border border-transparent rounded-md hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
-                                    {{ groupForm.processing ? 'Salvando...' : (groupForm.id ? 'Atualizar Grupo' : 'Adicionar Grupo') }}
+                                    <span v-if="groupForm.processing" class="flex items-center gap-2">
+                                        <svg class="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                        </svg>
+                                        Salvando...
+                                    </span>
+                                    <span v-else>{{ groupForm.id ? 'Atualizar Grupo' : 'Adicionar Grupo' }}</span>
                                 </button>
                                 
                                 <button
@@ -604,7 +643,7 @@
                     <div class="flex gap-3">
                         <button
                             type="button"
-                            @click="resetForm"
+                            @click="confirmResetForm"
                             class="px-6 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"
                         >
                             {{ form.id ? 'Cancelar' : 'Limpar' }}
@@ -614,7 +653,14 @@
                             :disabled="form.processing"
                             class="px-6 py-2 text-sm font-medium text-white bg-orange-600 border border-transparent rounded-md hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                            {{ form.processing ? 'Salvando...' : (form.id ? 'Atualizar Produto' : 'Salvar Produto') }}
+                            <span v-if="form.processing" class="flex items-center gap-2">
+                                <svg class="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                                Salvando...
+                            </span>
+                            <span v-else>{{ form.id ? 'Atualizar Produto' : 'Salvar Produto' }}</span>
                         </button>
                     </div>
                 </div>
@@ -691,7 +737,7 @@
 
 <script setup>
 import { router, useForm, Head, usePage } from '@inertiajs/vue3'
-import { ref } from 'vue'
+import { ref, nextTick } from 'vue'
 import AppLayout from '@/layouts/AppLayout.vue'
 
 const breadcrumbs = [
@@ -707,6 +753,83 @@ const props = defineProps({
     recipes: Array,
     contents: Array
 })
+
+// Toast notification system
+const toasts = ref([])
+let toastIdCounter = 0
+
+function showToast(message, type = 'info', duration = 5000) {
+    const toast = {
+        id: ++toastIdCounter,
+        message,
+        type,
+        visible: false
+    }
+    
+    toasts.value.push(toast)
+    
+    // Show toast with animation
+    nextTick(() => {
+        toast.visible = true
+    })
+    
+    // Auto-remove toast after duration
+    setTimeout(() => {
+        removeToast(toast.id)
+    }, duration)
+}
+
+function removeToast(id) {
+    const index = toasts.value.findIndex(t => t.id === id)
+    if (index > -1) {
+        toasts.value[index].visible = false
+        setTimeout(() => {
+            toasts.value.splice(index, 1)
+        }, 300)
+    }
+}
+
+function showValidationErrors(errors) {
+    // Show first error as a toast
+    const firstError = Object.values(errors)[0]
+    if (firstError) {
+        const errorMessage = Array.isArray(firstError) ? firstError[0] : firstError
+        showToast(`Erro de validação: ${errorMessage}`, 'error')
+    }
+    
+    // Show additional errors if there are more
+    const errorCount = Object.keys(errors).length
+    if (errorCount > 1) {
+        setTimeout(() => {
+            showToast(`Mais ${errorCount - 1} erro(s) de validação encontrado(s)`, 'warning')
+        }, 1000)
+    }
+}
+
+function showFormProcessingMessage() {
+    showToast('Processando formulário...', 'info', 2000)
+}
+
+function showFormSuccessMessage(isUpdate, itemName) {
+    const message = isUpdate 
+        ? `${itemName} atualizado com sucesso!` 
+        : `${itemName} criado com sucesso!`
+    showToast(message, 'success')
+}
+
+function confirmResetForm() {
+    if (form.id) {
+        // If editing, just cancel without confirmation
+        resetForm()
+        showToast('Edição cancelada', 'info')
+    } else {
+        // If creating new, ask for confirmation
+        if (confirm('Tem certeza que deseja limpar todos os dados do formulário?')) {
+            resetForm()
+            showToast('Formulário limpo', 'info')
+        }
+    }
+}
 
 // Form data
 const form = useForm({
@@ -821,11 +944,23 @@ function submit() {
     
     form.post("/products", {
         onSuccess: () => {
+            const isUpdate = form.id !== null
+            showFormSuccessMessage(isUpdate, `Produto "${form.descricao}"`)
+            
+            // Reset form after successful submission
+            resetForm()
+            
             // Refresh the page to show updated data
             router.reload()
         },
         onError: (errors) => {
             console.error('Form submission errors:', errors)
+            
+            if (Object.keys(errors).length > 0) {
+                showValidationErrors(errors)
+            } else {
+                showToast('Erro ao salvar o produto. Verifique os dados e tente novamente.', 'error')
+            }
         }
     })
 }
@@ -912,7 +1047,17 @@ function editProduct(product) {
 
 function deleteProduct(product) {
     if (confirm(`Tem certeza que deseja excluir "${product.descricao}"?`)) {
-        router.delete(`/products/${product.id}`)
+        router.delete(`/products/${product.id}`, {
+            onSuccess: () => {
+                const message = `Produto "${product.descricao}" excluído com sucesso!`
+                showToast(message, 'success')
+            },
+            onError: (errors) => {
+                console.error('Product deletion errors:', errors)
+                const errorMessage = 'Erro ao excluir o produto. Tente novamente.'
+                showToast(errorMessage, 'error')
+            }
+        })
     }
 }
 
@@ -933,20 +1078,44 @@ function submitGroup() {
         // Update existing group
         groupForm.put(`/group-products/${groupForm.id}`, {
             onSuccess: () => {
+                showFormSuccessMessage(true, `Grupo "${groupForm.descricao}"`)
+                
+                // Reset form after successful submission
+                resetGroupForm()
+                
+                // Refresh the page to show updated data
                 router.reload()
             },
             onError: (errors) => {
                 console.error('Group update errors:', errors)
+                
+                if (Object.keys(errors).length > 0) {
+                    showValidationErrors(errors)
+                } else {
+                    showToast('Erro ao atualizar o grupo. Verifique os dados e tente novamente.', 'error')
+                }
             }
         })
     } else {
         // Create new group
         groupForm.post('/group-products', {
             onSuccess: () => {
+                showFormSuccessMessage(false, `Grupo "${groupForm.descricao}"`)
+                
+                // Reset form after successful submission
+                resetGroupForm()
+                
+                // Refresh the page to show updated data
                 router.reload()
             },
             onError: (errors) => {
                 console.error('Group creation errors:', errors)
+                
+                if (Object.keys(errors).length > 0) {
+                    showValidationErrors(errors)
+                } else {
+                    showToast('Erro ao criar o grupo. Verifique os dados e tente novamente.', 'error')
+                }
             }
         })
     }
@@ -972,7 +1141,17 @@ function resetGroupForm() {
 
 function deleteGroup(group) {
     if (confirm(`Tem certeza que deseja excluir o grupo "${group.descricao}"?`)) {
-        router.delete(`/group-products/${group.id}`)
+        router.delete(`/group-products/${group.id}`, {
+            onSuccess: () => {
+                const message = `Grupo "${group.descricao}" excluído com sucesso!`
+                showToast(message, 'success')
+            },
+            onError: (errors) => {
+                console.error('Group deletion errors:', errors)
+                const errorMessage = 'Erro ao excluir o grupo. Tente novamente.'
+                showToast(errorMessage, 'error')
+            }
+        })
     }
 }
 </script>

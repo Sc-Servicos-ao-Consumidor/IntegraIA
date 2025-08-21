@@ -1,6 +1,38 @@
 <template>
     <Head title="Cadastros de Receitas" />
 
+    <!-- Toast Notifications -->
+    <div class="fixed top-4 right-4 z-50 space-y-2">
+        <div
+            v-for="toast in toasts"
+            :key="toast.id"
+            :class="[
+                'px-4 py-3 rounded-lg shadow-lg max-w-sm transform transition-all duration-300',
+                toast.type === 'success' ? 'bg-green-500 text-white' : '',
+                toast.type === 'error' ? 'bg-red-500 text-white' : '',
+                toast.type === 'warning' ? 'bg-yellow-500 text-white' : '',
+                toast.type === 'info' ? 'bg-blue-500 text-white' : '',
+                toast.visible ? 'translate-x-0 opacity-100' : 'translate-x-full opacity-0'
+            ]"
+        >
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-2">
+                    <span v-if="toast.type === 'success'" class="text-lg">✅</span>
+                    <span v-else-if="toast.type === 'error'" class="text-lg">❌</span>
+                    <span v-else-if="toast.type === 'warning'" class="text-lg">⚠️</span>
+                    <span v-else-if="toast.type === 'info'" class="text-lg">ℹ️</span>
+                    <span class="font-medium">{{ toast.message }}</span>
+                </div>
+                <button
+                    @click="removeToast(toast.id)"
+                    class="ml-2 text-white hover:text-gray-200 focus:outline-none"
+                >
+                    ×
+                </button>
+            </div>
+        </div>
+    </div>
+
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="max-w-7xl mx-auto">
             <div class="mb-6">
@@ -225,18 +257,25 @@
                 <!-- Action Buttons -->
                 <div class="flex gap-3 mt-8 pt-6 border-t border-gray-200">
                     <button
-                        type="reset"
-                        @click="form.reset()"
+                        type="button"
+                        @click="confirmResetForm"
                         class="px-6 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"
                     >
-                        Limpar
+                        {{ form.id ? 'Cancelar' : 'Limpar' }}
                     </button>
                     <button
                         type="submit"
                         :disabled="form.processing"
                         class="px-6 py-2 text-sm font-medium text-white bg-orange-600 border border-transparent rounded-md hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                        {{ form.processing ? 'Salvando...' : 'Salvar Receita' }}
+                        <span v-if="form.processing" class="flex items-center gap-2">
+                            <svg class="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            Salvando...
+                        </span>
+                        <span v-else>{{ form.id ? 'Atualizar Receita' : 'Salvar Receita' }}</span>
                     </button>
                 </div>
             </form>
@@ -283,7 +322,7 @@
 
 <script setup>
 import { router, useForm, Head } from '@inertiajs/vue3'
-import {ref} from 'vue'
+import {ref, nextTick} from 'vue'
 import axios from 'axios'
 import AppLayout from '@/layouts/AppLayout.vue'
 
@@ -305,6 +344,82 @@ const props = defineProps({
     recipes: Array,
     products: Array
 })
+
+// Toast notification system
+const toasts = ref([])
+let toastIdCounter = 0
+
+function showToast(message, type = 'info', duration = 5000) {
+    const toast = {
+        id: ++toastIdCounter,
+        message,
+        type,
+        visible: false
+    }
+    
+    toasts.value.push(toast)
+    
+    // Show toast with animation
+    nextTick(() => {
+        toast.visible = true
+    })
+    
+    // Auto-remove toast after duration
+    setTimeout(() => {
+        removeToast(toast.id)
+    }, duration)
+}
+
+function removeToast(id) {
+    const index = toasts.value.findIndex(t => t.id === id)
+    if (index > -1) {
+        toasts.value[index].visible = false
+        setTimeout(() => {
+            toasts.value.splice(index, 1)
+        }, 300)
+    }
+}
+
+function showValidationErrors(errors) {
+    // Show first error as a toast
+    const firstError = Object.values(errors)[0]
+    if (firstError) {
+        const errorMessage = Array.isArray(firstError) ? firstError[0] : firstError
+        showToast(`Erro de validação: ${errorMessage}`, 'error')
+    }
+    
+    // Show additional errors if there are more
+    const errorCount = Object.keys(errors).length
+    if (errorCount > 1) {
+        setTimeout(() => {
+            showToast(`Mais ${errorCount - 1} erro(s) de validação encontrado(s)`, 'warning')
+        }, 1000)
+    }
+}
+
+function showFormSuccessMessage(isUpdate, itemName) {
+    const message = isUpdate 
+        ? `${itemName} atualizado com sucesso!` 
+        : `${itemName} criado com sucesso!`
+    showToast(message, 'success')
+}
+
+function confirmResetForm() {
+    if (form.id) {
+        // If editing, just cancel without confirmation
+        form.reset()
+        form.selected_products = []
+        form.id = null
+        showToast('Edição cancelada', 'info')
+    } else {
+        // If creating new, ask for confirmation
+        if (confirm('Tem certeza que deseja limpar todos os dados do formulário?')) {
+            form.reset()
+            form.selected_products = []
+            showToast('Formulário limpo', 'info')
+        }
+    }
+}
 
 const form = useForm({
     id: null,
@@ -393,13 +508,43 @@ function editRecipe(recipe) {
 }
 
 function deleteRecipe(recipe) {
-    router.delete(`recipes/${recipe.id}`)
+    if (confirm(`Tem certeza que deseja excluir "${recipe.recipe_name || 'esta receita'}"?`)) {
+        router.delete(`recipes/${recipe.id}`, {
+            onSuccess: () => {
+                const message = `Receita "${recipe.recipe_name || 'sem título'}" excluída com sucesso!`
+                showToast(message, 'success')
+            },
+            onError: (errors) => {
+                console.error('Recipe deletion errors:', errors)
+                const errorMessage = 'Erro ao excluir a receita. Tente novamente.'
+                showToast(errorMessage, 'error')
+            }
+        })
+    }
 }
 
 const submit = () => {
     form.post("/recipes", {
         onSuccess: () => {
+            const isUpdate = form.id !== null
+            const itemName = form.recipe_name || 'Receita'
+            showFormSuccessMessage(isUpdate, itemName)
+            
+            // Reset form after successful submission
             form.reset()
+            form.selected_products = []
+            
+            // Clear form ID to indicate new recipe creation
+            form.id = null
+        },
+        onError: (errors) => {
+            console.error('Form submission errors:', errors)
+            
+            if (Object.keys(errors).length > 0) {
+                showValidationErrors(errors)
+            } else {
+                showToast('Erro ao salvar a receita. Verifique os dados e tente novamente.', 'error')
+            }
         }
     })
 }
