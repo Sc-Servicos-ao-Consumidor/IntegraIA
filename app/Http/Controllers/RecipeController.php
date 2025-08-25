@@ -115,7 +115,7 @@ class RecipeController extends Controller
 
         $query = $request->query('query');
         $type = $request->query('type', 'all');
-        $limit = $request->query('limit', 5);
+        $limit = $request->query('limit', 2);
 
         try {
             $prism = new PrismService();
