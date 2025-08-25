@@ -238,7 +238,7 @@ class RecipeController extends Controller
             //     ], 200);
             // }
 
-            if($response['status']){
+            if(isset($response['status']) && $response['status']){
                     return response()->json([
                     'response' => $response['response'] ?? $response
                 ], 200);
