@@ -8,6 +8,8 @@ use App\Models\ProductImage;
 use App\Models\GroupProduct;
 use App\Models\Recipe;
 use App\Models\Content;
+use App\Services\EmbeddingService;
+use App\Services\PrismService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
@@ -160,6 +162,47 @@ class ProductController extends Controller
             DB::rollback();
             return redirect()->back()->withErrors(['error' => 'Erro ao salvar produto: ' . $e->getMessage()]);
         }
+    }
+
+    /**
+     * Display the specified resource.
+     */
+    public function show($id)
+    {
+        $product = Product::with([
+            'groupProduct', 
+            'detail', 
+            'images' => function($query) {
+                $query->active()->ordered();
+            },
+            'recipes:id,recipe_name as descricao',
+            'contents:id,nome_conteudo as descricao'
+        ])->findOrFail($id);
+
+        return response()->json($product);
+    }
+
+    /**
+     * Search products using semantic search
+     */
+    public function search(Request $request)
+    {
+        $request->validate([
+            'query' => 'required|string|min:2',
+            'limit' => 'integer|min:1|max:50'
+        ]);
+
+        $query = $request->input('query');
+        $limit = $request->input('limit', 10);
+
+        $embeddingService = new EmbeddingService(app(PrismService::class));
+        $results = $embeddingService->searchProducts($query, $limit);
+
+        return response()->json([
+            'query' => $query,
+            'results' => $results,
+            'total' => count($results)
+        ]);
     }
 
     /**

@@ -207,4 +207,161 @@ class EmbeddingService
 
         return $results;
     }
+
+    /**
+     * Perform semantic search on products
+     */
+    public function searchProducts(string $query, int $limit = 10): array
+    {
+        try {
+            $queryEmbedding = $this->prismService->getEmbedding($query);
+            $queryVector = $this->prismService->extractEmbeddingFromResponse($queryEmbedding);
+            
+            if (!$queryVector) {
+                throw new \Exception('Failed to generate query embedding');
+            }
+
+            $products = Product::with(['groupProduct', 'detail', 'images', 'recipes', 'contents'])
+                ->whereNotNull('embedding')
+                ->get()
+                ->map(function ($product) use ($queryVector) {
+                    if (is_array($product->embedding)) {
+                        $similarity = $this->calculateCosineSimilarity($queryVector, $product->embedding);
+                        return [
+                            'product' => $product,
+                            'similarity' => $similarity
+                        ];
+                    }
+                    return null;
+                })
+                ->filter()
+                ->sortByDesc('similarity')
+                ->take($limit)
+                ->values()
+                ->toArray();
+
+            return $products;
+        } catch (\Exception $e) {
+            Log::error('Error in semantic product search', [
+                'error' => $e->getMessage(),
+                'query' => $query
+            ]);
+            return [];
+        }
+    }
+
+    /**
+     * Perform semantic search on contents
+     */
+    public function searchContents(string $query, int $limit = 10): array
+    {
+        try {
+            $queryEmbedding = $this->prismService->getEmbedding($query);
+            $queryVector = $this->prismService->extractEmbeddingFromResponse($queryEmbedding);
+            
+            if (!$queryVector) {
+                throw new \Exception('Failed to generate query embedding');
+            }
+
+            $contents = Content::with(['recipes', 'products'])
+                ->whereNotNull('embedding')
+                ->get()
+                ->map(function ($content) use ($queryVector) {
+                    if (is_array($content->embedding)) {
+                        $similarity = $this->calculateCosineSimilarity($queryVector, $content->embedding);
+                        return [
+                            'content' => $content,
+                            'similarity' => $similarity
+                        ];
+                    }
+                    return null;
+                })
+                ->filter()
+                ->sortByDesc('similarity')
+                ->take($limit)
+                ->values()
+                ->toArray();
+
+            return $contents;
+        } catch (\Exception $e) {
+            Log::error('Error in semantic content search', [
+                'error' => $e->getMessage(),
+                'query' => $query
+            ]);
+            return [];
+        }
+    }
+
+    /**
+     * Perform semantic search on recipes
+     */
+    public function searchRecipes(string $query, int $limit = 10): array
+    {
+        try {
+            $queryEmbedding = $this->prismService->getEmbedding($query);
+            $queryVector = $this->prismService->extractEmbeddingFromResponse($queryEmbedding);
+            
+            if (!$queryVector) {
+                throw new \Exception('Failed to generate query embedding');
+            }
+
+            $recipes = Recipe::with(['products'])
+                ->whereNotNull('embedding')
+                ->get()
+                ->map(function ($recipe) use ($queryVector) {
+                    if (is_array($recipe->embedding)) {
+                        $similarity = $this->calculateCosineSimilarity($queryVector, $recipe->embedding);
+                        return [
+                            'recipe' => $recipe,
+                            'similarity' => $similarity
+                        ];
+                    }
+                    return null;
+                })
+                ->filter()
+                ->sortByDesc('similarity')
+                ->take($limit)
+                ->values()
+                ->toArray();
+
+            return $recipes;
+        } catch (\Exception $e) {
+            Log::error('Error in semantic recipe search', [
+                'error' => $e->getMessage(),
+                'query' => $query
+            ]);
+            return [];
+        }
+    }
+
+    /**
+     * Calculate cosine similarity between two vectors
+     */
+    private function calculateCosineSimilarity(array $vectorA, array $vectorB): float
+    {
+        if (count($vectorA) !== count($vectorB)) {
+            return 0.0;
+        }
+
+        $dotProduct = 0.0;
+        $normA = 0.0;
+        $normB = 0.0;
+
+        for ($i = 0; $i < count($vectorA); $i++) {
+            $dotProduct += $vectorA[$i] * $vectorB[$i];
+            $normA += $vectorA[$i] * $vectorA[$i];
+            $normB += $vectorB[$i] * $vectorB[$i];
+        }
+
+        $normA = sqrt($normA);
+        $normB = sqrt($normB);
+
+        if ($normA == 0 || $normB == 0) {
+            return 0.0;
+        }
+
+        return $dotProduct / ($normA * $normB);
+    }
+
+
 }

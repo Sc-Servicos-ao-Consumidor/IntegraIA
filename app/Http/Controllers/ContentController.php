@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Content;
 use App\Models\Product;
 use App\Models\Recipe;
+use App\Services\EmbeddingService;
+use App\Services\PrismService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -95,6 +97,39 @@ class ContentController extends Controller
         }
 
         return null;
+    }
+
+    /**
+     * Display the specified resource.
+     */
+    public function show($id)
+    {
+        $content = Content::with(['recipes', 'products'])->findOrFail($id);
+
+        return response()->json($content);
+    }
+
+    /**
+     * Search contents using semantic search
+     */
+    public function search(Request $request)
+    {
+        $request->validate([
+            'query' => 'required|string|min:2',
+            'limit' => 'integer|min:1|max:50'
+        ]);
+
+        $query = $request->input('query');
+        $limit = $request->input('limit', 10);
+
+        $embeddingService = new EmbeddingService(app(PrismService::class));
+        $results = $embeddingService->searchContents($query, $limit);
+
+        return response()->json([
+            'query' => $query,
+            'results' => $results,
+            'total' => count($results)
+        ]);
     }
 
     /**
