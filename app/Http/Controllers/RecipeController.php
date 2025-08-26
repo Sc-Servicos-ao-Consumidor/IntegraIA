@@ -6,8 +6,6 @@ use App\Models\Recipe;
 use App\Models\Product;
 use App\Models\Content;
 use App\Services\PrismService;
-use App\Services\EmbeddingService;
-use App\Services\AIToolService;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Schema;
@@ -253,6 +251,16 @@ class RecipeController extends Controller
                 'error' => 'Assistant failed: ' . $e->getMessage()
             ], 500);
         }
+    }
+
+    /**
+     * Display the specified resource.
+     */
+    public function show($id)
+    {
+        $recipe = Recipe::with(['products'])->findOrFail($id);
+
+        return response()->json($recipe);
     }
 
     /**

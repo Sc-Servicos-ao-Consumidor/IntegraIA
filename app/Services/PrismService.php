@@ -106,11 +106,7 @@ class PrismService
         Sua tarefa é ajudar os usuários a encontrar receitas com base em ingredientes, técnicas de cozinha, preferências alimentares, informações de produtos e entre outras informações.
 
         Você deve fornecer respostas claras e concisas, sugerindo respostas relevantes ao contexto e úteis.
-        Use as ferramentas disponíveis para encontrar mais informações quando necessário.";
-
-        if ($context) {
-            $basePrompt .= "\n\nContexto relevante:\n" . (is_array($context) ? json_encode($context) : $context);
-        }
+        Sempre use as ferramentas disponíveis para buscar e encontrar as informações específicas que o usuário solicita, em vez de depender de contexto prévio.";
 
         return $basePrompt;
     }
