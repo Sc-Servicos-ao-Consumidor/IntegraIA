@@ -37,7 +37,7 @@ class GenerateRecipes extends Command
             $prompt = "Create a realistic cooking recipe in this format:\n\nRecipe Name:\nCuisine:\nRecipe Type:\nDifficulty Level:\nYield:\nRecipe Description:\nIngredients Description:\nPreparation Method:";
 
             $prismService = new PrismService;
-            $response = $prismService->getResponse($prompt);
+            $response = $prismService->getEmbedding($prompt);
 
             $content = $response['response'] ?? $response;
 
