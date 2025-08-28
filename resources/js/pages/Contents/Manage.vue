@@ -63,7 +63,7 @@
                             id="cozinheiro"
                             class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                         >
-                            <option value="">sim ou não</option>
+                            <option value="" disabled selected>Selecione...</option>
                             <option :value="true">Sim</option>
                             <option :value="false">Não</option>
                         </select>
@@ -77,7 +77,7 @@
                             id="comprador"
                             class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                         >
-                            <option value="">sim ou não</option>
+                            <option value="" disabled selected>Selecione...</option>
                             <option :value="true">Sim</option>
                             <option :value="false">Não</option>
                         </select>
@@ -91,7 +91,7 @@
                             id="administrador"
                             class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                         >
-                            <option value="">sim ou não</option>
+                            <option value="" disabled selected>Selecione...</option>
                             <option :value="true">Sim</option>
                             <option :value="false">Não</option>
                         </select>
@@ -105,7 +105,7 @@
                             id="tipo_conteudo"
                             class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                         >
-                            <option value="">(E-book, UFS Academy, Artigos, Menu do Futuro, Dicas)</option>
+                            <option value="" disabled selected>Selecione...</option>
                             <option value="ebook">E-book</option>
                             <option value="ufs-academy">UFS Academy</option>
                             <option value="artigos">Artigos</option>
@@ -122,7 +122,7 @@
                             id="pilares"
                             class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                         >
-                            <option value="">(Treinamento, Inspiração, Comprar, SAC)</option>
+                            <option value="" disabled selected>Selecione...</option>
                             <option value="treinamento">Treinamento</option>
                             <option value="inspiracao">Inspiração</option>
                             <option value="comprar">Comprar</option>
@@ -138,7 +138,7 @@
                             id="canal"
                             class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                         >
-                            <option value="">(Padaria, Lanchonete, Buffet, A la Carte, Industrial)</option>
+                            <option value="" disabled selected>Selecione...</option>
                             <option value="padaria">Padaria</option>
                             <option value="lanchonete">Lanchonete</option>
                             <option value="buffet">Buffet</option>
@@ -156,7 +156,7 @@
                             <input
                                 v-model="link.nome"
                                 type="text"
-                                placeholder="Nome do Link"
+                                placeholder="Descrição do Link"
                                 class="flex-1 border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                             />
                             <input
@@ -190,8 +190,7 @@
                         v-model="form.descricao_conteudo"
                         id="descricao_conteudo"
                         rows="4"
-                        class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-none cursor-not-allowed"
-                        disabled
+                        class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-vertical"
                     ></textarea>
                 </div>
 
@@ -217,7 +216,7 @@
                                             v-model="recipe.recipe_id"
                                             class="flex-1 border-0 text-sm bg-transparent focus:outline-none"
                                         >
-                                            <option value="">Nome da Receita</option>
+                                            <option value="" disabled selected>Selecione...</option>
                                             <option v-for="availableRecipe in props.recipes" :key="availableRecipe.id" :value="availableRecipe.id">
                                                 {{ availableRecipe.recipe_name }}
                                             </option>
@@ -261,7 +260,7 @@
                                             v-model="product.product_id"
                                             class="flex-1 border-0 text-sm bg-transparent focus:outline-none"
                                         >
-                                            <option value="">Nome do Produto</option>
+                                            <option value="" disabled selected>Selecione...</option>
                                             <option v-for="availableProduct in props.products" :key="availableProduct.id" :value="availableProduct.id">
                                                 {{ availableProduct.descricao }}
                                             </option>
@@ -270,7 +269,7 @@
                                             v-model="product.featured"
                                             class="border border-gray-300 rounded px-2 py-1 text-sm"
                                         >
-                                            <option value="" selected>Principal? (Sim ou Não)</option>
+                                            <option value="" disabled selected>Selecione...</option>
                                             <option value="nao">Não</option>
                                             <option value="sim">Sim</option>
                                         </select>
@@ -484,13 +483,13 @@ const form = useForm({
     imagens_ingredientes_cadastradas: [],
     imagens_preparo_cadastradas: [],
     imagens_rendimentos_cadastradas: [],
-    tipo_conteudo: null,
-    pilares: null,
-    canal: null,
+    tipo_conteudo: '',
+    pilares: '',
+    canal: '',
     links_conteudo: [{ nome: '', url: '' }],
-    cozinheiro: null,
-    comprador: null,
-    administrador: null,
+    cozinheiro: '',
+    comprador: '',
+    administrador: '',
     status: true,
     descricao_conteudo: null,
     selected_recipes: [],

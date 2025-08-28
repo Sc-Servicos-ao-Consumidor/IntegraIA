@@ -68,7 +68,7 @@
             <!-- Recipe Form -->
             <form @submit.prevent="submit" class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <!-- Left Column -->
+                    <!-- Left Column - Select/Smaller Fields -->
                     <div class="space-y-4">
                         <!-- Nome da Receita -->
                         <div>
@@ -100,33 +100,6 @@
                             <p v-if="form.errors.cuisine" class="text-red-500 text-xs mt-1">{{ form.errors.cuisine }}</p>
                         </div>
 
-                        <!-- Descrição da Receita -->
-                        <div>
-                            <label for="recipe_description" class="block text-sm font-medium text-gray-700 mb-1">Descrição da Receita</label>
-                            <textarea
-                                v-model="form.recipe_description"
-                                id="recipe_description"
-                                rows="4"
-                                class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-none"
-                            ></textarea>
-                            <p v-if="form.errors.recipe_description" class="text-red-500 text-xs mt-1">{{ form.errors.recipe_description }}</p>
-                        </div>
-
-                        <!-- Descrição dos Ingredientes -->
-                        <div>
-                            <label for="ingredients_description" class="block text-sm font-medium text-gray-700 mb-1">Descrição dos Ingredientes</label>
-                            <textarea
-                                v-model="form.ingredients_description"
-                                id="ingredients_description"
-                                rows="8"
-                                class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-none"
-                            ></textarea>
-                            <p v-if="form.errors.ingredients_description" class="text-red-500 text-xs mt-1">{{ form.errors.ingredients_description }}</p>
-                        </div>
-                    </div>
-
-                    <!-- Right Column -->
-                    <div class="space-y-4">
                         <!-- Tipo de Receita -->
                         <div>
                             <label for="recipe_type" class="block text-sm font-medium text-gray-700 mb-1">Tipo de Receita</label>
@@ -162,21 +135,15 @@
 
                         <!-- Tempo de Preparo -->
                         <div>
-                            <label for="preparation_time" class="block text-sm font-medium text-gray-700 mb-1">Tempo de Preparo</label>
-                            <select
+                            <label for="preparation_time" class="block text-sm font-medium text-gray-700 mb-1">Tempo de Preparo (minutos)</label>
+                            <input
+                                type="number"
                                 v-model="form.preparation_time"
                                 id="preparation_time"
+                                min="1"
+                                placeholder="Ex: 45"
                                 class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-                            >
-                                <option value="">Selecione</option>
-                                <option value="15">15 minutos</option>
-                                <option value="30">30 minutos</option>
-                                <option value="45">45 minutos</option>
-                                <option value="60">1 hora</option>
-                                <option value="90">1h 30min</option>
-                                <option value="120">2 horas</option>
-                                <option value="180">3 horas</option>
-                            </select>
+                            />
                             <p v-if="form.errors.preparation_time" class="text-red-500 text-xs mt-1">{{ form.errors.preparation_time }}</p>
                         </div>
 
@@ -231,8 +198,33 @@
                             </select>
                             <p v-if="form.errors.channel" class="text-red-500 text-xs mt-1">{{ form.errors.channel }}</p>
                         </div>
+                    </div>
 
+                    <!-- Right Column - Larger Text Fields -->
+                    <div class="space-y-4">
+                        <!-- Descrição da Receita -->
+                        <div>
+                            <label for="recipe_description" class="block text-sm font-medium text-gray-700 mb-1">Descrição da Receita</label>
+                            <textarea
+                                v-model="form.recipe_description"
+                                id="recipe_description"
+                                rows="7"
+                                class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-vertical"
+                            ></textarea>
+                            <p v-if="form.errors.recipe_description" class="text-red-500 text-xs mt-1">{{ form.errors.recipe_description }}</p>
+                        </div>
 
+                        <!-- Descrição dos Ingredientes -->
+                        <div>
+                            <label for="ingredients_description" class="block text-sm font-medium text-gray-700 mb-1">Descrição dos Ingredientes</label>
+                            <textarea
+                                v-model="form.ingredients_description"
+                                id="ingredients_description"
+                                rows="7"
+                                class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-vertical"
+                            ></textarea>
+                            <p v-if="form.errors.ingredients_description" class="text-red-500 text-xs mt-1">{{ form.errors.ingredients_description }}</p>
+                        </div>
 
                         <!-- Modo de Preparo -->
                         <div>
@@ -240,8 +232,8 @@
                             <textarea
                                 v-model="form.preparation_method"
                                 id="preparation_method"
-                                rows="8"
-                                class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-none"
+                                rows="7"
+                                class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-vertical"
                             ></textarea>
                             <p v-if="form.errors.preparation_method" class="text-red-500 text-xs mt-1">{{ form.errors.preparation_method }}</p>
                         </div>

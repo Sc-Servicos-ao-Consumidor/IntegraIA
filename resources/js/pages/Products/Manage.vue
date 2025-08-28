@@ -233,13 +233,13 @@
                         <div class="space-y-4">
                             <!-- Escolha a Embalagem -->
                             <div>
-                                <label for="escolha_embalagem" class="block text-sm font-medium text-gray-700 mb-1">Escolha a Embalagem</label>
+                                <label for="escolha_embalagem" class="block text-sm font-medium text-gray-700 mb-1"></label>
                                 <select
                                     v-model="form.escolha_embalagem"
                                     id="escolha_embalagem"
                                     class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                                 >
-                                    <option value="">Inserir Embalagem...</option>
+                                    <option value="">Selecionar Embalagem</option>
                                     <option value="bag">Bag/Sachê</option>
                                     <option value="pote">Pote</option>
                                     <option value="lata">Lata</option>
@@ -249,7 +249,7 @@
                             </div>
 
                             <!-- Embalagens Cadastradas -->
-                            <div>
+                            <!-- <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Embalagens Cadastradas</label>
                                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                                     <div v-for="i in 4" :key="i" class="border border-gray-300 rounded-md p-3 text-center bg-gray-100">
@@ -259,7 +259,7 @@
                                         <p class="text-xs text-gray-600">Nome da Embalagem (válida de produtos embalagem)</p>
                                     </div>
                                 </div>
-                            </div>
+                            </div> -->
 
                             <!-- Prompt para Especificação das Embalagens -->
                             <div>
@@ -269,7 +269,7 @@
                                     id="prompt_especificacao_embalagens"
                                     rows="4"
                                     placeholder="Descreva as especificações das embalagens..."
-                                    class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-none cursor-not-allowed"
+                                    class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-vertical cursor-not-allowed"
                                     disabled
                                 ></textarea>
                             </div>
@@ -282,7 +282,7 @@
                                     id="prompt_uso_informacoes_produto"
                                     rows="4"
                                     placeholder="Descreva como usar as informações do produto..."
-                                    class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-none cursor-not-allowed"
+                                    class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-vertical cursor-not-allowed"
                                     disabled
                                 ></textarea>
                             </div>
@@ -301,7 +301,7 @@
                                     id="especificacao_produto"
                                     rows="6"
                                     placeholder="Especificações técnicas do produto..."
-                                    class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-none"
+                                    class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-vertical"
                                 ></textarea>
                             </div>
 
@@ -313,7 +313,7 @@
                                     id="descricao_tabela_nutricional"
                                     rows="4"
                                     placeholder="Informações nutricionais do produto..."
-                                    class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-none"
+                                    class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-vertical"
                                 ></textarea>
                             </div>
 
@@ -350,9 +350,9 @@
                                 <textarea
                                     v-model="form.descricao_modos_preparo"
                                     id="descricao_modos_preparo"
-                                    rows="4"
+                                    rows="8"
                                     placeholder="Instruções de preparo..."
-                                    class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-none"
+                                    class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-vertical"
                                 ></textarea>
                             </div>
 
@@ -362,9 +362,9 @@
                                 <textarea
                                     v-model="form.descricao_rendimentos"
                                     id="descricao_rendimentos"
-                                    rows="4"
+                                    rows="8"
                                     placeholder="Informações sobre rendimento..."
-                                    class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-none"
+                                    class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-vertical"
                                 ></textarea>
                             </div>
                         </div>
@@ -379,7 +379,7 @@
                                     id="perfil_sabor"
                                     rows="6"
                                     placeholder="Características de sabor do produto..."
-                                    class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-none"
+                                    class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-vertical"
                                 ></textarea>
                             </div>
 
@@ -391,7 +391,7 @@
                                     id="descricao_lista_ingredientes"
                                     rows="4"
                                     placeholder="Lista de ingredientes do produto..."
-                                    class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-none"
+                                    class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-vertical"
                                 ></textarea>
                             </div>
 
