@@ -35,40 +35,34 @@
 
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="max-w-7xl mx-auto">
-            <div class="mb-6">
+            <div class="mb-6 flex items-center justify-between">
                 <h1 class="text-2xl font-bold text-gray-900">Cadastros de Receitas</h1>
+                <a 
+                    href="/recipes/semantic-search"
+                    class="bg-orange-600 hover:bg-orange-700 text-white font-medium px-4 py-2 rounded-md text-sm transition-colors inline-flex items-center gap-2"
+                >
+                    🔍 Busca Semântica
+                </a>
             </div>
 
-            <!-- Semantic Search Section -->
+            <!-- Quick Actions -->
             <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
-                <h2 class="text-lg font-semibold text-gray-900 mb-4">🔍 Busca Semântica</h2>
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">⚡ Ações Rápidas</h2>
                 
-                <div class="flex gap-3 mb-4">
-                    <input
-                        v-model="query"
-                        @keyup.enter="search"
-                        type="text"
-                        placeholder="ex: massa cremosa vegana"
-                        class="flex-1 border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-                    />
-                    <button 
-                        @click="search" 
-                        class="bg-orange-600 hover:bg-orange-700 text-white font-medium px-6 py-2 rounded-md text-sm transition-colors"
+                <div class="flex gap-3">
+                    <a 
+                        href="/recipes/semantic-search"
+                        class="bg-orange-600 hover:bg-orange-700 text-white font-medium px-6 py-2 rounded-md text-sm transition-colors inline-flex items-center gap-2"
                     >
-                        Buscar
+                        🔍 Busca Semântica
+                    </a>
+                    <button 
+                        @click="resetForm"
+                        class="bg-gray-600 hover:bg-gray-700 text-white font-medium px-6 py-2 rounded-md text-sm transition-colors"
+                    >
+                        ✨ Nova Receita
                     </button>
                 </div>
-                
-                <div v-if="loading" class="text-gray-600">Buscando...</div>
-                
-                <div v-if="assistantResponse" class="mt-6">
-                    <h3 class="font-medium text-gray-900 mb-2">Sugestão do Assistente</h3>
-                    <div class="bg-gray-50 border border-gray-200 rounded-md p-3 text-sm text-gray-700">
-                        {{ assistantResponse }}
-                    </div>
-                </div>
-
-
             </div>
     
             <!-- Recipe Form -->
@@ -323,15 +317,9 @@
 <script setup>
 import { router, useForm, Head } from '@inertiajs/vue3'
 import {ref, nextTick} from 'vue'
-import axios from 'axios'
 import AppLayout from '@/layouts/AppLayout.vue'
 
-const query = ref('')
-const results = ref([])
-const loading = ref(false)
-const hasSearched = ref(false)
-const header = ref('SmartChef IA')
-const assistantResponse = ref(null)
+
 
 const breadcrumbs = [
     {
@@ -447,30 +435,11 @@ const form = useForm({
     selected_products: []
 })
 
-const search = async () => {
-    if (!query.value.trim()) return
-    
-    loading.value = true
-    hasSearched.value = true
-    
-    try {
-        const searchResponse = await axios.get('/recipes/search', {
-            params: { query: query.value }
-        })
-        results.value = searchResponse.data
-
-        const assistantRes = await axios.post('/recipes/assistant', {
-            text: query.value,
-            context: results.value,
-        })
-        assistantResponse.value = assistantRes.data.response
-
-    } catch (error) {
-        console.error('Search error:', error)
-        results.value = []
-    } finally {
-        loading.value = false
-    }
+const resetForm = () => {
+    form.reset()
+    form.selected_products = []
+    form.id = null
+    showToast('Formulário limpo para nova receita', 'info')
 }
 
 function editRecipe(recipe) {
