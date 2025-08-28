@@ -9,10 +9,15 @@ import { BookOpen, Folder, LayoutGrid, ChefHat, Package, Search, Brain, Settings
 import AppLogo from './AppLogo.vue';
 
 const mainNavItems: NavItem[] = [
+    // {
+    //     title: 'Dashboard',
+    //     href: '/dashboard',
+    //     icon: LayoutGrid,
+    // },
     {
-        title: 'Dashboard',
-        href: '/dashboard',
-        icon: LayoutGrid,
+        title: 'Busca IA',
+        href: '/recipes/semantic-search',
+        icon: Search,
     },
     {
         title: 'Receitas',
@@ -28,11 +33,6 @@ const mainNavItems: NavItem[] = [
         title: 'Conteúdos',
         href: '/contents',
         icon: FileText,
-    },
-    {
-        title: 'Busca IA',
-        href: '/recipes/semantic-search',
-        icon: Search,
     },
 ];
 
