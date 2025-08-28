@@ -35,16 +35,6 @@
 
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="max-w-7xl mx-auto">
-            <div class="mb-6 flex items-center justify-between">
-                <h1 class="text-2xl font-bold text-gray-900">Cadastros de Receitas</h1>
-                <a 
-                    href="/recipes/semantic-search"
-                    class="bg-orange-600 hover:bg-orange-700 text-white font-medium px-4 py-2 rounded-md text-sm transition-colors inline-flex items-center gap-2"
-                >
-                    🔍 Busca Semântica
-                </a>
-            </div>
-
             <!-- Quick Actions -->
             <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
                 <h2 class="text-lg font-semibold text-gray-900 mb-4">⚡ Ações Rápidas</h2>
