@@ -139,9 +139,23 @@
                         </div>
                     </div>
                     <div class="flex-1">
-                        <h3 class="text-lg font-semibold text-blue-900 mb-2">Assistente IA</h3>
-                        <div class="prose prose-blue max-w-none">
-                            <p class="text-blue-800">{{ assistantResponse }}</p>
+                        <div class="flex items-center justify-between mb-2">
+                            <h3 class="text-lg font-semibold text-blue-900">Assistente IA</h3>
+                            <button
+                                v-if="containsMarkdown(assistantResponse)"
+                                @click="showRawMarkdown = !showRawMarkdown"
+                                class="text-xs px-2 py-1 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded transition-colors"
+                                :title="showRawMarkdown ? 'Ver renderizado' : 'Ver código markdown'"
+                            >
+                                {{ showRawMarkdown ? '👁️ Renderizado' : '📝 Código' }}
+                            </button>
+                        </div>
+                        <div v-if="showRawMarkdown" class="bg-blue-900 text-blue-100 p-4 rounded font-mono text-sm overflow-x-auto">
+                            <pre>{{ assistantResponse }}</pre>
+                        </div>
+                        <div v-else class="prose prose-blue max-w-none prose-headings:text-blue-900 prose-p:text-blue-800 prose-strong:text-blue-900 prose-code:text-blue-900 prose-code:bg-blue-100 prose-code:px-1 prose-code:py-0.5 prose-code:rounded">
+                            <div v-if="markdownError" class="text-blue-800 whitespace-pre-wrap">{{ assistantResponse }}</div>
+                            <div v-else v-html="renderedMarkdown" class="text-blue-800"></div>
                         </div>
                     </div>
                 </div>
@@ -150,7 +164,7 @@
             <!-- Search Results -->
             <div v-if="hasSearched && !loading" class="space-y-8">
                 <!-- Recipes Results -->
-                <div v-if="results.recipes && results.recipes.length > 0" class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <!-- <div v-if="results.recipes && results.recipes.length > 0" class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
                     <h2 class="text-xl font-semibold text-gray-900 mb-4 flex items-center gap-2">
                         📖 Receitas Encontradas
                         <span class="text-sm font-normal text-gray-500">({{ results.recipes.length }})</span>
@@ -189,10 +203,10 @@
                             </div>
                         </div>
                     </div>
-                </div>
+                </div> -->
 
                 <!-- Products Results -->
-                <div v-if="results.products && results.products.length > 0" class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <!-- <div v-if="results.products && results.products.length > 0" class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
                     <h2 class="text-xl font-semibold text-gray-900 mb-4 flex items-center gap-2">
                         🛍️ Produtos Encontrados
                         <span class="text-sm font-normal text-gray-500">({{ results.products.length }})</span>
@@ -231,10 +245,10 @@
                             </div>
                         </div>
                     </div>
-                </div>
+                </div> -->
 
                 <!-- Content Results -->
-                <div v-if="results.contents && results.contents.length > 0" class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <!-- <div v-if="results.contents && results.contents.length > 0" class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
                     <h2 class="text-xl font-semibold text-gray-900 mb-4 flex items-center gap-2">
                         📰 Conteúdos Encontrados
                         <span class="text-sm font-normal text-gray-500">({{ results.contents.length }})</span>
@@ -273,16 +287,16 @@
                             </div>
                         </div>
                     </div>
-                </div>
+                </div> -->
 
                 <!-- No Results -->
-                <div v-if="hasSearched && !loading && (!results.recipes || results.recipes.length === 0) && (!results.products || results.products.length === 0) && (!results.contents || results.contents.length === 0)" class="text-center py-12">
+                <!-- <div v-if="hasSearched && !loading && (!results.recipes || results.recipes.length === 0) && (!results.products || results.products.length === 0) && (!results.contents || results.contents.length === 0)" class="text-center py-12">
                     <div class="text-gray-500">
                         <div class="text-6xl mb-4">🔍</div>
                         <h3 class="text-lg font-medium text-gray-900 mb-2">Nenhum resultado encontrado</h3>
                         <p class="text-gray-600">Tente usar termos diferentes ou mais específicos para sua busca.</p>
                     </div>
-                </div>
+                </div> -->
             </div>
 
             <!-- Feature Highlights -->
@@ -403,9 +417,22 @@
 
 <script setup>
 import { router, Head } from '@inertiajs/vue3'
-import { ref, nextTick } from 'vue'
+import { ref, nextTick, computed } from 'vue'
 import axios from 'axios'
+import { marked } from 'marked'
 import AppLayout from '@/layouts/AppLayout.vue'
+
+// Configure marked for security and better rendering
+marked.setOptions({
+    breaks: true,
+    gfm: true,
+    sanitize: false,
+    headerIds: false,
+    mangle: false,
+    pedantic: false,
+    smartLists: true,
+    smartypants: true
+})
 
 const query = ref('')
 const results = ref({})
@@ -413,6 +440,47 @@ const loading = ref(false)
 const hasSearched = ref(false)
 const showAIAssistant = ref(true)
 const assistantResponse = ref(null)
+const markdownError = ref(false)
+const showRawMarkdown = ref(false)
+
+// Function to detect if content contains markdown
+function containsMarkdown(text) {
+    if (!text) return false
+    const markdownPatterns = [
+        /^#+\s+/m,           // Headers
+        /\*\*.*\*\*/,        // Bold
+        /\*.*\*/,            // Italic
+        /`.*`/,              // Inline code
+        /^```[\s\S]*```$/m,  // Code blocks
+        /^-\s+/m,            // Unordered lists
+        /^\d+\.\s+/m,        // Ordered lists
+        /^>\s+/m,            // Blockquotes
+        /\[.*\]\(.*\)/,      // Links
+        /!\[.*\]\(.*\)/,     // Images
+        /^\|.*\|$/m,         // Tables
+    ]
+    return markdownPatterns.some(pattern => pattern.test(text))
+}
+
+// Computed property to render markdown
+const renderedMarkdown = computed(() => {
+    if (!assistantResponse.value) return ''
+    
+    // Check if content contains markdown
+    if (!containsMarkdown(assistantResponse.value)) {
+        markdownError.value = false
+        return assistantResponse.value // Return as plain text if no markdown
+    }
+    
+    try {
+        markdownError.value = false
+        return marked(assistantResponse.value)
+    } catch (error) {
+        console.error('Markdown rendering error:', error)
+        markdownError.value = true
+        return '' // Return empty string when error occurs
+    }
+})
 
 const breadcrumbs = [
     {
@@ -466,6 +534,8 @@ const search = async () => {
     loading.value = true
     hasSearched.value = true
     assistantResponse.value = null
+    markdownError.value = false
+    showRawMarkdown.value = false
     
     try {
         // Perform semantic search
@@ -473,7 +543,7 @@ const search = async () => {
             params: { 
                 query: query.value,
                 type: 'all',
-                limit: 10
+                limit: 2
             }
         })
         results.value = searchResponse.data
@@ -562,5 +632,115 @@ function viewContent(content) {
     -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
+}
+
+/* Markdown content styling */
+:deep(.prose) {
+    line-height: 1.6;
+}
+
+:deep(.prose h1) {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-top: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+:deep(.prose h2) {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-top: 1.25rem;
+    margin-bottom: 0.75rem;
+}
+
+:deep(.prose h3) {
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin-top: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+:deep(.prose p) {
+    margin-bottom: 1rem;
+}
+
+:deep(.prose ul) {
+    margin-bottom: 1rem;
+    padding-left: 1.5rem;
+}
+
+:deep(.prose ol) {
+    margin-bottom: 1rem;
+    padding-left: 1.5rem;
+}
+
+:deep(.prose li) {
+    margin-bottom: 0.25rem;
+}
+
+:deep(.prose code) {
+    background-color: rgba(59, 130, 246, 0.1);
+    padding: 0.125rem 0.25rem;
+    border-radius: 0.25rem;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    font-size: 0.875rem;
+}
+
+:deep(.prose pre) {
+    background-color: rgba(59, 130, 246, 0.1);
+    padding: 1rem;
+    border-radius: 0.5rem;
+    overflow-x: auto;
+    margin: 1rem 0;
+}
+
+:deep(.prose pre code) {
+    background: none;
+    padding: 0;
+}
+
+:deep(.prose blockquote) {
+    border-left: 4px solid rgba(59, 130, 246, 0.3);
+    padding-left: 1rem;
+    margin: 1rem 0;
+    font-style: italic;
+    color: rgba(30, 64, 175, 0.8);
+}
+
+:deep(.prose strong) {
+    font-weight: 600;
+    color: rgba(30, 64, 175, 0.9);
+}
+
+:deep(.prose em) {
+    font-style: italic;
+}
+
+:deep(.prose a) {
+    color: rgba(59, 130, 246, 0.8);
+    text-decoration: underline;
+}
+
+:deep(.prose a:hover) {
+    color: rgba(59, 130, 246, 1);
+}
+
+:deep(.prose table) {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0;
+}
+
+:deep(.prose th) {
+    background-color: rgba(59, 130, 246, 0.1);
+    padding: 0.5rem;
+    text-align: left;
+    font-weight: 600;
+    border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+:deep(.prose td) {
+    padding: 0.5rem;
+    border: 1px solid rgba(59, 130, 246, 0.2);
 }
 </style>
