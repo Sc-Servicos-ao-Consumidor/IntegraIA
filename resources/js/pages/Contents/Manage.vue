@@ -221,6 +221,17 @@
                                                 {{ availableRecipe.recipe_name }}
                                             </option>
                                         </select>
+                                        
+                                        <label class="flex items-center gap-2 text-sm">
+                                            <input
+                                                type="checkbox"
+                                                v-model="recipe.top_dish"
+                                                :true-value="'sim'"
+                                                :false-value="'nao'"
+                                                class="w-4 h-4 text-orange-600 bg-gray-100 border-gray-300 rounded focus:ring-orange-500 focus:ring-2"
+                                            />
+                                            <span class="text-gray-700">Top Dish</span>
+                                        </label>
 
                                         <button 
                                             type="button"
@@ -265,14 +276,16 @@
                                                 {{ availableProduct.descricao }}
                                             </option>
                                         </select>
-                                        <select
-                                            v-model="product.featured"
-                                            class="border border-gray-300 rounded px-2 py-1 text-sm"
-                                        >
-                                            <option value="" disabled selected>Selecione...</option>
-                                            <option value="nao">Não</option>
-                                            <option value="sim">Sim</option>
-                                        </select>
+                                        <label class="flex items-center gap-2 text-sm">
+                                            <input
+                                                type="checkbox"
+                                                v-model="product.featured"
+                                                :true-value="'sim'"
+                                                :false-value="'nao'"
+                                                class="w-4 h-4 text-orange-600 bg-gray-100 border-gray-300 rounded focus:ring-orange-500 focus:ring-2"
+                                            />
+                                            <span class="text-gray-700">Principal</span>
+                                        </label>
                                         <button 
                                             type="button"
                                             @click="removeProduct(index)"
@@ -540,7 +553,7 @@ const removeImageRendimentos = (index) => {
 
 // Recipe management functions
 const addRecipe = () => {
-    form.selected_recipes.push({ recipe_id: '' })
+    form.selected_recipes.push({ recipe_id: '', top_dish: 'nao' })
 }
 
 const removeRecipe = (index) => {
@@ -584,7 +597,8 @@ function editContent(content) {
     
     // Load associated recipes
     form.selected_recipes = content.recipes ? content.recipes.map(recipe => ({
-        recipe_id: recipe.id
+        recipe_id: recipe.id,
+        top_dish: recipe.pivot.top_dish || 'nao'
     })) : []
     
     // Load associated products

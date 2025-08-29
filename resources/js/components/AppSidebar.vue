@@ -37,16 +37,6 @@ const mainNavItems: NavItem[] = [
 ];
 
 const footerNavItems: NavItem[] = [
-    {
-        title: 'Configurações',
-        href: '/settings',
-        icon: Settings,
-    },
-    {
-        title: 'Documentação',
-        href: '/docs',
-        icon: BookOpen,
-    },
 ];
 </script>
 

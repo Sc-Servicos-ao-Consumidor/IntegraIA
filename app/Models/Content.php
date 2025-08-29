@@ -66,7 +66,7 @@ class Content extends Model
     public function recipes(): BelongsToMany
     {
         return $this->belongsToMany(Recipe::class)
-            ->withPivot(['order'])
+            ->withPivot(['order', 'top_dish'])
             ->withTimestamps()
             ->orderByPivot('order');
     }

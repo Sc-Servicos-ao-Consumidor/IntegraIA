@@ -181,10 +181,11 @@
                                 class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                             >
                                 <option value="">Selecione</option>
-                                <option value="website">Website</option>
-                                <option value="youtube">YouTube</option>
-                                <option value="instagram">Instagram</option>
-                                <option value="blog">Blog</option>
+                                <option value="padaria">Padaria</option>
+                                <option value="lanchonete">Lanchonete</option>
+                                <option value="buffet">Buffet</option>
+                                <option value="ala-carte">A la Carte</option>
+                                <option value="industrial">Industrial</option>
                             </select>
                             <p v-if="form.errors.channel" class="text-red-500 text-xs mt-1">{{ form.errors.channel }}</p>
                         </div>
