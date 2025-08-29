@@ -103,10 +103,10 @@
                                 prato italiano tradicional
                             </button>
                             <button 
-                                @click="query = 'ingredientes para sobremesa'; search()"
+                                @click="query = 'receita de empanada de carne'; search()"
                                 class="px-3 py-1 bg-orange-100 hover:bg-orange-200 text-orange-800 text-xs rounded-full border border-orange-200 transition-colors"
                             >
-                                ingredientes para sobremesa
+                                receita de empanada de carne
                             </button>
                             <button 
                                 @click="query = 'receita fácil para iniciantes'; search()"
