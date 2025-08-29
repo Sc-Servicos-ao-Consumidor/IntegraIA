@@ -478,65 +478,103 @@
                         </div>
                     </div>
 
-                    <!-- Vincular Receitas e Conteúdos -->
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        <!-- Vincular Receitas -->
-                        <section class="bg-gray-50 p-6 rounded-lg">
-                            <div class="bg-blue-100 px-4 py-2 rounded-md mb-4">
-                                <h3 class="text-sm font-semibold text-blue-900">+ Receitas (N para N)</h3>
-                            </div>
-                            
-                            <div class="space-y-3">
-                                <p class="text-sm font-medium text-gray-700">Receitas Cadastradas</p>
-                                
-                                <div class="space-y-2 max-h-40 overflow-y-auto">
-                                    <div v-for="recipe in props.recipes" :key="recipe.id" class="flex items-center justify-between p-3 bg-white rounded border">
-                                        <div class="flex items-center">
-                                            <input
-                                                v-model="selectedRecipes"
-                                                :value="recipe.id"
-                                                type="checkbox"
-                                                class="h-4 w-4 text-orange-600 focus:ring-orange-500 border-gray-300 rounded mr-3"
-                                            />
-                                            <span class="text-sm text-gray-900">{{ recipe.descricao }}</span>
-                                        </div>
-                                    </div>
+                    <!-- Connections Section -->
+                    <div class="mt-8 pt-6 border-t border-gray-200">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4">🔗 Conexões e Associações</h3>
+                        
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <!-- Recipe Associations -->
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <div class="bg-orange-100 px-4 py-2 rounded-md mb-4">
+                                    <h4 class="text-sm font-semibold text-orange-900">🍳 Receitas (N para N)</h4>
                                 </div>
                                 
-                                <div v-if="!props.recipes?.length" class="text-center py-4 text-gray-500 text-sm">
-                                    Nenhuma receita cadastrada
-                                </div>
-                            </div>
-                        </section>
+                                <div class="space-y-3">
+                                    <p class="text-sm font-medium text-gray-700">Receitas Vinculadas</p>
+                                    <div class="space-y-2">
+                                        <div v-for="(recipe, index) in form.selected_recipes" :key="index" class="flex items-center gap-3 p-3 border border-gray-200 rounded bg-white">
+                                            <div class="w-8 h-8 bg-orange-100 rounded flex items-center justify-center">
+                                                <svg class="w-4 h-4 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                                                </svg>
+                                            </div>
+                                            
+                                            <select
+                                                v-model="recipe.recipe_id"
+                                                class="flex-1 border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                                            >
+                                                <option value="">Selecione uma receita...</option>
+                                                <option v-for="availableRecipe in props.recipes" :key="availableRecipe.id" :value="availableRecipe.id">
+                                                    {{ availableRecipe.recipe_name || availableRecipe.descricao || 'Sem nome' }}
+                                                </option>
+                                            </select>
 
-                        <!-- Vincular Conteúdos -->
-                        <section class="bg-gray-50 p-6 rounded-lg">
-                            <div class="bg-green-100 px-4 py-2 rounded-md mb-4">
-                                <h3 class="text-sm font-semibold text-green-900">+ Conteúdo (N para N)</h3>
-                            </div>
-                            
-                            <div class="space-y-3">
-                                <p class="text-sm font-medium text-gray-700">Conteúdos Cadastrados</p>
-                                
-                                <div class="space-y-2 max-h-40 overflow-y-auto">
-                                    <div v-for="content in props.contents" :key="content.id" class="flex items-center justify-between p-3 bg-white rounded border">
-                                        <div class="flex items-center">
-                                            <input
-                                                v-model="selectedContents"
-                                                :value="content.id"
-                                                type="checkbox"
-                                                class="h-4 w-4 text-orange-600 focus:ring-orange-500 border-gray-300 rounded mr-3"
-                                            />
-                                            <span class="text-sm text-gray-900">{{ content.descricao }}</span>
+                                            <button 
+                                                type="button"
+                                                @click="removeRecipe(index)"
+                                                class="text-red-600 hover:text-red-800 text-sm font-medium px-2 py-1 rounded hover:bg-red-50"
+                                            >
+                                                Remover
+                                            </button>
                                         </div>
+                                        
+                                        <button 
+                                            type="button"
+                                            @click="addRecipe"
+                                            class="text-orange-600 hover:text-orange-800 text-sm font-medium px-3 py-2 border border-orange-300 rounded-md hover:bg-orange-50 transition-colors"
+                                        >
+                                            + Adicionar Receita
+                                        </button>
                                     </div>
                                 </div>
+                            </div>
+
+                            <!-- Content Associations -->
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <div class="bg-blue-100 px-4 py-2 rounded-md mb-4">
+                                    <h4 class="text-sm font-semibold text-blue-900">📄 Conteúdos (N para N)</h4>
+                                </div>
                                 
-                                <div v-if="!props.contents?.length" class="text-center py-4 text-gray-500 text-sm">
-                                    Nenhum conteúdo cadastrado
+                                <div class="space-y-3">
+                                    <p class="text-sm font-medium text-gray-700">Conteúdos Vinculados</p>
+                                    <div class="space-y-2">
+                                        <div v-for="(content, index) in form.selected_contents" :key="index" class="flex items-center gap-3 p-3 border border-gray-200 rounded bg-white">
+                                            <div class="w-8 h-8 bg-blue-100 rounded flex items-center justify-center">
+                                                <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                                </svg>
+                                            </div>
+                                            
+                                            <select
+                                                v-model="content.content_id"
+                                                class="flex-1 border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                            >
+                                                <option value="">Selecione um conteúdo...</option>
+                                                <option v-for="availableContent in props.contents" :key="availableContent.id" :value="availableContent.id">
+                                                    {{ availableContent.nome_conteudo || availableContent.descricao || 'Sem nome' }}
+                                                </option>
+                                            </select>
+
+                                            <button 
+                                                type="button"
+                                                @click="removeContent(index)"
+                                                class="text-red-600 hover:text-red-800 text-sm font-medium px-2 py-1 rounded hover:bg-red-50"
+                                            >
+                                                Remover
+                                            </button>
+                                        </div>
+                                        
+                                        <button 
+                                            type="button"
+                                            @click="addContent"
+                                            class="text-blue-600 hover:text-blue-800 text-sm font-medium px-3 py-2 border border-blue-300 rounded-md hover:bg-blue-50 transition-colors"
+                                        >
+                                            + Adicionar Conteúdo
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
-                        </section>
+                        </div>
                     </div>
 
                     <!-- Additional Product Information -->
@@ -873,6 +911,8 @@ const form = useForm({
     // Relationships
     recipe_ids: [],
     content_ids: [],
+    selected_recipes: [],
+    selected_contents: [],
 })
 
 // Separate refs for image URLs
@@ -884,6 +924,24 @@ const yieldsImageUrl = ref('')
 // Selected relationships
 const selectedRecipes = ref([])
 const selectedContents = ref([])
+
+// Recipe management functions
+const addRecipe = () => {
+    form.selected_recipes.push({ recipe_id: '' })
+}
+
+const removeRecipe = (index) => {
+    form.selected_recipes.splice(index, 1)
+}
+
+// Content management functions
+const addContent = () => {
+    form.selected_contents.push({ content_id: '' })
+}
+
+const removeContent = (index) => {
+    form.selected_contents.splice(index, 1)
+}
 
 function submit() {
     // Prepare images data
@@ -931,8 +989,8 @@ function submit() {
     
     // Add images and relationships to form data
     form.images = images
-    form.recipe_ids = selectedRecipes.value
-    form.content_ids = selectedContents.value
+    form.recipe_ids = form.selected_recipes.map(r => r.recipe_id).filter(id => id)
+    form.content_ids = form.selected_contents.map(c => c.content_id).filter(id => id)
     
     // Debug: Log what we're sending
     console.log('Submitting form with data:', {
@@ -976,6 +1034,8 @@ function resetForm() {
     selectedContents.value = []
     form.recipe_ids = []
     form.content_ids = []
+    form.selected_recipes = []
+    form.selected_contents = []
 }
 
 function editProduct(product) {
@@ -1040,6 +1100,15 @@ function editProduct(product) {
     selectedContents.value = product.contents ? product.contents.map(c => c.id) : []
     form.recipe_ids = selectedRecipes.value
     form.content_ids = selectedContents.value
+    
+    // Load selected recipes and contents for the new pattern
+    form.selected_recipes = product.recipes ? product.recipes.map(recipe => ({
+        recipe_id: recipe.id
+    })) : []
+    
+    form.selected_contents = product.contents ? product.contents.map(content => ({
+        content_id: content.id
+    })) : []
     
     // Scroll to form
     window.scrollTo({ top: 0, behavior: 'smooth' })

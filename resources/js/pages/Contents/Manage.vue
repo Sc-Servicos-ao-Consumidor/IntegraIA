@@ -194,29 +194,32 @@
                     ></textarea>
                 </div>
 
-                <!-- Recipe Linking Section -->
+                <!-- Connections Section -->
                 <div class="mt-8 pt-8 border-t border-gray-200">
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                        <!-- Vincular Receitas -->
-                        <div>
-                            <div class="bg-gray-100 p-3 rounded-t-md">
-                                <h3 class="font-medium text-gray-900">+ Receitas ( N para N)</h3>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">🔗 Conexões e Associações</h3>
+                    
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <!-- Recipe Associations -->
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <div class="bg-orange-100 px-4 py-2 rounded-md mb-4">
+                                <h4 class="text-sm font-semibold text-orange-900">🍳 Receitas (N para N)</h4>
                             </div>
                             
-                            <div class="border border-gray-200 border-t-0 rounded-b-md p-4">
-                                <h4 class="font-medium text-gray-900 mb-3">Receitas Cadastradas</h4>
+                            <div class="space-y-3">
+                                <p class="text-sm font-medium text-gray-700">Receitas Vinculadas</p>
                                 <div class="space-y-2">
-                                    <div v-for="(recipe, index) in form.selected_recipes" :key="index" class="flex items-center gap-3 p-2 border border-gray-200 rounded">
-                                        <div class="w-8 h-8 bg-gray-200 rounded flex items-center justify-center">
-                                            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <div v-for="(recipe, index) in form.selected_recipes" :key="index" class="flex items-center gap-3 p-3 border border-gray-200 rounded bg-white">
+                                        <div class="w-8 h-8 bg-orange-100 rounded flex items-center justify-center">
+                                            <svg class="w-4 h-4 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
                                             </svg>
                                         </div>
+                                        
                                         <select
                                             v-model="recipe.recipe_id"
-                                            class="flex-1 border-0 text-sm bg-transparent focus:outline-none"
+                                            class="flex-1 border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                                         >
-                                            <option value="" disabled selected>Selecione...</option>
+                                            <option disabled selected value="">Selecione uma receita...</option>
                                             <option v-for="availableRecipe in props.recipes" :key="availableRecipe.id" :value="availableRecipe.id">
                                                 {{ availableRecipe.recipe_name }}
                                             </option>
@@ -236,15 +239,16 @@
                                         <button 
                                             type="button"
                                             @click="removeRecipe(index)"
-                                            class="text-red-600 hover:text-red-800 text-sm"
+                                            class="text-red-600 hover:text-red-800 text-sm font-medium px-2 py-1 rounded hover:bg-red-50"
                                         >
                                             Remover
                                         </button>
                                     </div>
+                                    
                                     <button 
                                         type="button"
                                         @click="addRecipe"
-                                        class="text-orange-600 hover:text-orange-800 text-sm font-medium"
+                                        class="text-orange-600 hover:text-orange-800 text-sm font-medium px-3 py-2 border border-orange-300 rounded-md hover:bg-orange-50 transition-colors"
                                     >
                                         + Adicionar Receita
                                     </button>
@@ -252,52 +256,56 @@
                             </div>
                         </div>
 
-                        <!-- Vincular Produtos -->
-                        <div>
-                            <div class="bg-gray-100 p-3 rounded-t-md">
-                                <h3 class="font-medium text-gray-900">+ Produto (N para N)</h3>
+                        <!-- Product Associations -->
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <div class="bg-blue-100 px-4 py-2 rounded-md mb-4">
+                                <h4 class="text-sm font-semibold text-blue-900">🛒 Produtos (N para N)</h4>
                             </div>
                             
-                            <div class="border border-gray-200 border-t-0 rounded-b-md p-4">
-                                <h4 class="font-medium text-gray-900 mb-3">Produtos Cadastrados</h4>
+                            <div class="space-y-3">
+                                <p class="text-sm font-medium text-gray-700">Produtos Vinculados</p>
                                 <div class="space-y-2">
-                                    <div v-for="(product, index) in form.selected_products" :key="index" class="flex items-center gap-3 p-2 border border-gray-200 rounded">
-                                        <div class="w-8 h-8 bg-gray-200 rounded flex items-center justify-center">
-                                            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <div v-for="(product, index) in form.selected_products" :key="index" class="flex items-center gap-3 p-3 border border-gray-200 rounded bg-white">
+                                        <div class="w-8 h-8 bg-blue-100 rounded flex items-center justify-center">
+                                            <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
                                             </svg>
                                         </div>
+                                        
                                         <select
                                             v-model="product.product_id"
-                                            class="flex-1 border-0 text-sm bg-transparent focus:outline-none"
+                                            class="flex-1 border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                         >
-                                            <option value="" disabled selected>Selecione...</option>
+                                            <option disabled selected value="">Selecione um produto...</option>
                                             <option v-for="availableProduct in props.products" :key="availableProduct.id" :value="availableProduct.id">
                                                 {{ availableProduct.descricao }}
                                             </option>
                                         </select>
+                                        
                                         <label class="flex items-center gap-2 text-sm">
                                             <input
                                                 type="checkbox"
                                                 v-model="product.featured"
                                                 :true-value="'sim'"
                                                 :false-value="'nao'"
-                                                class="w-4 h-4 text-orange-600 bg-gray-100 border-gray-300 rounded focus:ring-orange-500 focus:ring-2"
+                                                class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
                                             />
                                             <span class="text-gray-700">Principal</span>
                                         </label>
+                                        
                                         <button 
                                             type="button"
                                             @click="removeProduct(index)"
-                                            class="text-red-600 hover:text-red-800 text-sm"
+                                            class="text-red-600 hover:text-red-800 text-sm font-medium px-2 py-1 rounded hover:bg-red-50"
                                         >
                                             Remover
                                         </button>
                                     </div>
+                                    
                                     <button 
                                         type="button"
                                         @click="addProduct"
-                                        class="text-orange-600 hover:text-orange-800 text-sm font-medium"
+                                        class="text-blue-600 hover:text-blue-800 text-sm font-medium px-3 py-2 border border-blue-300 rounded-md hover:bg-blue-50 transition-colors"
                                     >
                                         + Adicionar Produto
                                     </button>

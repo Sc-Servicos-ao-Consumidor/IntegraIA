@@ -231,6 +231,124 @@
                     </div>
                 </div>
 
+                <!-- Connections Section -->
+                <div class="mt-8 pt-6 border-t border-gray-200">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">🔗 Conexões e Associações</h3>
+                    
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <!-- Product Associations -->
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <div class="bg-orange-100 px-4 py-2 rounded-md mb-4">
+                                <h4 class="text-sm font-semibold text-orange-900">🛒 Produtos (N para N)</h4>
+                            </div>
+                            
+                            <div class="space-y-3">
+                                <p class="text-sm font-medium text-gray-700">Produtos Vinculados</p>
+                                <div class="space-y-2">
+                                    <div v-for="(product, index) in form.selected_products" :key="index" class="flex items-center gap-3 p-3 border border-gray-200 rounded bg-white">
+                                        <div class="w-8 h-8 bg-orange-100 rounded flex items-center justify-center">
+                                            <svg class="w-4 h-4 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                                            </svg>
+                                        </div>
+                                        
+                                        <select
+                                            v-model="product.product_id"
+                                            class="flex-1 border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                                        >
+                                            <option value="">Selecione um produto...</option>
+                                            <option v-for="availableProduct in props.products" :key="availableProduct.id" :value="availableProduct.id">
+                                                {{ availableProduct.descricao || 'Sem descrição' }}
+                                            </option>
+                                        </select>
+                                        
+                                        <select
+                                            v-model="product.ingredient_type"
+                                            class="w-32 border border-gray-300 rounded-md px-2 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                                        >
+                                            <option value="main">Principal</option>
+                                            <option value="supporting">Secundário</option>
+                                        </select>
+
+                                        <button 
+                                            type="button"
+                                            @click="removeProduct(index)"
+                                            class="text-red-600 hover:text-red-800 text-sm font-medium px-2 py-1 rounded hover:bg-red-50"
+                                        >
+                                            Remover
+                                        </button>
+                                    </div>
+                                    
+                                    <button 
+                                        type="button"
+                                        @click="addProduct"
+                                        class="text-orange-600 hover:text-orange-800 text-sm font-medium px-3 py-2 border border-orange-300 rounded-md hover:bg-orange-50 transition-colors"
+                                    >
+                                        + Adicionar Produto
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Content Associations -->
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <div class="bg-blue-100 px-4 py-2 rounded-md mb-4">
+                                <h4 class="text-sm font-semibold text-blue-900">📄 Conteúdos (N para N)</h4>
+                            </div>
+
+                            <div class="space-y-3">
+                                <p class="text-sm font-medium text-gray-700">Conteúdos Vinculados</p>
+                                <div class="space-y-2">
+                                    <div v-for="(content, index) in form.selected_contents" :key="index" class="flex items-center gap-3 p-3 border border-gray-200 rounded bg-white">
+                                        <div class="w-8 h-8 bg-blue-100 rounded flex items-center justify-center">
+                                            <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                            </svg>
+                                        </div>
+                                        
+                                        <select
+                                            v-model="content.content_id"
+                                            class="flex-1 border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                        >
+                                            <option value="">Selecione um conteúdo...</option>
+                                            <option v-for="availableContent in props.contents" :key="availableContent.id" :value="availableContent.id">
+                                                {{ availableContent.nome_conteudo || 'Sem nome' }}
+                                            </option>
+                                        </select>
+                                        
+                                        <label class="flex items-center gap-2 text-sm">
+                                            <input
+                                                type="checkbox"
+                                                v-model="content.top_dish"
+                                                :true-value="'sim'"
+                                                :false-value="'nao'"
+                                                class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+                                            />
+                                            <span class="text-gray-700">Top Dish</span>
+                                        </label>
+
+                                        <button 
+                                            type="button"
+                                            @click="removeContent(index)"
+                                            class="text-red-600 hover:text-red-800 text-sm font-medium px-2 py-1 rounded hover:bg-red-50"
+                                        >
+                                            Remover
+                                        </button>
+                                    </div>
+                                    
+                                    <button 
+                                        type="button"
+                                        @click="addContent"
+                                        class="text-blue-600 hover:text-blue-800 text-sm font-medium px-3 py-2 border border-blue-300 rounded-md hover:bg-blue-50 transition-colors"
+                                    >
+                                        + Adicionar Conteúdo
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Action Buttons -->
                 <div class="flex gap-3 mt-8 pt-6 border-t border-gray-200">
                     <button
@@ -271,6 +389,21 @@
                         <p class="text-sm text-gray-600 mt-2 line-clamp-2">
                             {{ recipe.recipe_description || 'Sem descrição' }}...
                         </p>
+                        
+                        <!-- Associations Info -->
+                        <div class="mt-3 space-y-2">
+                            <!-- Products -->
+                            <div v-if="recipe.products?.length" class="flex items-center gap-2 text-sm text-gray-600">
+                                <span class="font-medium">🛒 Produtos:</span>
+                                <span>{{ recipe.products.length }} vinculado(s)</span>
+                            </div>
+                            
+                            <!-- Contents -->
+                            <div v-if="recipe.contents?.length" class="flex items-center gap-2 text-sm text-gray-600">
+                                <span class="font-medium">📄 Conteúdos:</span>
+                                <span>{{ recipe.contents.length }} vinculado(s)</span>
+                            </div>
+                        </div>
                         
                         <div class="mt-3 flex gap-2">
                             <button 
@@ -313,7 +446,8 @@ const breadcrumbs = [
 
 const props = defineProps({
     recipes: Array,
-    products: Array
+    products: Array,
+    contents: Array
 })
 
 // Toast notification system
@@ -351,6 +485,27 @@ function removeToast(id) {
     }
 }
 
+// Content management functions
+function addContent() {
+    form.selected_contents.push({ content_id: '', top_dish: 'nao' })
+}
+
+function removeContent(index) {
+    form.selected_contents.splice(index, 1)
+}
+
+// Product management functions
+function addProduct() {
+    form.selected_products.push({ 
+        product_id: '', 
+        ingredient_type: 'main'
+    })
+}
+
+function removeProduct(index) {
+    form.selected_products.splice(index, 1)
+}
+
 function showValidationErrors(errors) {
     // Show first error as a toast
     const firstError = Object.values(errors)[0]
@@ -380,6 +535,7 @@ function confirmResetForm() {
         // If editing, just cancel without confirmation
         form.reset()
         form.selected_products = []
+        form.selected_contents = []
         form.id = null
         showToast('Edição cancelada', 'info')
     } else {
@@ -415,12 +571,15 @@ const form = useForm({
     product_code: null,
     content_code: null,
     // Product associations
-    selected_products: []
+    selected_products: [],
+    // Content associations
+    selected_contents: []
 })
 
 const resetForm = () => {
     form.reset()
     form.selected_products = []
+    form.selected_contents = []
     form.id = null
     showToast('Formulário limpo para nova receita', 'info')
 }
@@ -451,11 +610,13 @@ function editRecipe(recipe) {
     // Load associated products
     form.selected_products = recipe.products ? recipe.products.map(product => ({
         product_id: product.id,
-        quantity: product.pivot.quantity,
-        unit: product.pivot.unit,
-        ingredient_type: product.pivot.ingredient_type,
-        preparation_notes: product.pivot.preparation_notes,
-        optional: product.pivot.optional
+        ingredient_type: product.pivot.ingredient_type
+    })) : []
+    
+    // Load associated contents
+    form.selected_contents = recipe.contents ? recipe.contents.map(content => ({
+        content_id: content.id,
+        top_dish: content.pivot.top_dish || 'nao'
     })) : []
 }
 
@@ -485,6 +646,7 @@ const submit = () => {
             // Reset form after successful submission
             form.reset()
             form.selected_products = []
+            form.selected_contents = []
             
             // Clear form ID to indicate new recipe creation
             form.id = null

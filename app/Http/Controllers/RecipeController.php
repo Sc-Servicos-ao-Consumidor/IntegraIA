@@ -20,12 +20,14 @@ class RecipeController extends Controller
      */
     public function index()
     {
-        $recipes = Recipe::with('products')->latest()->get();
+        $recipes = Recipe::with(['products', 'contents'])->latest()->get();
         $products = Product::where('status', true)->orderBy('descricao')->get();
+        $contents = Content::where('status', true)->orderBy('nome_conteudo')->get();
 
         return Inertia::render('Recipes/Manage', [
             'recipes' => $recipes,
-            'products' => $products
+            'products' => $products,
+            'contents' => $contents
         ]);
     }
 
@@ -66,16 +68,17 @@ class RecipeController extends Controller
             // Product associations
             'selected_products' => 'nullable|array',
             'selected_products.*.product_id' => 'required_with:selected_products|exists:products,id',
-            'selected_products.*.quantity' => 'nullable|numeric|min:0',
-            'selected_products.*.unit' => 'nullable|string|max:50',
             'selected_products.*.ingredient_type' => 'nullable|in:main,supporting',
-            'selected_products.*.preparation_notes' => 'nullable|string',
-            'selected_products.*.optional' => 'nullable|boolean',
+            
+            // Content associations
+            'selected_contents' => 'nullable|array',
+            'selected_contents.*.content_id' => 'required_with:selected_contents|exists:contents,id',
+            'selected_contents.*.top_dish' => 'nullable|in:sim,nao',
         ]);
 
         $recipe = Recipe::updateOrCreate(
             ['id' => $request->id],
-            collect($data)->except('selected_products')->toArray()
+            collect($data)->except(['selected_products', 'selected_contents'])->toArray()
         );
 
         // Sync products if provided
@@ -83,15 +86,23 @@ class RecipeController extends Controller
             $productData = [];
             foreach ($request->selected_products as $index => $productInfo) {
                 $productData[$productInfo['product_id']] = [
-                    'quantity' => $productInfo['quantity'] ?? null,
-                    'unit' => $productInfo['unit'] ?? null,
                     'ingredient_type' => $productInfo['ingredient_type'] ?? 'main',
-                    'preparation_notes' => $productInfo['preparation_notes'] ?? null,
-                    'optional' => $productInfo['optional'] ?? false,
                     'order' => $index + 1,
                 ];
             }
             $recipe->products()->sync($productData);
+        }
+
+        // Sync contents if provided
+        if ($request->has('selected_contents') && is_array($request->selected_contents)) {
+            $contentData = [];
+            foreach ($request->selected_contents as $index => $contentInfo) {
+                $contentData[$contentInfo['content_id']] = [
+                    'order' => $index + 1,
+                    'top_dish' => $contentInfo['top_dish'] ?? 'nao',
+                ];
+            }
+            $recipe->contents()->sync($contentData);
         }
 
         return null;
