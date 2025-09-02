@@ -75,6 +75,7 @@ class PrismService
                 ->asText();
 
             if ($response->finishReason->name == 'Error') {
+                Log::error('Error: ' . $response->finishReason);
                 throw new \Exception('Error: ' . $response->finishReason);
             }
 
@@ -86,13 +87,13 @@ class PrismService
             Log::error('Text generation failed:', ['error' => $e->getMessage()]);
             return [
                 'status' => 'error',
-                'message' => 'Text generation failed: ' . $e->getMessage()
+                'response' => 'Text generation failed: ' . $e->getMessage()
             ];
         } catch (Throwable $e) {
             Log::error('Generic error:', ['error' => $e->getMessage()]);
             return [
                 'status' => 'error',
-                'message' => 'Generic error: ' . $e->getMessage()
+                'response' => 'Generic error: ' . $e->getMessage()
             ];
         }
     }

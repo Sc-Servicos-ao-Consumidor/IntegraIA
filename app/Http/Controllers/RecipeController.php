@@ -261,13 +261,13 @@ class RecipeController extends Controller
                 ], 200);
             }else{
                 return response()->json([
-                    'error' => $response['error'] ?? 'Erro ao processar a solicitação'
+                    'response' => $response['response'] ?? 'Erro ao processar a solicitação'
                 ], 500);
             }
 
         } catch (\Exception $e) {
             return response()->json([
-                'error' => 'Assistant failed: ' . $e->getMessage()
+                'response' => 'Assistant failed: ' . $e->getMessage()
             ], 500);
         }
     }
