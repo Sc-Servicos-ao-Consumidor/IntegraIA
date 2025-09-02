@@ -71,14 +71,6 @@ class PrismService
                 ->withSystemPrompt($prompt)
                 ->withMessages($messages)
                 ->withClientRetry(3, 100)
-                ->withProviderOptions([
-                    'reasoning' => [
-                        'effort' => 'low',
-                        'max_tokens' => 30000,
-                        'exclude' => true,
-                        'enabled' => true
-                    ],
-                ])
                 ->withMaxSteps(10)
                 ->asText();
 
