@@ -3,21 +3,38 @@
 namespace App\Services;
 
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Config;
+use Prism\Prism\Prism;
+use Prism\Prism\Enums\Provider;
+use Prism\Prism\Exceptions\PrismException;
+use Illuminate\Support\Facades\Log;
+use Prism\Prism\ValueObjects\Messages\AssistantMessage;
+use Prism\Prism\ValueObjects\Messages\UserMessage;
+use Throwable;
 
 class PrismService
 {
-    private string $apiUrl;
-    private string $apiToken;
+    private string $providerName;
+    private string $modelName;
 
     public function __construct()
     {
-        $this->apiUrl = config('services.prism_api.url', 'https://openapi.test/api/ai');
-        $this->apiToken = config('services.prism_api.token');
-        
-        if (!$this->apiToken) {
-            throw new \Exception('Prism API token not configured. Please set PRISM_API_TOKEN in your .env file.');
-        }
+        $this->providerName = config('services.prism_api.chat_provider', 'openai');
+        $this->modelName = config('services.prism_api.chat_model', 'gpt-o4-mini');
+    }
+
+    public function buildMessages(array $conversation): array
+    {
+        return collect($conversation)
+            ->map(function ($message) {
+                if ($message['type'] === 'user') {
+                    return new UserMessage($message['content']);
+                } elseif ($message['type'] === 'assistant') {
+                    return new AssistantMessage($message['content']);
+                }
+                // Default fallback for unknown message types
+                return new UserMessage($message['content']);
+            })
+            ->toArray();
     }
 
     /**
@@ -25,57 +42,67 @@ class PrismService
      */
     public function getEmbedding(string $query): array
     {
-        $response = $this->makeRequest('/embeddings', [
-            'provider' => config('services.prism_api.embedding_provider', 'openai'),
-            'model' => config('services.prism_api.embedding_model', 'text-embedding-3-small'),
-            'text' => $query,
-        ]);
+        try {
+            $response = Prism::embeddings()
+                ->using($this->getProvider(), config('services.prism_api.embedding_model', 'text-embedding-3-small'))
+                ->fromInput($query)
+                ->asEmbeddings();
 
-        return $response;
+            return $response->embeddings[0]->embedding ?? [];
+        } catch (PrismException $e) {
+            Log::error('Embedding generation failed:', ['error' => $e->getMessage()]);
+            return [];
+        } catch (Throwable $e) {
+            Log::error('Generic error in embedding:', ['error' => $e->getMessage()]);
+            return [];
+        }
     }
 
     /**
      * Get AI response with optional context and tools
      */
-    public function getResponse(string $text, $context = null, array $tools = []): array
+    public function getResponse(array $messages, $context = null, array $tools = []): array
     {
         $prompt = $this->buildSystemPrompt($context);
 
-        $requestData = [
-            'provider' => config('services.prism_api.chat_provider', 'openai'),
-            'model' => config('services.prism_api.chat_model', 'gpt-4'),
-            'messages' => [
-                [
-                    'type' => 'user',
-                    'content' => $text,
-                ]
-            ],
-            'prompt' => $prompt,
-        ];
+        try {
+            $response = Prism::text()
+                ->using($this->getProvider(), $this->modelName)
+                ->withSystemPrompt($prompt)
+                ->withMessages($messages)
+                ->withClientRetry(3, 100)
+                ->withProviderOptions([
+                    'reasoning' => [
+                        'effort' => 'low',
+                        'max_tokens' => 30000,
+                        'exclude' => true,
+                        'enabled' => true
+                    ],
+                ])
+                ->withMaxSteps(10)
+                ->asText();
 
-        // Add tools if provided
-        // if (!empty($tools)) {
-        //     $requestData['tools'] = $tools;
-        //     $requestData['tool_choice'] = 'auto';
-        // }
+            if ($response->finishReason->name == 'Error') {
+                throw new \Exception('Error: ' . $response->finishReason);
+            }
 
-        return $this->makeRequest('/response', $requestData);
-    }
-
-    /**
-     * Make HTTP request to Prism API
-     */
-    private function makeRequest(string $endpoint, array $data): array
-    {
-        $response = Http::withHeaders([
-            'Authorization' => 'Bearer ' . $this->apiToken,
-            'Content-Type' => 'application/json',
-        ])
-        ->withoutVerifying()
-        ->post($this->apiUrl . $endpoint, $data)
-        ->json();
-
-        return $response;
+            return [
+                'status' => 'success',
+                'response' => $response->text,
+            ];
+        } catch (PrismException $e) {
+            Log::error('Text generation failed:', ['error' => $e->getMessage()]);
+            return [
+                'status' => 'error',
+                'message' => 'Text generation failed: ' . $e->getMessage()
+            ];
+        } catch (Throwable $e) {
+            Log::error('Generic error:', ['error' => $e->getMessage()]);
+            return [
+                'status' => 'error',
+                'message' => 'Generic error: ' . $e->getMessage()
+            ];
+        }
     }
 
     /**
@@ -116,4 +143,10 @@ class PrismService
 
         return $basePrompt;
     }
+
+    protected function getProvider(): Provider
+    {
+        return Provider::from($this->providerName);
+    }
+
 }

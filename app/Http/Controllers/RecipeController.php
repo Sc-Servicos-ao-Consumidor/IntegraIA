@@ -191,13 +191,19 @@ class RecipeController extends Controller
             'context' => 'nullable',
             // 'use_tools' => 'nullable|boolean'
         ]);
+        $prism = new PrismService();
 
-        $text = $request->text;
+        $text = $prism->buildMessages([
+            [
+                'type' => 'user',
+                'content' => $request->text
+            ]
+        ]);
+
         $context = $this->cleanResultFromEmbeddings($request->context);
         // $useTools = $request->use_tools ?? false;
 
         try {
-            $prism = new PrismService();
             // $tools = [];
 
             // Add tools if requested
