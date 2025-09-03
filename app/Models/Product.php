@@ -22,14 +22,34 @@ class Product extends Model
         'codigo_padrao',
         'sku',
         'group_product_id',
-        'marca',
         'descricao',
+        'descricao_breve',
+        'informacao_adicional',
+        'ean',
+        'quantidade_caixa',
+        'embalagem_tipo',
+        'embalagem_descricao',
+        'localizacao',
+        'nome_responsavel',
+        'telefone',
+        'whatsapp',
+        'site',
+        'peso_liquido',
+        'peso_bruto',
+        'validade',
         'status',
+        'produto_familia_id',
+        'produto_grupo_id',
+        'produto_linha_id',
+        'produto_sub_linha_id',
         'embedding',
     ];
 
     protected $casts = [
         'status' => 'boolean',
+        'peso_liquido' => 'decimal:2',
+        'peso_bruto' => 'decimal:2',
+        'validade' => 'date',
     ];
 
     /**
@@ -45,13 +65,7 @@ class Product extends Model
         return $this->belongsTo(GroupProduct::class);
     }
 
-    /**
-     * Get the product details.
-     */
-    public function detail(): HasOne
-    {
-        return $this->hasOne(ProductDetail::class);
-    }
+    
 
     /**
      * Get all product images.
@@ -59,6 +73,11 @@ class Product extends Model
     public function images(): HasMany
     {
         return $this->hasMany(ProductImage::class)->ordered();
+    }
+
+    public function packagings(): HasMany
+    {
+        return $this->hasMany(ProductPackaging::class);
     }
 
     /**

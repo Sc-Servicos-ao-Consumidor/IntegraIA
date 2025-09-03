@@ -269,8 +269,7 @@
                                     id="prompt_especificacao_embalagens"
                                     rows="4"
                                     placeholder="Descreva as especificações das embalagens..."
-                                    class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-vertical cursor-not-allowed"
-                                    disabled
+                                    class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-vertical"
                                 ></textarea>
                             </div>
 
@@ -282,8 +281,7 @@
                                     id="prompt_uso_informacoes_produto"
                                     rows="4"
                                     placeholder="Descreva como usar as informações do produto..."
-                                    class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-vertical cursor-not-allowed"
-                                    disabled
+                                    class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-vertical"
                                 ></textarea>
                             </div>
                         </div>

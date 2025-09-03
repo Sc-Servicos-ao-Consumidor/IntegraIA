@@ -3,8 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
-use App\Models\ProductDetail;
-use App\Models\ProductImage;
 use App\Models\GroupProduct;
 use App\Models\Recipe;
 use App\Models\Content;
@@ -23,7 +21,6 @@ class ProductController extends Controller
     {
         $products = Product::with([
             'groupProduct', 
-            'detail', 
             'images' => function($query) {
                 $query->active()->ordered();
             },
@@ -57,35 +54,7 @@ class ProductController extends Controller
             'codigo_padrao' => 'nullable|string|max:255',
             'sku' => 'nullable|string|max:255',
             'group_product_id' => 'nullable|exists:group_products,id',
-            'marca' => 'nullable|string|max:255',
             'status' => 'boolean',
-        ]);
-
-        // Validate product detail data
-        $detailData = $request->validate([
-            'escolha_embalagem' => 'nullable|string|max:255',
-            'prompt_especificacao_embalagens' => 'nullable|string',
-            'prompt_uso_informacoes_produto' => 'nullable|string',
-            'especificacao_produto' => 'nullable|string',
-            'perfil_sabor' => 'nullable|string',
-            'descricao_tabela_nutricional' => 'nullable|string',
-            'descricao_lista_ingredientes' => 'nullable|string',
-            'descricao_modos_preparo' => 'nullable|string',
-            'descricao_rendimentos' => 'nullable|string',
-            'embalagem_tipo' => 'nullable|string|max:255',
-            'embalagem_descricao' => 'nullable|string',
-            'quantidade_caixa' => 'nullable|string|max:255',
-            'peso_liquido' => 'nullable|numeric|min:0',
-            'peso_bruto' => 'nullable|numeric|min:0',
-            'validade' => 'nullable|string|max:255',
-            'valor' => 'nullable|numeric|min:0',
-            'desconto' => 'nullable|numeric|min:0',
-            'informacao_adicional' => 'nullable|string',
-            'ean' => 'nullable|string|max:255',
-            'qr_code' => 'nullable|string|max:255',
-            'url_rede_social' => 'nullable|url',
-            'catalogo' => 'boolean',
-            'lancamento' => 'boolean',
         ]);
 
         // Validate images data
@@ -122,11 +91,7 @@ class ProductController extends Controller
                 $product = Product::create($productData);
             }
 
-            // Create or update product details
-            $product->detail()->updateOrCreate(
-                ['product_id' => $product->id],
-                $detailData
-            );
+            // Product details removed: no longer creating/updating detail records
 
             // Handle images
             if (!empty($imagesData['images'])) {
