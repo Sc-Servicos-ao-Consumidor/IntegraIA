@@ -60,11 +60,6 @@ class RecipeController extends Controller
             'preparation_techniques' => 'nullable|array',
             'consumption_occasion' => 'nullable|array',
             
-            // Reference fields
-            'general_images_link' => 'nullable|url',
-            'product_code' => 'nullable|string|max:255',
-            'content_code' => 'nullable|string|max:255',
-            
             // Product associations
             'selected_products' => 'nullable|array',
             'selected_products.*.product_id' => 'required_with:selected_products|exists:products,id',
@@ -73,7 +68,6 @@ class RecipeController extends Controller
             // Content associations
             'selected_contents' => 'nullable|array',
             'selected_contents.*.content_id' => 'required_with:selected_contents|exists:contents,id',
-            'selected_contents.*.top_dish' => 'nullable|in:sim,nao',
         ]);
 
         $recipe = Recipe::updateOrCreate(

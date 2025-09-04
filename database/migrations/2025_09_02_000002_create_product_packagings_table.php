@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('sku')->nullable();
             $table->string('ean')->nullable();
             $table->string('descricao')->nullable();
+            $table->text('prompt_especificacao_embalagens')->nullable();
             $table->string('quantidade_caixa')->nullable();
             $table->string('embalagem_tipo')->nullable();
             $table->decimal('peso_liquido', 8, 2)->nullable();

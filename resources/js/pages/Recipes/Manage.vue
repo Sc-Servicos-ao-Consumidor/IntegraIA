@@ -567,9 +567,6 @@ const form = useForm({
     usage_groups: [],
     preparation_techniques: [],
     consumption_occasion: [],
-    general_images_link: null,
-    product_code: null,
-    content_code: null,
     // Product associations
     selected_products: [],
     // Content associations
@@ -603,9 +600,6 @@ function editRecipe(recipe) {
     form.usage_groups = recipe.usage_groups || []
     form.preparation_techniques = recipe.preparation_techniques || []
     form.consumption_occasion = recipe.consumption_occasion || []
-    form.general_images_link = recipe.general_images_link
-    form.product_code = recipe.product_code
-    form.content_code = recipe.content_code
     
     // Load associated products
     form.selected_products = recipe.products ? recipe.products.map(product => ({

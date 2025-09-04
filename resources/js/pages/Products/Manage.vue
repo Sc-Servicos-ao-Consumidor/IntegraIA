@@ -39,124 +39,6 @@
                 <h1 class="text-2xl font-bold text-gray-900">Cadastro de Produtos</h1>
             </div>
 
-            <!-- Product Groups Management Section -->
-            <div class="bg-white rounded-lg shadow-sm border border-gray-200 mb-6">
-                <div class="px-6 py-4 border-b border-gray-200">
-                    <h2 class="text-lg font-semibold text-gray-900">🏷️ Grupos de Produtos</h2>
-                </div>
-                
-                <div class="p-6">
-                    <!-- Add/Edit Group Form -->
-                    <form @submit.prevent="submitGroup" class="mb-6">
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <div>
-                                <label for="group_descricao" class="block text-sm font-medium text-gray-700 mb-1">Nome do Grupo*</label>
-                                <input
-                                    v-model="groupForm.descricao"
-                                    id="group_descricao"
-                                    type="text"
-                                    placeholder="Ex: Condimentos, Laticínios..."
-                                    class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-                                    required
-                                />
-                            </div>
-                            
-                            <div>
-                                <label for="group_codigo_padrao" class="block text-sm font-medium text-gray-700 mb-1">Código Padrão</label>
-                                <input
-                                    v-model="groupForm.codigo_padrao"
-                                    id="group_codigo_padrao"
-                                    type="text"
-                                    placeholder="Código interno"
-                                    class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-                                />
-                            </div>
-                            
-                            <div>
-                                <label for="group_observacao" class="block text-sm font-medium text-gray-700 mb-1">Observação</label>
-                                <input
-                                    v-model="groupForm.observacao"
-                                    id="group_observacao"
-                                    type="text"
-                                    placeholder="Observações adicionais"
-                                    class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-                                />
-                            </div>
-                        </div>
-                        
-                        <div class="flex items-center gap-4 mt-4">
-                            <div class="flex gap-2">
-                                <button
-                                    type="submit"
-                                    :disabled="groupForm.processing"
-                                    class="px-4 py-2 text-sm font-medium text-white bg-orange-600 border border-transparent rounded-md hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                                >
-                                    <span v-if="groupForm.processing" class="flex items-center gap-2">
-                                        <svg class="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                        </svg>
-                                        Salvando...
-                                    </span>
-                                    <span v-else>{{ groupForm.id ? 'Atualizar Grupo' : 'Adicionar Grupo' }}</span>
-                                </button>
-                                
-                                <button
-                                    v-if="groupForm.id"
-                                    type="button"
-                                    @click="resetGroupForm"
-                                    class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"
-                                >
-                                    Cancelar
-                                </button>
-                            </div>
-                        </div>
-                    </form>
-
-                    <!-- Groups List -->
-                    <div>
-                        <h3 class="text-sm font-medium text-gray-700 mb-3">Grupos Cadastrados</h3>
-                        
-                        <div v-if="props.groupProducts?.length" class="space-y-2">
-                            <div
-                                v-for="group in props.groupProducts"
-                                :key="group.id"
-                                class="flex items-center justify-between p-3 bg-gray-50 rounded border"
-                            >
-                                <div class="flex-1">
-                                    <div class="flex items-center gap-2">
-                                        <h4 class="font-medium text-gray-900">{{ group.descricao }}</h4>
-                                        <span v-if="group.codigo_padrao" class="text-sm text-gray-500">
-                                            ({{ group.codigo_padrao }})
-                                        </span>
-                                    </div>
-                                    <p v-if="group.observacao" class="text-sm text-gray-600 mt-1">{{ group.observacao }}</p>
-                                </div>
-                                
-                                <div class="flex gap-2 ml-4">
-                                    <button 
-                                        @click="editGroup(group)" 
-                                        class="text-sm text-orange-600 hover:text-orange-800 font-medium"
-                                    >
-                                        Editar
-                                    </button>
-                                    <button 
-                                        @click="deleteGroup(group)" 
-                                        class="text-sm text-red-600 hover:text-red-800 font-medium"
-                                    >
-                                        Excluir
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div v-else class="text-center py-4 text-gray-500 text-sm">
-                            Nenhum grupo cadastrado
-                        </div>
-                    </div>
-                </div>
-            </div>
-
             <!-- Product Form -->
             <form @submit.prevent="submit" class="bg-white rounded-lg shadow-sm border border-gray-200">
                 <!-- Form Header -->
@@ -228,51 +110,9 @@
 
                     <!-- Embalagens -->
                     <section class="bg-gray-50 p-6 rounded-lg">
-                        <h3 class="text-base font-semibold text-gray-900 mb-4">Embalagens</h3>
+                        <h3 class="text-base font-semibold text-gray-900 mb-4">Informações do Produto</h3>
                         
                         <div class="space-y-4">
-                            <!-- Escolha a Embalagem -->
-                            <div>
-                                <label for="escolha_embalagem" class="block text-sm font-medium text-gray-700 mb-1"></label>
-                                <select
-                                    v-model="form.escolha_embalagem"
-                                    id="escolha_embalagem"
-                                    class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-                                >
-                                    <option value="">Selecionar Embalagem</option>
-                                    <option value="bag">Bag/Sachê</option>
-                                    <option value="pote">Pote</option>
-                                    <option value="lata">Lata</option>
-                                    <option value="caixa">Caixa</option>
-                                    <option value="frasco">Frasco</option>
-                                </select>
-                            </div>
-
-                            <!-- Embalagens Cadastradas -->
-                            <!-- <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Embalagens Cadastradas</label>
-                                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                                    <div v-for="i in 4" :key="i" class="border border-gray-300 rounded-md p-3 text-center bg-gray-100">
-                                        <div class="w-full h-20 bg-gray-200 rounded mb-2 flex items-center justify-center">
-                                            <span class="text-gray-500 text-xs">📦</span>
-                                        </div>
-                                        <p class="text-xs text-gray-600">Nome da Embalagem (válida de produtos embalagem)</p>
-                                    </div>
-                                </div>
-                            </div> -->
-
-                            <!-- Prompt para Especificação das Embalagens -->
-                            <div>
-                                <label for="prompt_especificacao_embalagens" class="block text-sm font-medium text-gray-700 mb-1">Prompt de Especificação das Embalagens</label>
-                                <textarea
-                                    v-model="form.prompt_especificacao_embalagens"
-                                    id="prompt_especificacao_embalagens"
-                                    rows="4"
-                                    placeholder="Descreva as especificações das embalagens..."
-                                    class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-vertical"
-                                ></textarea>
-                            </div>
-
                             <!-- Prompt para uso das informações do Produto -->
                             <div>
                                 <label for="prompt_uso_informacoes_produto" class="block text-sm font-medium text-gray-700 mb-1">Prompt para uso das informações do Produto</label>
@@ -604,56 +444,7 @@
                                 />
                             </div>
 
-                            <!-- Peso Líquido -->
-                            <div>
-                                <label for="peso_liquido" class="block text-sm font-medium text-gray-700 mb-1">Peso Líquido</label>
-                                <input
-                                    v-model="form.peso_liquido"
-                                    id="peso_liquido"
-                                    type="number"
-                                    step="0.01"
-                                    placeholder="0.00"
-                                    class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-                                />
-                            </div>
 
-                            <!-- Peso Bruto -->
-                            <div>
-                                <label for="peso_bruto" class="block text-sm font-medium text-gray-700 mb-1">Peso Bruto</label>
-                                <input
-                                    v-model="form.peso_bruto"
-                                    id="peso_bruto"
-                                    type="number"
-                                    step="0.01"
-                                    placeholder="0.00"
-                                    class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-                                />
-                            </div>
-
-                            <!-- Validade -->
-                            <div>
-                                <label for="validade" class="block text-sm font-medium text-gray-700 mb-1">Validade</label>
-                                <input
-                                    v-model="form.validade"
-                                    id="validade"
-                                    type="text"
-                                    placeholder="ex: 12 meses"
-                                    class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-                                />
-                            </div>
-
-                            <!-- Valor -->
-                            <div>
-                                <label for="valor" class="block text-sm font-medium text-gray-700 mb-1">Preço (R$)</label>
-                                <input
-                                    v-model="form.valor"
-                                    id="valor"
-                                    type="number"
-                                    step="0.01"
-                                    placeholder="0.00"
-                                    class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-                                />
-                            </div>
                         </div>
 
                         <!-- Status Checkboxes -->
@@ -669,6 +460,258 @@
                                     />
                                     <label for="status" class="ml-2 text-sm text-gray-700">Produto Ativo</label>
                                 </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Packaging Information Section -->
+                    <section class="bg-gray-50 p-6 rounded-lg mt-6">
+                        <h3 class="text-base font-semibold text-gray-900 mb-4">📦 Informações de Embalagem</h3>
+                        
+                        <!-- Packaging List -->
+                        <div v-if="form.packagings && form.packagings.length > 0" class="mb-6">
+                            <h4 class="text-sm font-medium text-gray-700 mb-3">Embalagens Cadastradas</h4>
+                            <div class="space-y-3">
+                                <div
+                                    v-for="(packaging, index) in form.packagings"
+                                    :key="index"
+                                    class="border border-gray-200 rounded-lg p-4 bg-white"
+                                >
+                                    <div class="flex items-center justify-between mb-3">
+                                        <div class="flex items-center space-x-3">
+                                            <div class="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center">
+                                                <span class="text-orange-600 text-sm">📦</span>
+                                            </div>
+                                            <div>
+                                                <h5 class="font-medium text-gray-900">{{ packaging.descricao || 'Embalagem sem descrição' }}</h5>
+                                                <p class="text-sm text-gray-600">
+                                                    {{ packaging.codigo_padrao ? `Código: ${packaging.codigo_padrao}` : '' }}
+                                                    {{ packaging.sku ? `SKU: ${packaging.sku}` : '' }}
+                                                </p>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="flex items-center space-x-2">
+                                            <span v-if="!packaging.status" class="bg-red-50 text-red-700 px-2 py-1 rounded text-xs border border-red-200">
+                                                INATIVA
+                                            </span>
+                                            <span v-if="packaging.descontinuado" class="bg-yellow-50 text-yellow-700 px-2 py-1 rounded text-xs border border-yellow-200">
+                                                DESCONTINUADA
+                                            </span>
+                                            <button
+                                                type="button"
+                                                @click="editPackaging(packaging, index)"
+                                                class="text-orange-600 hover:text-orange-800 text-sm font-medium"
+                                            >
+                                                Editar
+                                            </button>
+                                            <button
+                                                type="button"
+                                                @click="removePackaging(index)"
+                                                class="text-gray-600 hover:text-gray-800 text-sm font-medium"
+                                            >
+                                            </button>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
+                                        <div>
+                                            <span class="text-gray-500">Tipo:</span>
+                                            <span class="ml-1 font-medium">{{ packaging.embalagem_tipo || 'N/A' }}</span>
+                                        </div>
+                                        <div>
+                                            <span class="text-gray-500">Qtd/Caixa:</span>
+                                            <span class="ml-1 font-medium">{{ packaging.quantidade_caixa || 'N/A' }}</span>
+                                        </div>
+                                        <div>
+                                            <span class="text-gray-500">Peso Líquido:</span>
+                                            <span class="ml-1 font-medium">{{ packaging.peso_liquido ? `${packaging.peso_liquido}kg` : 'N/A' }}</span>
+                                        </div>
+                                        <div>
+                                            <span class="text-gray-500">Peso Bruto:</span>
+                                            <span class="ml-1 font-medium">{{ packaging.peso_bruto ? `${packaging.peso_bruto}kg` : 'N/A' }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Note about packaging management -->
+                        <!-- <div class="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                            <p class="text-sm text-blue-800">
+                                💡 <strong>Nota:</strong> As embalagens são criadas automaticamente quando você salva um produto pela primeira vez. 
+                                Use o botão "Editar" para atualizar as informações da embalagem.
+                            </p>
+                        </div> -->
+
+                        <!-- Packaging Form -->
+                        <div v-if="showPackagingForm" class="border border-gray-200 rounded-lg p-4 bg-white">
+                            <h4 class="text-sm font-medium text-gray-700 mb-4">
+                                Editar Embalagem
+                            </h4>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                <!-- Basic Information -->
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Descrição*</label>
+                                    <input
+                                        v-model="packagingForm.descricao"
+                                        type="text"
+                                        placeholder="Descrição da embalagem"
+                                        class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                                        required
+                                    />
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Código Padrão</label>
+                                    <input
+                                        v-model="packagingForm.codigo_padrao"
+                                        type="text"
+                                        placeholder="Código interno"
+                                        class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">SKU</label>
+                                    <input
+                                        v-model="packagingForm.sku"
+                                        type="text"
+                                        placeholder="Stock Keeping Unit"
+                                        class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">EAN</label>
+                                    <input
+                                        v-model="packagingForm.ean"
+                                        type="text"
+                                        placeholder="Código de Barras"
+                                        class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Tipo de Embalagem</label>
+                                    <select
+                                        v-model="packagingForm.embalagem_tipo"
+                                        class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                                    >
+                                        <option value="">Selecione...</option>
+                                        <option value="kg">Quilogramas (kg)</option>
+                                        <option value="g">Gramas (g)</option>
+                                        <option value="l">Litros (L)</option>
+                                        <option value="ml">Mililitros (ml)</option>
+                                        <option value="unidade">Unidade</option>
+                                        <option value="caixa">Caixa</option>
+                                        <option value="saco">Saco</option>
+                                        <option value="garrafa">Garrafa</option>
+                                        <option value="lata">Lata</option>
+                                        <option value="pote">Pote</option>
+                                        <option value="outro">Outro</option>
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Quantidade por Caixa</label>
+                                    <input
+                                        v-model="packagingForm.quantidade_caixa"
+                                        type="text"
+                                        placeholder="Ex: 12 unidades"
+                                        class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Peso Líquido (kg)</label>
+                                    <input
+                                        v-model="packagingForm.peso_liquido"
+                                        type="number"
+                                        step="0.01"
+                                        min="0"
+                                        placeholder="0.00"
+                                        class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Peso Bruto (kg)</label>
+                                    <input
+                                        v-model="packagingForm.peso_bruto"
+                                        type="number"
+                                        step="0.01"
+                                        min="0"
+                                        placeholder="0.00"
+                                        class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Data de Validade</label>
+                                    <input
+                                        v-model="packagingForm.validade"
+                                        type="date"
+                                        class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                                    />
+                                </div>
+                            </div>
+
+                            <!-- AI Specifications -->
+                            <div class="mt-4">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">🤖 Especificações para IA</label>
+                                <textarea
+                                    v-model="packagingForm.prompt_especificacao_embalagens"
+                                    rows="4"
+                                    placeholder="Descreva detalhadamente as especificações da embalagem para geração de conteúdo por IA..."
+                                    class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-vertical"
+                                ></textarea>
+                                <p class="text-xs text-gray-500 mt-1">
+                                    Este texto será usado para gerar descrições automáticas da embalagem
+                                </p>
+                            </div>
+
+                            <!-- Status -->
+                            <div class="mt-4 space-y-3">
+                                <h5 class="text-sm font-medium text-gray-700">Status da Embalagem</h5>
+                                <div class="flex flex-wrap gap-6">
+                                    <div class="flex items-center">
+                                        <input
+                                            v-model="packagingForm.status"
+                                            type="checkbox"
+                                            class="h-4 w-4 text-orange-600 focus:ring-orange-500 border-gray-300 rounded"
+                                        />
+                                        <label class="ml-2 text-sm text-gray-700">Embalagem Ativa</label>
+                                    </div>
+                                    
+                                    <div class="flex items-center">
+                                        <input
+                                            v-model="packagingForm.descontinuado"
+                                            type="checkbox"
+                                            class="h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300 rounded"
+                                        />
+                                        <label class="ml-2 text-sm text-gray-700">Embalagem Descontinuada</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Packaging Form Actions -->
+                            <div class="flex gap-3 mt-6 pt-4 border-t border-gray-200">
+                                <button
+                                    type="button"
+                                    @click="cancelPackagingForm"
+                                    class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"
+                                >
+                                    Cancelar
+                                </button>
+                                <button
+                                    type="button"
+                                    @click="savePackaging"
+                                    class="px-4 py-2 text-sm font-medium text-white bg-orange-600 border border-transparent rounded-md hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"
+                                >
+                                    Atualizar Embalagem
+                                </button>
                             </div>
                         </div>
                     </section>
@@ -722,9 +765,7 @@
                                     <span v-if="product.group_product" class="bg-blue-50 text-blue-700 px-2 py-1 rounded text-xs border border-blue-200">
                                         {{ product.group_product.descricao }}
                                     </span>
-                                    <span v-if="product.detail?.lancamento" class="bg-green-50 text-green-700 px-2 py-1 rounded text-xs border border-green-200">
-                                        NOVO
-                                    </span>
+
                                     <span v-if="!product.status" class="bg-red-50 text-red-700 px-2 py-1 rounded text-xs border border-red-200">
                                         INATIVO
                                     </span>
@@ -736,12 +777,7 @@
                                         <span v-if="product.codigo_padrao && product.sku"> • </span>
                                         <span v-if="product.sku">SKU: {{ product.sku }}</span>
                                     </div>
-                                    <div v-if="product.detail?.valor">
-                                        Preço: R$ {{ parseFloat(product.detail.valor).toFixed(2) }}
-                                    </div>
-                                    <div v-if="product.detail?.peso_liquido || product.detail?.embalagem_tipo">
-                                        <span v-if="product.detail?.peso_liquido">{{ product.detail.peso_liquido }}{{ product.detail?.embalagem_tipo || 'kg' }}</span>
-                                    </div>
+
                                 </div>
                             </div>
                             
@@ -888,20 +924,7 @@ const form = useForm({
     descricao_lista_ingredientes: '',
     descricao_modos_preparo: '',
     descricao_rendimentos: '',
-    embalagem_tipo: '',
-    embalagem_descricao: '',
-    quantidade_caixa: '',
-    peso_liquido: null,
-    peso_bruto: null,
-    validade: '',
-    valor: null,
-    desconto: null,
-    informacao_adicional: '',
     ean: '',
-    qr_code: '',
-    url_rede_social: '',
-    catalogo: true,
-    lancamento: false,
     
     // Images will be handled separately
     images: [],
@@ -911,6 +934,10 @@ const form = useForm({
     content_ids: [],
     selected_recipes: [],
     selected_contents: [],
+    
+    // Packaging
+    packagings: [],
+    packaging: null,
 })
 
 // Separate refs for image URLs
@@ -922,6 +949,23 @@ const yieldsImageUrl = ref('')
 // Selected relationships
 const selectedRecipes = ref([])
 const selectedContents = ref([])
+
+// Packaging management
+const showPackagingForm = ref(false)
+const packagingForm = ref({
+    descricao: '',
+    codigo_padrao: '',
+    sku: '',
+    ean: '',
+    quantidade_caixa: '',
+    embalagem_tipo: '',
+    peso_liquido: '',
+    peso_bruto: '',
+    validade: '',
+    descontinuado: false,
+    status: true,
+    prompt_especificacao_embalagens: '',
+})
 
 // Recipe management functions
 const addRecipe = () => {
@@ -939,6 +983,84 @@ const addContent = () => {
 
 const removeContent = (index) => {
     form.selected_contents.splice(index, 1)
+}
+
+// Packaging management functions
+const addPackaging = () => {
+    // This function is no longer needed - packaging is created automatically
+    showToast('As embalagens são criadas automaticamente. Use "Editar" para atualizar.', 'info')
+}
+
+const savePackaging = () => {
+    if (!packagingForm.value.descricao) {
+        showToast('Descrição da embalagem é obrigatória', 'error')
+        return
+    }
+    
+    const packagingData = { ...packagingForm.value }
+    delete packagingData.editIndex // Remove the edit index from data
+    
+    // Update existing packaging
+    form.packagings[packagingForm.value.editIndex] = {
+        ...packagingData,
+        id: form.packagings[packagingForm.value.editIndex].id // Preserve original ID
+    }
+    showToast('Embalagem atualizada com sucesso!', 'success')
+    
+    // Reset packaging form
+    resetPackagingForm()
+    showPackagingForm.value = false
+}
+
+const removePackaging = (index) => {
+    showToast('As embalagens não podem ser removidas. Use "Editar" para atualizar as informações.', 'info')
+}
+
+const editPackaging = (packaging, index) => {
+    // Reset form first
+    resetPackagingForm()
+    
+    // Load packaging data into form
+    packagingForm.value = {
+        descricao: packaging.descricao || '',
+        codigo_padrao: packaging.codigo_padrao || '',
+        sku: packaging.sku || '',
+        ean: packaging.ean || '',
+        quantidade_caixa: packaging.quantidade_caixa || '',
+        embalagem_tipo: packaging.embalagem_tipo || '',
+        peso_liquido: packaging.peso_liquido || '',
+        peso_bruto: packaging.peso_bruto || '',
+        validade: packaging.validade || '',
+        descontinuado: packaging.descontinuado || false,
+        status: packaging.status,
+        prompt_especificacao_embalagens: packaging.prompt_especificacao_embalagens || '',
+        editIndex: index // Store the index for updating
+    }
+    
+    showPackagingForm.value = true
+}
+
+const cancelPackagingForm = () => {
+    resetPackagingForm()
+    showPackagingForm.value = false
+}
+
+const resetPackagingForm = () => {
+    packagingForm.value = {
+        descricao: '',
+        codigo_padrao: '',
+        sku: '',
+        ean: '',
+        quantidade_caixa: '',
+        embalagem_tipo: '',
+        peso_liquido: '',
+        peso_bruto: '',
+        validade: '',
+        descontinuado: false,
+        status: true,
+        prompt_especificacao_embalagens: '',
+        editIndex: undefined
+    }
 }
 
 function submit() {
@@ -985,18 +1107,35 @@ function submit() {
         })
     }
     
-    // Add images and relationships to form data
+    // Prepare packaging data
+    const packagingData = {
+        prompt_especificacao_embalagens: form.prompt_especificacao_embalagens,
+        packagings: form.packagings
+    }
+    
+    // Add images, relationships, and packaging to form data
     form.images = images
     form.recipe_ids = form.selected_recipes.map(r => r.recipe_id).filter(id => id)
     form.content_ids = form.selected_contents.map(c => c.content_id).filter(id => id)
+    
+    // Ensure packaging data is properly structured
+    form.packaging = packagingData
     
     // Debug: Log what we're sending
     console.log('Submitting form with data:', {
         form: form.data(),
         selectedRecipes: selectedRecipes.value,
         selectedContents: selectedContents.value,
-        images: images
+        images: images,
+        packaging: packagingData,
+        packagings: form.packagings,
+        packagingInForm: form.packaging
     })
+    
+    // Additional debug to check if packaging is in form data
+    const formData = form.data()
+    console.log('Form data keys:', Object.keys(formData))
+    console.log('Packaging in form data:', formData.packaging)
     
     form.post("/products", {
         onSuccess: () => {
@@ -1034,6 +1173,9 @@ function resetForm() {
     form.content_ids = []
     form.selected_recipes = []
     form.selected_contents = []
+    form.packagings = []
+    showPackagingForm.value = false
+    resetPackagingForm()
 }
 
 function editProduct(product) {
@@ -1046,32 +1188,38 @@ function editProduct(product) {
     form.marca = product.marca || ''
     form.status = product.status
     
-    // Product details
-    if (product.detail) {
-        form.escolha_embalagem = product.detail.escolha_embalagem || ''
-        form.prompt_especificacao_embalagens = product.detail.prompt_especificacao_embalagens || ''
-        form.prompt_uso_informacoes_produto = product.detail.prompt_uso_informacoes_produto || ''
-        form.especificacao_produto = product.detail.especificacao_produto || ''
-        form.perfil_sabor = product.detail.perfil_sabor || ''
-        form.descricao_tabela_nutricional = product.detail.descricao_tabela_nutricional || ''
-        form.descricao_lista_ingredientes = product.detail.descricao_lista_ingredientes || ''
-        form.descricao_modos_preparo = product.detail.descricao_modos_preparo || ''
-        form.descricao_rendimentos = product.detail.descricao_rendimentos || ''
-        form.embalagem_tipo = product.detail.embalagem_tipo || ''
-        form.embalagem_descricao = product.detail.embalagem_descricao || ''
-        form.quantidade_caixa = product.detail.quantidade_caixa || ''
-        form.peso_liquido = product.detail.peso_liquido
-        form.peso_bruto = product.detail.peso_bruto
-        form.validade = product.detail.validade || ''
-        form.valor = product.detail.valor
-        form.desconto = product.detail.desconto
-        form.informacao_adicional = product.detail.informacao_adicional || ''
-        form.ean = product.detail.ean || ''
-        form.qr_code = product.detail.qr_code || ''
-        form.url_rede_social = product.detail.url_rede_social || ''
-        form.catalogo = product.detail.catalogo
-        form.lancamento = product.detail.lancamento
+    // Product details - now directly on product model
+    form.escolha_embalagem = product.escolha_embalagem || ''
+    form.prompt_uso_informacoes_produto = product.prompt_uso_informacoes_produto || ''
+    
+    // Load packaging data
+    form.packagings = product.packagings ? product.packagings.map(p => ({
+        id: p.id,
+        descricao: p.descricao || '',
+        codigo_padrao: p.codigo_padrao || '',
+        sku: p.sku || '',
+        ean: p.ean || '',
+        quantidade_caixa: p.quantidade_caixa || '',
+        embalagem_tipo: p.embalagem_tipo || '',
+        peso_liquido: p.peso_liquido || '',
+        peso_bruto: p.peso_bruto || '',
+        validade: p.validade || '',
+        descontinuado: p.descontinuado || false,
+        status: p.status,
+        prompt_especificacao_embalagens: p.prompt_especificacao_embalagens || ''
+    })) : []
+    
+    // Load packaging-specific fields
+    if (product.packagings && product.packagings.length > 0) {
+        form.prompt_especificacao_embalagens = product.packagings[0].prompt_especificacao_embalagens || ''
     }
+    form.especificacao_produto = product.especificacao_produto || ''
+    form.perfil_sabor = product.perfil_sabor || ''
+    form.descricao_tabela_nutricional = product.descricao_tabela_nutricional || ''
+    form.descricao_lista_ingredientes = product.descricao_lista_ingredientes || ''
+    form.descricao_modos_preparo = product.descricao_modos_preparo || ''
+    form.descricao_rendimentos = product.descricao_rendimentos || ''
+    form.ean = product.ean || ''
     
     // Load images
     if (product.images) {

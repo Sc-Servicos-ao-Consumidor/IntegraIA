@@ -38,7 +38,7 @@ return new class extends Migration
             
             // Content type and classification
             $table->string('tipo_conteudo')->nullable();
-            $table->string('pilares')->nullable(); // Based on dropdown in image
+            $table->string('pilares')->nullable();
             $table->string('canal')->nullable();
             
             // Links and references
@@ -52,6 +52,7 @@ return new class extends Migration
             
             // SEO and prompt content
             $table->text('descricao_conteudo')->nullable();
+            $table->vector('embedding', 1536)->nullable();
             
             $table->timestamps();
         });

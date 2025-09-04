@@ -40,7 +40,6 @@ class RecipeSeeder extends Seeder
                 'consumption_occasion' => ['Almoço', 'Jantar'],
                 'general_images_link' => 'https://example.com/images/molho-bolonhesa.jpg',
                 'product_code' => 'KNR-BT-750',
-                'content_code' => 'CNT-001'
             ],
 
             // Ragú de Carne com Base de Tomate Knorr
@@ -64,7 +63,6 @@ class RecipeSeeder extends Seeder
                 'consumption_occasion' => ['Almoço', 'Jantar'],
                 'general_images_link' => 'https://example.com/images/ragu-carne.jpg',
                 'product_code' => 'KNR-BT-750',
-                'content_code' => 'CNT-002'
             ],
 
             // Molho de Pizza com Base de Tomate Knorr
@@ -88,7 +86,6 @@ class RecipeSeeder extends Seeder
                 'consumption_occasion' => ['Almoço', 'Jantar', 'Lanche'],
                 'general_images_link' => 'https://example.com/images/molho-pizza.jpg',
                 'product_code' => 'KNR-BT-750',
-                'content_code' => 'CNT-003'
             ]
         ];
 

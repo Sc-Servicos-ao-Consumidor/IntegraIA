@@ -22,6 +22,15 @@ class Product extends Model
         'codigo_padrao',
         'sku',
         'group_product_id',
+        'marca', // Added back - this field exists in the original products table
+        'escolha_embalagem', // Added from migration
+        'prompt_uso_informacoes_produto', // Added from migration
+        'especificacao_produto', // Added from migration
+        'perfil_sabor', // Added from migration
+        'descricao_tabela_nutricional', // Added from migration
+        'descricao_lista_ingredientes', // Added from migration
+        'descricao_modos_preparo', // Added from migration
+        'descricao_rendimentos', // Added from migration
         'descricao',
         'descricao_breve',
         'informacao_adicional',

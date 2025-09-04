@@ -4,8 +4,8 @@ namespace Database\Seeders;
 
 use App\Models\GroupProduct;
 use App\Models\Product;
-use App\Models\ProductDetail;
 use App\Models\ProductImage;
+use App\Models\ProductPackaging;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
 
@@ -30,26 +30,25 @@ class ProductSeeder extends Seeder
                     'group_product_id' => $basesGroup->id,
                     'marca' => 'Knorr Professional',
                     'descricao' => 'Base de Tomate Knorr Professional',
+                    'descricao_breve' => 'Base desidratada para molho de tomate com ingredientes selecionados',
+                    'ean' => '7891234567890',
                     'status' => true,
+                    // New form-specific fields
+                    'prompt_uso_informacoes_produto' => 'Use 1 sachê para cada 2 litros de água',
+                    'especificacao_produto' => 'Base desidratada de tomate com temperos selecionados',
+                    'perfil_sabor' => 'Sabor intenso de tomate com notas de ervas aromáticas',
+                    'descricao_tabela_nutricional' => 'Porção de 100g: Energia 320kcal, Proteínas 12g, Carboidratos 45g, Gorduras 8g',
+                    'descricao_lista_ingredientes' => 'Tomate desidratado, sal, açúcar, cebola, alho, ervas aromáticas',
+                    'descricao_modos_preparo' => '1. Dissolva o conteúdo em água quente\n2. Cozinhe por 5 minutos\n3. Adicione temperos a gosto',
+                    'descricao_rendimentos' => '1 sachê rende aproximadamente 2 litros de molho pronto',
                 ],
-                'details' => [
-                    'especificacao_produto' => 'Base desidratada para molho de tomate com ingredientes selecionados',
-                    'perfil_sabor' => 'Sabor intenso de tomate com notas de ervas mediterrâneas',
-                    'descricao_tabela_nutricional' => 'Rica em licopeno, fonte de vitaminas A e C',
-                    'descricao_lista_ingredientes' => 'Tomate desidratado (88%), sal, açúcar, cebola, alho, especiarias naturais',
-                    'descricao_modos_preparo' => 'Misture 1 colher de sopa em 200ml de água quente. Cozinhe por 1 minuto.',
-                    'descricao_rendimentos' => 'Cada embalagem rende aproximadamente 3,1kg de molho pronto',
-                    'embalagem_tipo' => 'bag',
-                    'embalagem_descricao' => '6x750g',
-                    'quantidade_caixa' => '6',
-                    'peso_liquido' => 750.00,
-                    'peso_bruto' => 780.00,
-                    'validade' => '24 meses',
-                    'valor' => 89.90,
-                    'informacao_adicional' => 'Feita com 88 tomates, preparo em 1 minuto, rende mais que 2 latas de 3,1 kg de molho de tomate pronto.',
-                    'catalogo' => true,
-                    'lancamento' => false,
+                'packaging' => [
+                    'ulid' => (string) Str::ulid(),
+                    'codigo_padrao' => 'KNR-BT-750-PKG',
+                    'sku' => 'KNR001750PKG',
+                    'descricao' => 'Embalagem Base de Tomate Knorr 750g',
                     'status' => true,
+                    'prompt_especificacao_embalagens' => 'Embalagem em sachê de 750g, ideal para uso profissional',
                 ],
                 'images' => [
                     [
@@ -78,26 +77,26 @@ class ProductSeeder extends Seeder
                     'group_product_id' => $caldosGroup->id,
                     'marca' => 'Knorr Professional',
                     'descricao' => 'Caldo de Carne Knorr Professional',
+                    'descricao_breve' => 'Caldo concentrado em pó sabor carne para realçar preparações',
+                    'ean' => '7891234567891',
                     'status' => true,
+                    // New form-specific fields
+                    'escolha_embalagem' => 'pote',
+                    'prompt_uso_informacoes_produto' => 'Use 1 colher de sopa para cada litro de água',
+                    'especificacao_produto' => 'Caldo concentrado em pó sabor carne',
+                    'perfil_sabor' => 'Sabor intenso de carne bovina com notas de legumes',
+                    'descricao_tabela_nutricional' => 'Porção de 100g: Energia 280kcal, Proteínas 15g, Carboidratos 35g, Gorduras 5g',
+                    'descricao_lista_ingredientes' => 'Extrato de carne bovina, sal, cebola, cenoura, aipo, temperos naturais',
+                    'descricao_modos_preparo' => '1. Dissolva em água quente\n2. Adicione aos alimentos durante o cozimento\n3. Ajuste o sal conforme necessário',
+                    'descricao_rendimentos' => '1kg rende aproximadamente 100 litros de caldo',
                 ],
-                'details' => [
-                    'especificacao_produto' => 'Caldo concentrado em pó sabor carne para realçar preparações',
-                    'perfil_sabor' => 'Sabor robusto de carne bovina com notas defumadas',
-                    'descricao_tabela_nutricional' => 'Rico em proteínas e aminoácidos essenciais',
-                    'descricao_lista_ingredientes' => 'Sal, extrato de carne bovina, gordura vegetal, cebola, especiarias',
-                    'descricao_modos_preparo' => 'Dissolva 1 colher de chá em 250ml de água quente',
-                    'descricao_rendimentos' => 'Cada embalagem rende aproximadamente 200 porções',
-                    'embalagem_tipo' => 'pote',
-                    'embalagem_descricao' => '12x1kg',
-                    'quantidade_caixa' => '12',
-                    'peso_liquido' => 1000.00,
-                    'peso_bruto' => 1050.00,
-                    'validade' => '18 meses',
-                    'valor' => 45.90,
-                    'informacao_adicional' => 'Caldo concentrado para realçar o sabor de carnes e preparações.',
-                    'catalogo' => true,
-                    'lancamento' => false,
+                'packaging' => [
+                    'ulid' => (string) Str::ulid(),
+                    'codigo_padrao' => 'KNR-CC-1000-PKG',
+                    'sku' => 'KNR002100PKG',
+                    'descricao' => 'Embalagem Caldo de Carne Knorr 1kg',
                     'status' => true,
+                    'prompt_especificacao_embalagens' => 'Embalagem em pote de 1kg, com tampa hermética',
                 ],
                 'images' => [
                     [
@@ -116,28 +115,27 @@ class ProductSeeder extends Seeder
                     'codigo_padrao' => 'ING-CM-001',
                     'sku' => 'ING001001',
                     'group_product_id' => $carnesGroup->id,
-                    'marca' => null,
+                    'marca' => 'Frigorífico Premium',
                     'descricao' => 'Carne Moída Bovina',
+                    'descricao_breve' => 'Carne bovina moída fresca de primeira qualidade',
+                    'ean' => '7891234567892',
                     'status' => true,
+                    // New form-specific fields
+                    'prompt_uso_informacoes_produto' => 'Conserve refrigerado e consuma em até 3 dias',
+                    'especificacao_produto' => 'Carne bovina moída com baixo teor de gordura',
+                    'perfil_sabor' => 'Sabor natural de carne bovina fresca',
+                    'descricao_tabela_nutricional' => 'Porção de 100g: Energia 250kcal, Proteínas 26g, Carboidratos 0g, Gorduras 15g',
+                    'descricao_lista_ingredientes' => 'Carne bovina moída',
+                    'descricao_modos_preparo' => '1. Tempere a gosto\n2. Refogue em fogo médio\n3. Cozinhe até dourar completamente',
+                    'descricao_rendimentos' => '1kg rende aproximadamente 4 porções de 250g',
                 ],
-                'details' => [
-                    'especificacao_produto' => 'Carne bovina moída fresca de primeira qualidade',
-                    'perfil_sabor' => 'Sabor característico da carne bovina',
-                    'descricao_tabela_nutricional' => 'Alta fonte de proteína, ferro e vitaminas do complexo B',
-                    'descricao_lista_ingredientes' => '100% carne bovina moída',
-                    'descricao_modos_preparo' => 'Tempere e cozinhe em fogo médio até dourar',
-                    'descricao_rendimentos' => 'Rendimento de aproximadamente 4 porções por kg',
-                    'embalagem_tipo' => 'kg',
-                    'embalagem_descricao' => 'Por kg',
-                    'quantidade_caixa' => '1',
-                    'peso_liquido' => 1.00,
-                    'peso_bruto' => 1.00,
-                    'validade' => '3 dias refrigerado',
-                    'valor' => 32.90,
-                    'informacao_adicional' => 'Carne bovina moída com baixo teor de gordura.',
-                    'catalogo' => true,
-                    'lancamento' => false,
+                'packaging' => [
+                    'ulid' => (string) Str::ulid(),
+                    'codigo_padrao' => 'ING-CM-001-PKG',
+                    'sku' => 'ING001001PKG',
+                    'descricao' => 'Embalagem Carne Moída Bovina 1kg',
                     'status' => true,
+                    'prompt_especificacao_embalagens' => 'Embalagem em bandeja de isopor com filme plástico',
                 ],
                 'images' => [
                     [
@@ -156,28 +154,27 @@ class ProductSeeder extends Seeder
                     'codigo_padrao' => 'ING-OR-001',
                     'sku' => 'ING002001',
                     'group_product_id' => $vegetaisGroup->id,
-                    'marca' => null,
+                    'marca' => 'Ervas Naturais',
                     'descricao' => 'Orégano Desidratado',
+                    'descricao_breve' => 'Orégano desidratado em folhas para temperos',
+                    'ean' => '7891234567893',
                     'status' => true,
+                    // New form-specific fields
+                    'prompt_uso_informacoes_produto' => 'Adicione no final do cozimento para preservar o aroma',
+                    'especificacao_produto' => 'Orégano desidratado em folhas inteiras',
+                    'perfil_sabor' => 'Aroma intenso e sabor característico do orégano mediterrâneo',
+                    'descricao_tabela_nutricional' => 'Porção de 100g: Energia 265kcal, Proteínas 9g, Carboidratos 69g, Gorduras 4g',
+                    'descricao_lista_ingredientes' => 'Orégano desidratado',
+                    'descricao_modos_preparo' => '1. Adicione no final do cozimento\n2. Polvilhe sobre pizzas e massas\n3. Use em molhos e marinadas',
+                    'descricao_rendimentos' => '50g rende aproximadamente 100 porções de 0,5g',
                 ],
-                'details' => [
-                    'especificacao_produto' => 'Orégano desidratado em folhas para temperos',
-                    'perfil_sabor' => 'Aroma intenso e sabor característico de orégano',
-                    'descricao_tabela_nutricional' => 'Rico em antioxidantes e óleos essenciais',
-                    'descricao_lista_ingredientes' => '100% orégano desidratado',
-                    'descricao_modos_preparo' => 'Adicione no final do cozimento para preservar o aroma',
-                    'descricao_rendimentos' => 'Cada embalagem tempera até 50 preparações',
-                    'embalagem_tipo' => 'pote',
-                    'embalagem_descricao' => '12x50g',
-                    'quantidade_caixa' => '12',
-                    'peso_liquido' => 50.00,
-                    'peso_bruto' => 65.00,
-                    'validade' => '12 meses',
-                    'valor' => 8.90,
-                    'informacao_adicional' => 'Orégano desidratado para temperos e molhos.',
-                    'catalogo' => true,
-                    'lancamento' => false,
+                'packaging' => [
+                    'ulid' => (string) Str::ulid(),
+                    'codigo_padrao' => 'ING-OR-001-PKG',
+                    'sku' => 'ING002001PKG',
+                    'descricao' => 'Embalagem Orégano Desidratado 50g',
                     'status' => true,
+                    'prompt_especificacao_embalagens' => 'Embalagem em pote de vidro com tampa hermética',
                 ],
                 'images' => [
                     [
@@ -195,10 +192,10 @@ class ProductSeeder extends Seeder
             // Create the product
             $product = Product::create($data['product']);
             
-            // Create product details
-            $details = $data['details'];
-            $details['product_id'] = $product->id;
-            ProductDetail::create($details);
+            // Create product packaging
+            $packaging = $data['packaging'];
+            $packaging['product_id'] = $product->id;
+            ProductPackaging::create($packaging);
             
             // Create product images
             foreach ($data['images'] as $imageData) {

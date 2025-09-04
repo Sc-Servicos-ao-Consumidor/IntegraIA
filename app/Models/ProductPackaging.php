@@ -24,6 +24,7 @@ class ProductPackaging extends Model
         'validade',
         'descontinuado',
         'status',
+        'prompt_especificacao_embalagens',
     ];
 
     protected $casts = [
