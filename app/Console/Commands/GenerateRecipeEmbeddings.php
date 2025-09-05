@@ -4,40 +4,94 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use App\Models\Recipe;
-use App\Services\RecipeEmbeddingService;
-use Pgvector\Laravel\Vector;
+use App\Services\EmbeddingService;
+use App\Services\PrismService;
 
 class GenerateRecipeEmbeddings extends Command
 {
-    protected $signature = 'recipes:generate-embeddings';
-    protected $description = 'Generate and store embeddings for all recipes without one';
+    /**
+     * The name and signature of the console command.
+     *
+     * @var string
+     */
+    protected $signature = 'embedding:generate-recipes 
+                            {--limit= : Limit the number of recipes to process}
+                            {--force : Regenerate embeddings even if they already exist}';
 
-    public function handle(RecipeEmbeddingService $embeddingService): int
+    /**
+     * The console command description.
+     *
+     * @var string
+     */
+    protected $description = 'Generate embeddings for recipes using the AI service';
+
+    /**
+     * Execute the console command.
+     */
+    public function handle()
     {
-        $recipes = Recipe::query()->get();
+        $this->info('Starting recipe embedding generation...');
 
-        if ($recipes->isEmpty()) {
-            $this->info('No recipes found that need embeddings.');
-            return Command::SUCCESS;
-        }
+        $limit = $this->option('limit');
+        $force = $this->option('force');
 
-        foreach ($recipes as $recipe) {
-            $this->info("Generating embedding for recipe: {$recipe->title}");
+        try {
+            $embeddingService = new EmbeddingService(new PrismService());
 
-            try {
-                $embedding = $embeddingService->generateEmbedding($recipe);
+            $query = Recipe::query();
 
-                $recipe->embedding = new Vector($embedding);
-                $recipe->save();
-
-                $this->info("Saved embedding for: {$recipe->title}");
-            } catch (\Exception $e) {
-                $this->error("Failed for {$recipe->title}: " . $e->getMessage());
+            if (!$force) {
+                $query->whereNull('embedding');
             }
+
+            if ($limit) {
+                $query->limit((int) $limit);
+            }
+
+            $recipes = $query->get();
+
+            if ($recipes->isEmpty()) {
+                $this->info('No recipes to process.');
+                return Command::SUCCESS;
+            }
+
+            $this->info("Processing {$recipes->count()} recipes...");
+
+            $progressBar = $this->output->createProgressBar($recipes->count());
+            $progressBar->start();
+
+            $successCount = 0;
+            $errorCount = 0;
+
+            foreach ($recipes as $recipe) {
+                if ($embeddingService->generateEmbedding($recipe)) {
+                    $successCount++;
+                } else {
+                    $errorCount++;
+                    $this->warn("\nFailed to generate embedding for recipe ID: {$recipe->id}");
+                }
+                
+                $progressBar->advance();
+            }
+
+            $progressBar->finish();
+
+            $this->newLine(2);
+            $this->info("Recipe embedding generation completed!");
+            $this->table(
+                ['Status', 'Count'],
+                [
+                    ['Success', $successCount],
+                    ['Failed', $errorCount],
+                    ['Total', $recipes->count()]
+                ]
+            );
+
+            return Command::SUCCESS;
+
+        } catch (\Exception $e) {
+            $this->error('Error generating recipe embeddings: ' . $e->getMessage());
+            return Command::FAILURE;
         }
-
-        $this->info('Embeddings generated successfully.');
-        return Command::SUCCESS;
     }
-
 }

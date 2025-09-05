@@ -2,75 +2,189 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use Illuminate\Database\Seeder;
+use App\Models\Product;
 use App\Models\Recipe;
-use Pgvector\Laravel\Vector;
+use Illuminate\Database\Seeder;
 
 class RecipeSeeder extends Seeder
 {
     public function run(): void
     {
+        // Get products for relationships
+        $baseTomateKnorr = Product::where('descricao', 'Base de Tomate Knorr Professional')->first();
+        $caldoCarneKnorr = Product::where('descricao', 'Caldo de Carne Knorr Professional')->first();
+        $meuTemperoKnorr = Product::where('descricao', 'Meu Tempero Knorr Professional')->first();
+        $carneMoida = Product::where('descricao', 'Carne Moída Bovina')->first();
+        $carneDesfiada = Product::where('descricao', 'Carne Bovina Desfiada')->first();
+        $oregano = Product::where('descricao', 'Orégano Desidratado')->first();
+
         $recipes = [
+            // Molho à Bolonhesa com Base de Tomate Knorr
             [
-                'title' => 'Spaghetti Carbonara',
-                'raw_text' => <<<TEXT
-Ingredients:
-- 200g spaghetti
-- 100g pancetta
-- 2 eggs
-- 50g grated Parmesan
-- Salt and black pepper
-
-Instructions:
-1. Cook spaghetti until al dente.
-2. Fry pancetta until crispy.
-3. Beat eggs and mix with cheese.
-4. Combine all with pasta off heat to avoid scrambling eggs.
-TEXT,
-                'tags' => ['Italian', 'Quick', 'Comfort Food'],
-                'embedding' => new Vector(array_fill(0, 1536, 0.001)), // Dummy data for now
+                'recipe_code' => 'REC-001',
+                'recipe_name' => 'Molho à Bolonhesa com Base de Tomate Knorr',
+                'cuisine' => 'Italiana',
+                'recipe_type' => 'Molho',
+                'service_order' => 'Acompanhamento',
+                'preparation_time' => 30,
+                'difficulty_level' => 'Médio',
+                'yield' => '50 porções',
+                'channel' => 'Restaurante',
+                'recipe_description' => 'Molho à bolonhesa cremoso e saboroso, preparado com Base de Tomate Knorr Professional, garantindo qualidade e consistência em cada preparo.',
+                'ingredients_description' => 'Base de Tomate Knorr Professional, carne moída bovina, água, Meu Tempero Knorr',
+                'preparation_method' => "1. Refogue a carne moída até dourar\n2. Adicione 6L de água e 1 embalagem de Base de Tomate Knorr (750g)\n3. Adicione 100g de Meu Tempero Knorr\n4. Cozinhe em fogo baixo por 15 minutos mexendo ocasionalmente\n5. Ajuste o tempero se necessário\n6. Sirva quente",
+                'main_ingredients' => ['Base de Tomate Knorr Professional', 'Carne Moída Bovina'],
+                'supporting_ingredients' => ['Meu Tempero Knorr'],
+                'usage_groups' => ['Restaurantes', 'Food Service'],
+                'preparation_techniques' => ['Refogado', 'Cozimento lento'],
+                'consumption_occasion' => ['Almoço', 'Jantar'],
             ],
+
+            // Ragú de Carne com Base de Tomate Knorr
             [
-                'title' => 'Vegan Buddha Bowl',
-                'raw_text' => <<<TEXT
-Ingredients:
-- Quinoa
-- Chickpeas
-- Roasted sweet potato
-- Avocado
-- Tahini dressing
-
-Instructions:
-1. Cook quinoa.
-2. Roast sweet potato.
-3. Assemble bowl with ingredients and drizzle with tahini.
-TEXT,
-                'tags' => ['Vegan', 'Healthy', 'Bowl'],
-                'embedding' => new Vector(array_fill(0, 1536, 0.002)),
+                'recipe_code' => 'REC-002',
+                'recipe_name' => 'Ragú de Carne com Base de Tomate Knorr',
+                'cuisine' => 'Italiana',
+                'recipe_type' => 'Molho',
+                'service_order' => 'Acompanhamento',
+                'preparation_time' => 45,
+                'difficulty_level' => 'Médio',
+                'yield' => '45 porções',
+                'channel' => 'Restaurante',
+                'recipe_description' => 'Ragú tradicional com carne bovina desfiada e molho de tomate encorpado, preparado com Base de Tomate Knorr Professional.',
+                'ingredients_description' => 'Base de Tomate Knorr Professional, carne bovina desfiada, água, Caldo de Carne Knorr',
+                'preparation_method' => "1. Aqueça a carne bovina desfiada\n2. Adicione 6L de água e 1 embalagem de Base de Tomate Knorr (750g)\n3. Adicione 160g de Caldo de Carne Knorr\n4. Cozinhe em fogo baixo por 25 minutos\n5. Mexe ocasionalmente até obter consistência cremosa\n6. Ajuste o tempero\n7. Sirva sobre massas ou risotos",
+                'main_ingredients' => ['Base de Tomate Knorr Professional', 'Carne Bovina Desfiada'],
+                'supporting_ingredients' => ['Caldo de Carne Knorr Professional'],
+                'usage_groups' => ['Restaurantes', 'Food Service'],
+                'preparation_techniques' => ['Cozimento lento', 'Redução'],
+                'consumption_occasion' => ['Almoço', 'Jantar'],
             ],
+
+            // Molho de Pizza com Base de Tomate Knorr
             [
-                'title' => 'Chicken Tikka Masala',
-                'raw_text' => <<<TEXT
-Ingredients:
-- Chicken breast
-- Yogurt
-- Garam masala
-- Tomato paste
-- Cream
-
-Instructions:
-1. Marinate chicken in spices and yogurt.
-2. Grill or pan fry.
-3. Simmer sauce and combine.
-TEXT,
-                'tags' => ['Indian', 'Spicy', 'Dinner'],
-                'embedding' => new Vector (array_fill(0, 1536, 0.003)),
-            ],
+                'recipe_code' => 'REC-003',
+                'recipe_name' => 'Molho de Pizza com Base de Tomate Knorr',
+                'cuisine' => 'Italiana',
+                'recipe_type' => 'Molho',
+                'service_order' => 'Base',
+                'preparation_time' => 15,
+                'difficulty_level' => 'Fácil',
+                'yield' => '40 pizzas',
+                'channel' => 'Pizzaria',
+                'recipe_description' => 'Molho de pizza aromático e saboroso, preparado com Base de Tomate Knorr Professional e orégano fresco.',
+                'ingredients_description' => 'Base de Tomate Knorr Professional, água, orégano desidratado',
+                'preparation_method' => "1. Misture 1 embalagem de Base de Tomate Knorr (750g) com 5L de água\n2. Adicione 10g de orégano desidratado\n3. Misture bem até obter consistência homogênea\n4. Deixe repousar por 5 minutos\n5. Está pronto para usar nas pizzas",
+                'main_ingredients' => ['Base de Tomate Knorr Professional'],
+                'supporting_ingredients' => ['Orégano Desidratado'],
+                'usage_groups' => ['Pizzarias', 'Food Service'],
+                'preparation_techniques' => ['Mistura simples'],
+                'consumption_occasion' => ['Almoço', 'Jantar', 'Lanche'],
+            ]
         ];
 
         foreach ($recipes as $data) {
-            Recipe::create($data);
+            $recipe = Recipe::create($data);
+
+            // Add product relationships based on recipe
+            switch ($recipe->recipe_code) {
+                case 'REC-001': // Molho à Bolonhesa
+                    if ($baseTomateKnorr) {
+                        $recipe->products()->attach($baseTomateKnorr->id, [
+                            'quantity' => 750,
+                            'unit' => 'g',
+                            'ingredient_type' => 'main',
+                            'preparation_notes' => 'Misturar com 6L de água',
+                            'optional' => false,
+                            'order' => 1,
+                            'top_dish' => true
+                        ]);
+                    }
+                    if ($carneMoida) {
+                        $recipe->products()->attach($carneMoida->id, [
+                            'quantity' => 3000,
+                            'unit' => 'g',
+                            'ingredient_type' => 'main',
+                            'preparation_notes' => 'Refogar até dourar',
+                            'optional' => false,
+                            'order' => 2,
+                            'top_dish' => false
+                        ]);
+                    }
+                    if ($meuTemperoKnorr) {
+                        $recipe->products()->attach($meuTemperoKnorr->id, [
+                            'quantity' => 100,
+                            'unit' => 'g',
+                            'ingredient_type' => 'supporting',
+                            'preparation_notes' => 'Adicionar no final do preparo',
+                            'optional' => false,
+                            'order' => 3,
+                            'top_dish' => false
+                        ]);
+                    }
+                    break;
+
+                case 'REC-002': // Ragú de Carne
+                    if ($baseTomateKnorr) {
+                        $recipe->products()->attach($baseTomateKnorr->id, [
+                            'quantity' => 750,
+                            'unit' => 'g',
+                            'ingredient_type' => 'main',
+                            'preparation_notes' => 'Misturar com 6L de água',
+                            'optional' => false,
+                            'order' => 1,
+                            'top_dish' => true
+                        ]);
+                    }
+                    if ($carneDesfiada) {
+                        $recipe->products()->attach($carneDesfiada->id, [
+                            'quantity' => 3000,
+                            'unit' => 'g',
+                            'ingredient_type' => 'main',
+                            'preparation_notes' => 'Carne já cozida e desfiada',
+                            'optional' => false,
+                            'order' => 2,
+                            'top_dish' => false
+                        ]);
+                    }
+                    if ($caldoCarneKnorr) {
+                        $recipe->products()->attach($caldoCarneKnorr->id, [
+                            'quantity' => 160,
+                            'unit' => 'g',
+                            'ingredient_type' => 'supporting',
+                            'preparation_notes' => 'Realça o sabor da carne',
+                            'optional' => false,
+                            'order' => 3,
+                            'top_dish' => false
+                        ]);
+                    }
+                    break;
+
+                case 'REC-003': // Molho de Pizza
+                    if ($baseTomateKnorr) {
+                        $recipe->products()->attach($baseTomateKnorr->id, [
+                            'quantity' => 750,
+                            'unit' => 'g',
+                            'ingredient_type' => 'main',
+                            'preparation_notes' => 'Misturar com 5L de água',
+                            'optional' => false,
+                            'order' => 1,
+                            'top_dish' => true
+                        ]);
+                    }
+                    if ($oregano) {
+                        $recipe->products()->attach($oregano->id, [
+                            'quantity' => 10,
+                            'unit' => 'g',
+                            'ingredient_type' => 'supporting',
+                            'preparation_notes' => 'Adicionar para aromatizar',
+                            'optional' => false,
+                            'order' => 2,
+                            'top_dish' => false
+                        ]);
+                    }
+                    break;
+            }
         }
     }
 }

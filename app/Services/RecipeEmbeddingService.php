@@ -12,9 +12,17 @@ class RecipeEmbeddingService
     public function generateEmbedding(Recipe $recipe)
     {
         $embeddingInput = collect([
-            $recipe->title,
-            implode(', ', $recipe->tags ?? []),
-            $recipe->raw_text,
+            $recipe->recipe_name,
+            $recipe->cuisine,
+            $recipe->recipe_type,
+            $recipe->recipe_description,
+            $recipe->ingredients_description,
+            $recipe->preparation_method,
+            collect($recipe->main_ingredients ?? [])->implode(', '),
+            collect($recipe->supporting_ingredients ?? [])->implode(', '),
+            collect($recipe->usage_groups ?? [])->implode(', '),
+            collect($recipe->preparation_techniques ?? [])->implode(', '),
+            collect($recipe->consumption_occasion ?? [])->implode(', '),
         ])->filter()->implode("\n");
 
         try{

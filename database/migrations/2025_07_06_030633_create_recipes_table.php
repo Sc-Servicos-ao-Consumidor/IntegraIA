@@ -13,10 +13,34 @@ return new class extends Migration
     {
         Schema::create('recipes', function (Blueprint $table) {
             $table->id();
-            $table->string('title');
-            $table->text('raw_text');
-            $table->json('tags')->nullable();
+            
+            // Recipe identification
+            $table->string('recipe_code')->nullable();
+            $table->string('recipe_name')->nullable();
+            
+            // Recipe classification
+            $table->string('cuisine')->nullable();
+            $table->string('recipe_type')->nullable();
+            $table->string('service_order')->nullable();
+            $table->string('difficulty_level')->nullable();
+            $table->string('channel')->nullable();
+            
+            // Recipe details
+            $table->integer('preparation_time')->nullable();
+            $table->string('yield')->nullable();
+            $table->text('recipe_description')->nullable();
+            $table->text('ingredients_description')->nullable();
+            $table->text('preparation_method')->nullable();
+            
+            // JSON fields for flexible data
+            $table->json('main_ingredients')->nullable();
+            $table->json('supporting_ingredients')->nullable();
+            $table->json('usage_groups')->nullable();
+            $table->json('preparation_techniques')->nullable();
+            $table->json('consumption_occasion')->nullable();
+            
             $table->vector('embedding', 1536)->nullable();
+            
             $table->timestamps();
         });
     }

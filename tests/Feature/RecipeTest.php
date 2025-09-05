@@ -15,14 +15,14 @@ class RecipeTest extends TestCase
     {
         $response = $this->post('/recipes', [
             'id' => 1,
-            'title' => 'Test Recipe',
-            'raw_text' => 'Test ingredients and steps...',
+            'recipe_name' => 'Test Recipe',
+            'recipe_description' => 'Test recipe description...',
         ]);
 
         $response->assertRedirect(); // Inertia redirect after form post
 
         $this->assertDatabaseHas('recipes', [
-            'title' => 'Test Recipe',
+            'recipe_name' => 'Test Recipe',
         ]);
     }
 
@@ -30,6 +30,6 @@ class RecipeTest extends TestCase
     public function it_validates_required_fields()
     {
         $response = $this->post('/recipes', []);
-        $response->assertSessionHasErrors(['title', 'raw_text']);
+        $response->assertSessionHasErrors(['recipe_name']);
     }
 }

@@ -3,7 +3,7 @@ import InputError from '@/components/InputError.vue';
 import AppLayout from '@/layouts/AppLayout.vue';
 import SettingsLayout from '@/layouts/settings/Layout.vue';
 import { Head, useForm } from '@inertiajs/vue3';
-import { ref } from 'vue';
+import { ref, nextTick } from 'vue';
 
 import HeadingSmall from '@/components/HeadingSmall.vue';
 import { Button } from '@/components/ui/button';
@@ -21,6 +21,41 @@ const breadcrumbItems: BreadcrumbItem[] = [
 const passwordInput = ref<HTMLInputElement | null>(null);
 const currentPasswordInput = ref<HTMLInputElement | null>(null);
 
+// Toast notification system
+const toasts = ref([]);
+let toastIdCounter = 0;
+
+function showToast(message: string, type: 'success' | 'error' | 'warning' | 'info' = 'info', duration = 5000) {
+    const toast = {
+        id: ++toastIdCounter,
+        message,
+        type,
+        visible: false
+    };
+    
+    toasts.value.push(toast);
+    
+    // Show toast with animation
+    nextTick(() => {
+        toast.visible = true;
+    });
+    
+    // Auto-remove toast after duration
+    setTimeout(() => {
+        removeToast(toast.id);
+    }, duration);
+}
+
+function removeToast(id: number) {
+    const index = toasts.value.findIndex(t => t.id === id);
+    if (index > -1) {
+        toasts.value[index].visible = false;
+        setTimeout(() => {
+            toasts.value.splice(index, 1);
+        }, 300);
+    }
+}
+
 const form = useForm({
     current_password: '',
     password: '',
@@ -30,7 +65,10 @@ const form = useForm({
 const updatePassword = () => {
     form.put(route('password.update'), {
         preserveScroll: true,
-        onSuccess: () => form.reset(),
+        onSuccess: () => {
+            form.reset();
+            showToast('Senha atualizada com sucesso!', 'success');
+        },
         onError: (errors: any) => {
             if (errors.password) {
                 form.reset('password', 'password_confirmation');
@@ -45,6 +83,10 @@ const updatePassword = () => {
                     currentPasswordInput.value.focus();
                 }
             }
+            
+            // Show error toast
+            const errorMessage = Object.values(errors)[0] || 'Erro ao atualizar a senha. Tente novamente.';
+            showToast(`Erro: ${errorMessage}`, 'error');
         },
     });
 };
@@ -53,6 +95,38 @@ const updatePassword = () => {
 <template>
     <AppLayout :breadcrumbs="breadcrumbItems">
         <Head title="Password settings" />
+
+        <!-- Toast Notifications -->
+        <div class="fixed top-4 right-4 z-50 space-y-2">
+            <div
+                v-for="toast in toasts"
+                :key="toast.id"
+                :class="[
+                    'px-4 py-3 rounded-lg shadow-lg max-w-sm transform transition-all duration-300',
+                    toast.type === 'success' ? 'bg-green-500 text-white' : '',
+                    toast.type === 'error' ? 'bg-red-500 text-white' : '',
+                    toast.type === 'warning' ? 'bg-yellow-500 text-white' : '',
+                    toast.type === 'info' ? 'bg-blue-500 text-white' : '',
+                    toast.visible ? 'translate-x-0 opacity-100' : 'translate-x-full opacity-0'
+                ]"
+            >
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-2">
+                        <span v-if="toast.type === 'success'" class="text-lg">✅</span>
+                        <span v-else-if="toast.type === 'error'" class="text-lg">❌</span>
+                        <span v-else-if="toast.type === 'warning'" class="text-lg">⚠️</span>
+                        <span v-else-if="toast.type === 'info'" class="text-lg">ℹ️</span>
+                        <span class="font-medium">{{ toast.message }}</span>
+                    </div>
+                    <button
+                        @click="removeToast(toast.id)"
+                        class="ml-2 text-white hover:text-gray-200 focus:outline-none"
+                    >
+                        ×
+                    </button>
+                </div>
+            </div>
+        </div>
 
         <SettingsLayout>
             <div class="space-y-6">
@@ -101,7 +175,16 @@ const updatePassword = () => {
                     </div>
 
                     <div class="flex items-center gap-4">
-                        <Button :disabled="form.processing">Save password</Button>
+                        <Button :disabled="form.processing">
+                            <span v-if="form.processing" class="flex items-center gap-2">
+                                <svg class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                                Salvando...
+                            </span>
+                            <span v-else>Salvar senha</span>
+                        </Button>
 
                         <Transition
                             enter-active-class="transition ease-in-out"
