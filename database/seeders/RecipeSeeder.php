@@ -96,7 +96,8 @@ class RecipeSeeder extends Seeder
                             'ingredient_type' => 'main',
                             'preparation_notes' => 'Misturar com 6L de água',
                             'optional' => false,
-                            'order' => 1
+                            'order' => 1,
+                            'top_dish' => true
                         ]);
                     }
                     if ($carneMoida) {
@@ -106,7 +107,8 @@ class RecipeSeeder extends Seeder
                             'ingredient_type' => 'main',
                             'preparation_notes' => 'Refogar até dourar',
                             'optional' => false,
-                            'order' => 2
+                            'order' => 2,
+                            'top_dish' => false
                         ]);
                     }
                     if ($meuTemperoKnorr) {
@@ -116,7 +118,8 @@ class RecipeSeeder extends Seeder
                             'ingredient_type' => 'supporting',
                             'preparation_notes' => 'Adicionar no final do preparo',
                             'optional' => false,
-                            'order' => 3
+                            'order' => 3,
+                            'top_dish' => false
                         ]);
                     }
                     break;
@@ -129,7 +132,8 @@ class RecipeSeeder extends Seeder
                             'ingredient_type' => 'main',
                             'preparation_notes' => 'Misturar com 6L de água',
                             'optional' => false,
-                            'order' => 1
+                            'order' => 1,
+                            'top_dish' => true
                         ]);
                     }
                     if ($carneDesfiada) {
@@ -139,7 +143,8 @@ class RecipeSeeder extends Seeder
                             'ingredient_type' => 'main',
                             'preparation_notes' => 'Carne já cozida e desfiada',
                             'optional' => false,
-                            'order' => 2
+                            'order' => 2,
+                            'top_dish' => false
                         ]);
                     }
                     if ($caldoCarneKnorr) {
@@ -149,7 +154,8 @@ class RecipeSeeder extends Seeder
                             'ingredient_type' => 'supporting',
                             'preparation_notes' => 'Realça o sabor da carne',
                             'optional' => false,
-                            'order' => 3
+                            'order' => 3,
+                            'top_dish' => false
                         ]);
                     }
                     break;
@@ -162,7 +168,8 @@ class RecipeSeeder extends Seeder
                             'ingredient_type' => 'main',
                             'preparation_notes' => 'Misturar com 5L de água',
                             'optional' => false,
-                            'order' => 1
+                            'order' => 1,
+                            'top_dish' => true
                         ]);
                     }
                     if ($oregano) {
@@ -172,7 +179,8 @@ class RecipeSeeder extends Seeder
                             'ingredient_type' => 'supporting',
                             'preparation_notes' => 'Adicionar para aromatizar',
                             'optional' => false,
-                            'order' => 2
+                            'order' => 2,
+                            'top_dish' => false
                         ]);
                     }
                     break;

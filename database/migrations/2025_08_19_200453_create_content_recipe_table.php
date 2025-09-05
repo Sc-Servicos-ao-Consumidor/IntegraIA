@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('content_id')->constrained()->onDelete('cascade');
             $table->foreignId('recipe_id')->constrained()->onDelete('cascade');
-            $table->string('top_dish')->nullable(); // "Sim ou Não" from the UI
+            $table->boolean('top_dish')->nullable();
             $table->integer('order')->default(1);
             $table->timestamps();
             

@@ -316,7 +316,7 @@
                         
                         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                             <!-- Recipe Associations -->
-                            <ConnectionCard title="Receitas (N para N)" icon="🍳" type="recipe" color="orange">
+                            <ConnectionCard title="Receitas" icon="🍳" type="recipe" color="orange">
                                 <ConnectionItem
                                     v-for="(recipe, index) in form.selected_recipes"
                                     :key="index"
@@ -331,6 +331,19 @@
                                             {{ availableRecipe.recipe_name || availableRecipe.descricao || 'Sem nome' }}
                                         </option>
                                     </select>
+                                    
+                                    <template #actions>
+                                        <label class="flex items-center gap-2 text-sm">
+                                            <input
+                                                type="checkbox"
+                                                v-model="recipe.top_dish"
+                                                :true-value="true"
+                                                :false-value="false"
+                                                class="w-4 h-4 text-orange-600 bg-gray-100 border-gray-300 rounded focus:ring-orange-500 focus:ring-2"
+                                            />
+                                            <span class="text-gray-700">Top Dish</span>
+                                        </label>
+                                    </template>
                                     
                                     <template #remove>
                                         <button 
@@ -352,7 +365,7 @@
                             </ConnectionCard>
 
                             <!-- Content Associations -->
-                            <ConnectionCard title="Conteúdos (N para N)" icon="📄" type="content" color="blue">
+                            <ConnectionCard title="Conteúdos" icon="📄" type="content" color="blue">
                                 <ConnectionItem
                                     v-for="(content, index) in form.selected_contents"
                                     :key="index"
@@ -917,7 +930,7 @@ const packagingForm = ref({
 
 // Recipe management functions
 const addRecipe = () => {
-    form.selected_recipes.push({ recipe_id: '' })
+    form.selected_recipes.push({ recipe_id: '', top_dish: false })
 }
 
 const removeRecipe = (index) => {
@@ -1184,7 +1197,8 @@ function editProduct(product) {
     
     // Load selected recipes and contents for the new pattern
     form.selected_recipes = product.recipes ? product.recipes.map(recipe => ({
-        recipe_id: recipe.id
+        recipe_id: recipe.id,
+        top_dish: !!(recipe.pivot && recipe.pivot.top_dish)
     })) : []
     
     form.selected_contents = product.contents ? product.contents.map(content => ({

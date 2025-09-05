@@ -58,7 +58,7 @@ class ContentController extends Controller
             // Recipe associations
             'selected_recipes' => 'nullable|array',
             'selected_recipes.*.recipe_id' => 'required_with:selected_recipes|exists:recipes,id',
-            'selected_recipes.*.top_dish' => 'nullable|in:sim,nao',
+            'selected_recipes.*.top_dish' => 'nullable|boolean',
             // Product associations
             'selected_products' => 'nullable|array',
             'selected_products.*.product_id' => 'required_with:selected_products|exists:products,id',
@@ -77,7 +77,7 @@ class ContentController extends Controller
             foreach ($request->selected_recipes as $index => $recipeInfo) {
                 $recipeData[$recipeInfo['recipe_id']] = [
                     'order' => $index + 1,
-                    'top_dish' => $recipeInfo['top_dish'] ?? 'nao',
+                    'top_dish' => (bool)($recipeInfo['top_dish'] ?? false),
                 ];
             }
             $content->recipes()->sync($recipeData);

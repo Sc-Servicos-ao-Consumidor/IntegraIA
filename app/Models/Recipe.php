@@ -60,7 +60,8 @@ class Recipe extends Model
                 'ingredient_type',
                 'preparation_notes',
                 'optional',
-                'order'
+                'order',
+                'top_dish'
             ])
             ->withTimestamps()
             ->orderByPivot('order');
@@ -88,7 +89,7 @@ class Recipe extends Model
     public function contents(): BelongsToMany
     {
         return $this->belongsToMany(Content::class)
-            ->withPivot(['order'])
+            ->withPivot(['order', 'top_dish'])
             ->withTimestamps()
             ->orderByPivot('order');
     }

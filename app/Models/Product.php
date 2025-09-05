@@ -153,7 +153,8 @@ class Product extends Model
                 'ingredient_type',
                 'preparation_notes',
                 'optional',
-                'order'
+                'order',
+                'top_dish'
             ])
             ->withTimestamps()
             ->orderByPivot('order');

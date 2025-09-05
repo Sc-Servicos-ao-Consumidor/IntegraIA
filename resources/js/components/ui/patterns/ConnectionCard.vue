@@ -7,7 +7,7 @@ interface Props {
   title?: string
   subtitle?: string
   icon?: string
-  color?: 'orange' | 'blue' | 'green' | 'purple'
+  color?: 'orange' | 'blue' | 'green' | 'purple' | 'yellow'
   type?: 'recipe' | 'product' | 'content' | 'ingredient'
 }
 
@@ -18,7 +18,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 const typeConfig = {
   recipe: { icon: '🍳', color: 'orange' },
-  product: { icon: '🛒', color: 'blue' },
+  product: { icon: '🛒', color: 'yellow' },
   content: { icon: '📄', color: 'blue' },
   ingredient: { icon: '🥕', color: 'green' }
 }
@@ -51,6 +51,13 @@ const colorVariants = {
     border: 'border-purple-200',
     icon: 'bg-purple-100',
     iconText: 'text-purple-600'
+  },
+  yellow: {
+    bg: 'bg-yellow-100',
+    text: 'text-yellow-900',
+    border: 'border-yellow-200',
+    icon: 'bg-yellow-100',
+    iconText: 'text-yellow-600'
   }
 }
 

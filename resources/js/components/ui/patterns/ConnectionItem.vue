@@ -5,7 +5,7 @@ import { cn } from '@/lib/utils'
 interface Props {
   class?: HTMLAttributes['class']
   icon?: string
-  color?: 'orange' | 'blue' | 'green' | 'purple'
+  color?: 'orange' | 'blue' | 'green' | 'purple' | 'yellow'
   removable?: boolean
 }
 
@@ -42,6 +42,13 @@ const colorVariants = {
     button: 'text-purple-600 hover:text-purple-800',
     border: 'border-purple-300',
     hover: 'hover:bg-purple-50'
+  },
+  yellow: {
+    icon: 'bg-yellow-100',
+    iconText: 'text-yellow-600',
+    button: 'text-yellow-600 hover:text-yellow-800',
+    border: 'border-yellow-300',
+    hover: 'hover:bg-yellow-50'
   }
 }
 

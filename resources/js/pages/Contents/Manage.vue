@@ -197,7 +197,7 @@
                     
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         <!-- Recipe Associations -->
-                        <ConnectionCard title="Receitas (N para N)" icon="🍳" type="recipe" color="orange">
+                        <ConnectionCard title="Receitas" icon="🍳" type="recipe" color="orange">
                             <ConnectionItem
                                 v-for="(recipe, index) in form.selected_recipes"
                                 :key="index"
@@ -218,8 +218,8 @@
                                         <input
                                             type="checkbox"
                                             v-model="recipe.top_dish"
-                                            :true-value="'sim'"
-                                            :false-value="'nao'"
+                                            :true-value="true"
+                                            :false-value="false"
                                             class="w-4 h-4 text-orange-600 bg-gray-100 border-gray-300 rounded focus:ring-orange-500 focus:ring-2"
                                         />
                                         <span class="text-gray-700">Top Dish</span>
@@ -246,7 +246,7 @@
                         </ConnectionCard>
 
                         <!-- Product Associations -->
-                        <ConnectionCard title="Produtos (N para N)" icon="🛒" type="product" color="blue">
+                        <ConnectionCard title="Produtos" icon="🛒" type="product" color="blue">
                             <ConnectionItem
                                 v-for="(product, index) in form.selected_products"
                                 :key="index"
@@ -539,7 +539,7 @@ const removeImageRendimentos = (index) => {
 
 // Recipe management functions
 const addRecipe = () => {
-    form.selected_recipes.push({ recipe_id: '', top_dish: 'nao' })
+    form.selected_recipes.push({ recipe_id: '', top_dish: false })
 }
 
 const removeRecipe = (index) => {
@@ -584,7 +584,7 @@ function editContent(content) {
     // Load associated recipes
     form.selected_recipes = content.recipes ? content.recipes.map(recipe => ({
         recipe_id: recipe.id,
-        top_dish: recipe.pivot.top_dish || 'nao'
+        top_dish: !!recipe.pivot.top_dish
     })) : []
     
     // Load associated products

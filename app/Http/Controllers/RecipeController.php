@@ -42,9 +42,9 @@ class RecipeController extends Controller
         $data = $request->validate([
             // Recipe fields
             'recipe_code' => 'nullable|string|max:255',
-            'recipe_name' => 'nullable|string|max:255',
+            'recipe_name' => 'string|max:255',
             'cuisine' => 'nullable|string|max:255',
-            'recipe_type' => 'nullable|string|max:255',
+            'recipe_type' => 'string|max:255',
             'service_order' => 'nullable|string|max:255',
             'preparation_time' => 'nullable|integer|min:1',
             'difficulty_level' => 'nullable|string|in:facil,medio,dificil,expert',
@@ -52,9 +52,9 @@ class RecipeController extends Controller
             'channel' => 'nullable|string|max:255',
             
             // Content fields
-            'recipe_description' => 'nullable|string',
-            'ingredients_description' => 'nullable|string',
-            'preparation_method' => 'nullable|string',
+            'recipe_description' => 'string',
+            'ingredients_description' => 'string',
+            'preparation_method' => 'string',
             
             // Array fields (stored as JSON)
             'main_ingredients' => 'nullable|array',
@@ -67,6 +67,7 @@ class RecipeController extends Controller
             'selected_products' => 'nullable|array',
             'selected_products.*.product_id' => 'required_with:selected_products|exists:products,id',
             'selected_products.*.ingredient_type' => 'nullable|in:main,supporting',
+            'selected_products.*.top_dish' => 'nullable|boolean',
             
             // Content associations
             'selected_contents' => 'nullable|array',
@@ -91,6 +92,7 @@ class RecipeController extends Controller
                 $productData[$productInfo['product_id']] = [
                     'ingredient_type' => $productInfo['ingredient_type'] ?? 'main',
                     'order' => $index + 1,
+                    'top_dish' => (bool)($productInfo['top_dish'] ?? false),
                 ];
             }
             $recipe->products()->sync($productData);
@@ -102,7 +104,7 @@ class RecipeController extends Controller
             foreach ($request->selected_contents as $index => $contentInfo) {
                 $contentData[$contentInfo['content_id']] = [
                     'order' => $index + 1,
-                    'top_dish' => $contentInfo['top_dish'] ?? 'nao',
+                    'top_dish' => (bool)($contentInfo['top_dish'] ?? false),
                 ];
             }
             $recipe->contents()->sync($contentData);

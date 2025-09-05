@@ -83,6 +83,9 @@ class ProductController extends Controller
         $relationshipData = $request->validate([
             'recipe_ids' => 'nullable|array',
             'recipe_ids.*' => 'integer|exists:recipes,id',
+            'selected_recipes' => 'nullable|array',
+            'selected_recipes.*.recipe_id' => 'required_with:selected_recipes|integer|exists:recipes,id',
+            'selected_recipes.*.top_dish' => 'nullable|boolean',
             'content_ids' => 'nullable|array',
             'content_ids.*' => 'integer|exists:contents,id',
         ]);
@@ -134,7 +137,19 @@ class ProductController extends Controller
             }
 
             // Handle recipe relationships
-            if ($request->has('recipe_ids') && is_array($request->recipe_ids)) {
+            if ($request->has('selected_recipes') && is_array($request->selected_recipes)) {
+                $recipeData = [];
+                foreach ($request->selected_recipes as $index => $recipeInfo) {
+                    if (!empty($recipeInfo['recipe_id'])) {
+                        $recipeData[$recipeInfo['recipe_id']] = [
+                            'order' => $index + 1,
+                            'top_dish' => (bool)($recipeInfo['top_dish'] ?? false),
+                        ];
+                    }
+                }
+                $product->recipes()->sync($recipeData);
+            } elseif ($request->has('recipe_ids') && is_array($request->recipe_ids)) {
+                // Fallback for legacy array without pivot attributes
                 $product->recipes()->sync($request->recipe_ids);
             }
 

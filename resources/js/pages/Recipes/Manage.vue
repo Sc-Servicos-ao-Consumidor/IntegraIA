@@ -218,11 +218,11 @@
                     
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         <!-- Product Associations -->
-                        <ConnectionCard title="Produtos (N para N)" icon="🛒" type="product" color="orange">
+                        <ConnectionCard title="Produtos" icon="🛒" type="product" color="yellow">
                             <ConnectionItem
                                 v-for="(product, index) in form.selected_products"
                                 :key="index"
-                                color="orange"
+                                color="yellow"
                             >
                                 <select
                                     v-model="product.product_id"
@@ -235,13 +235,25 @@
                                 </select>
                                 
                                 <template #actions>
-                                    <select
-                                        v-model="product.ingredient_type"
-                                        class="w-32 border border-gray-300 rounded-md px-2 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-                                    >
-                                        <option value="main">Principal</option>
-                                        <option value="supporting">Secundário</option>
-                                    </select>
+                                    <div class="flex items-center gap-3">
+                                        <select
+                                            v-model="product.ingredient_type"
+                                            class="w-32 border border-gray-300 rounded-md px-2 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                                        >
+                                            <option value="main">Principal</option>
+                                            <option value="supporting">Secundário</option>
+                                        </select>
+                                        <label class="flex items-center gap-2 text-sm">
+                                            <input
+                                                type="checkbox"
+                                                v-model="product.top_dish"
+                                                :true-value="true"
+                                                :false-value="false"
+                                                class="w-4 h-4 text-yellow-600 bg-gray-100 border-gray-300 rounded focus:ring-yellow-500 focus:ring-2"
+                                            />
+                                            <span class="text-gray-700">Top Dish</span>
+                                        </label>
+                                    </div>
                                 </template>
                                 
                                 <template #remove>
@@ -257,14 +269,14 @@
                             <button 
                                 type="button"
                                 @click="addProduct"
-                                class="text-orange-600 hover:text-orange-800 text-sm font-medium px-3 py-2 border border-orange-300 rounded-md hover:bg-orange-50 transition-colors"
+                                class="text-yellow-600 hover:text-yellow-800 text-sm font-medium px-3 py-2 border border-yellow-300 rounded-md hover:bg-yellow-50 transition-colors"
                             >
                                 + Adicionar Produto
                             </button>
                         </ConnectionCard>
 
                         <!-- Content Associations -->
-                        <ConnectionCard title="Conteúdos (N para N)" icon="📄" type="content" color="blue">
+                        <ConnectionCard title="Conteúdos" icon="📄" type="content" color="blue">
                             <ConnectionItem
                                 v-for="(content, index) in form.selected_contents"
                                 :key="index"
@@ -285,8 +297,8 @@
                                         <input
                                             type="checkbox"
                                             v-model="content.top_dish"
-                                            :true-value="'sim'"
-                                            :false-value="'nao'"
+                                            :true-value="true"
+                                            :false-value="false"
                                             class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
                                         />
                                         <span class="text-gray-700">Top Dish</span>
@@ -314,7 +326,7 @@
                     </div>
 
                     <!-- Ingredient Associations -->
-                    <ConnectionCard title="Ingredientes (N para N)" icon="🥕" type="ingredient" color="green">
+                    <ConnectionCard title="Ingredientes" icon="🥕" type="ingredient" color="green">
                         <ConnectionItem
                             v-for="(ingredient, index) in selectedIngredients"
                             :key="index"
@@ -524,7 +536,7 @@ function removeToast(id) {
 
 // Content management functions
 function addContent() {
-    form.selected_contents.push({ content_id: '', top_dish: 'nao' })
+    form.selected_contents.push({ content_id: '', top_dish: false })
 }
 
 function removeContent(index) {
@@ -535,7 +547,8 @@ function removeContent(index) {
 function addProduct() {
     form.selected_products.push({ 
         product_id: '', 
-        ingredient_type: 'main'
+        ingredient_type: 'main',
+        top_dish: false
     })
 }
 
@@ -726,13 +739,14 @@ function editRecipe(recipe) {
     // Load associated products
     form.selected_products = recipe.products ? recipe.products.map(product => ({
         product_id: product.id,
-        ingredient_type: product.pivot.ingredient_type
+        ingredient_type: product.pivot.ingredient_type,
+        top_dish: !!product.pivot.top_dish
     })) : []
     
     // Load associated contents
     form.selected_contents = recipe.contents ? recipe.contents.map(content => ({
         content_id: content.id,
-        top_dish: content.pivot.top_dish || 'nao'
+        top_dish: !!content.pivot.top_dish
     })) : []
     
     // Load associated ingredients

@@ -17,7 +17,6 @@ return new class extends Migration
             // Recipe identification
             $table->string('recipe_code')->nullable();
             $table->string('recipe_name')->nullable();
-            $table->string('top_dish')->nullable();
             
             // Recipe classification
             $table->string('cuisine')->nullable();
