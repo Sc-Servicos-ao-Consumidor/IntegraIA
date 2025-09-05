@@ -12,11 +12,12 @@ class ProductImportService
 {
     public function importAll(string $baseUrl, array $headers = []): void
     {
-        $page = 1;
+        $currentUrl = $baseUrl;
+        
         do {
-            $response = Http::withHeaders($headers)->get($baseUrl, ['page' => $page]);
+            $response = Http::withHeaders($headers)->get($currentUrl);
             if (!$response->successful()) {
-                Log::error('Product import failed', ['page' => $page, 'status' => $response->status(), 'body' => $response->body()]);
+                Log::error('Product import failed',[ 'status' => $response->status(), 'body' => $response->body()]);
                 break;
             }
 
@@ -26,17 +27,16 @@ class ProductImportService
                 $this->upsertProductWithPackagings($item);
             }
 
-            $hasMore = false;
-            if (isset($payload['meta']['current_page'], $payload['meta']['last_page'])) {
-                $hasMore = $payload['meta']['current_page'] < $payload['meta']['last_page'];
-            } elseif (isset($payload['pagination']['page'], $payload['pagination']['total_pages'])) {
-                $hasMore = $payload['pagination']['page'] < $payload['pagination']['total_pages'];
-            } elseif (isset($payload['next_page_url'])) {
-                $hasMore = (bool) $payload['next_page_url'];
+            // Use next_cursor for pagination
+            $nextCursor = $payload['next_cursor'] ?? null;
+            if ($nextCursor) {
+                $separator = str_contains($baseUrl, '?') ? '&' : '?';
+                $currentUrl = $baseUrl . $separator . 'cursor=' . urlencode($nextCursor);
+                Log::info('Current URL: ' . $currentUrl);
+            } else {
+                $currentUrl = null;
             }
-
-            $page++;
-        } while ($hasMore);
+        } while ($currentUrl);
     }
 
     protected function upsertProductWithPackagings(array $item): void
@@ -48,19 +48,13 @@ class ProductImportService
             'sku' => $item['sku'] ?? null,
             'descricao' => $item['descricao'] ?? null,
             'descricao_breve' => $item['descricao_breve'] ?? null,
-            'informacao_adicional' => $item['informacao_adicional'] ?? null,
+            'especificacao_produto' => $item['especificacao_produto'] ?? null,
             'ean' => $item['ean'] ?? null,
-            'quantidade_caixa' => $item['quantidade_caixa'] ?? null,
-            'embalagem_tipo' => $item['embalagem_tipo'] ?? null,
-            'embalagem_descricao' => $item['embalagem_descricao'] ?? null,
             'localizacao' => $item['localizacao'] ?? null,
             'nome_responsavel' => $item['nome_responsavel'] ?? null,
             'telefone' => $item['telefone'] ?? null,
             'whatsapp' => $item['whatsapp'] ?? null,
             'site' => $item['site'] ?? null,
-            'peso_liquido' => $item['peso_liquido'] ?? null,
-            'peso_bruto' => $item['peso_bruto'] ?? null,
-            'validade' => $item['validade'] ?? null,
             'status' => (bool)($item['status'] ?? true),
             'produto_familia_id' => $item['produto_familia_id'] ?? null,
             'produto_grupo_id' => $item['produto_grupo_id'] ?? null,

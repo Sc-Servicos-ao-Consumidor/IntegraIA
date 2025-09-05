@@ -759,12 +759,12 @@
                             <div class="flex-1">
                                 <div class="flex items-center gap-2 mb-2">
                                     <h3 class="font-medium text-gray-900">{{ product.descricao }}</h3>
-                                    <span v-if="product.marca" class="bg-purple-50 text-purple-700 px-2 py-1 rounded text-xs border border-purple-200">
+                                    <!-- <span v-if="product.marca" class="bg-purple-50 text-purple-700 px-2 py-1 rounded text-xs border border-purple-200">
                                         {{ product.marca }}
                                     </span>
                                     <span v-if="product.group_product" class="bg-blue-50 text-blue-700 px-2 py-1 rounded text-xs border border-blue-200">
                                         {{ product.group_product.descricao }}
-                                    </span>
+                                    </span> -->
 
                                     <span v-if="!product.status" class="bg-red-50 text-red-700 px-2 py-1 rounded text-xs border border-red-200">
                                         INATIVO
@@ -1121,21 +1121,8 @@ function submit() {
     // Ensure packaging data is properly structured
     form.packaging = packagingData
     
-    // Debug: Log what we're sending
-    console.log('Submitting form with data:', {
-        form: form.data(),
-        selectedRecipes: selectedRecipes.value,
-        selectedContents: selectedContents.value,
-        images: images,
-        packaging: packagingData,
-        packagings: form.packagings,
-        packagingInForm: form.packaging
-    })
-    
-    // Additional debug to check if packaging is in form data
+    // Prepare final form data for submission
     const formData = form.data()
-    console.log('Form data keys:', Object.keys(formData))
-    console.log('Packaging in form data:', formData.packaging)
     
     form.post("/products", {
         onSuccess: () => {

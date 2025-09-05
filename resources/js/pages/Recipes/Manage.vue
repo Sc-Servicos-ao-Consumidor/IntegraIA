@@ -347,6 +347,80 @@
                             </div>
                         </div>
                     </div>
+
+                    <!-- Ingredient Associations -->
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <div class="bg-green-100 px-4 py-2 rounded-md mb-4">
+                            <h4 class="text-sm font-semibold text-green-900">🥕 Ingredientes (N para N)</h4>
+                        </div>
+
+                        <div class="space-y-3">
+                            <p class="text-sm font-medium text-gray-700">Ingredientes da Receita</p>
+                            <div class="space-y-2">
+                                <div v-for="(ingredient, index) in selectedIngredients" :key="index" class="flex items-center gap-3 p-3 border border-gray-200 rounded bg-white">
+                                    <div class="w-8 h-8 bg-green-100 rounded flex items-center justify-center">
+                                        <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                                        </svg>
+                                    </div>
+                                    
+                                    <!-- Ingredient Search Input -->
+                                    <div class="flex-1 relative">
+                                        <input
+                                            :value="ingredient.search_term"
+                                            @input="updateIngredientSearchTerm(index, $event.target.value)"
+                                            @focus="showIngredientDropdown(index)"
+                                            @blur="hideIngredientDropdown(index)"
+                                            type="text"
+                                            placeholder="Digite o nome do ingrediente..."
+                                            class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                                        />
+                                        
+                                        <!-- Dropdown Results -->
+                                        <div 
+                                            v-if="ingredient.show_dropdown && ingredient.search_results.length > 0"
+                                            class="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-48 overflow-y-auto"
+                                        >
+                                            <div 
+                                                v-for="result in ingredient.search_results" 
+                                                :key="result.id"
+                                                @mousedown="selectIngredient(index, result)"
+                                                class="px-3 py-2 hover:bg-gray-100 cursor-pointer text-sm"
+                                            >
+                                                {{ result.name }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <label class="flex items-center gap-2 text-sm">
+                                        <input
+                                            type="checkbox"
+                                            :checked="ingredient.primary_ingredient"
+                                            @change="updateIngredientPrimary(index, $event.target.checked)"
+                                            class="w-4 h-4 text-green-600 bg-gray-100 border-gray-300 rounded focus:ring-green-500 focus:ring-2"
+                                        />
+                                        <span class="text-gray-700">Principal</span>
+                                    </label>
+
+                                    <button 
+                                        type="button"
+                                        @click="removeIngredient(index)"
+                                        class="text-red-600 hover:text-red-800 text-sm font-medium px-2 py-1 rounded hover:bg-red-50"
+                                    >
+                                        Remover
+                                    </button>
+                                </div>
+                                
+                                <button 
+                                    type="button"
+                                    @click="addIngredient"
+                                    class="text-green-600 hover:text-green-800 text-sm font-medium px-3 py-2 border border-green-300 rounded-md hover:bg-green-50 transition-colors"
+                                >
+                                    + Adicionar Ingrediente
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Action Buttons -->
@@ -403,6 +477,12 @@
                                 <span class="font-medium">📄 Conteúdos:</span>
                                 <span>{{ recipe.contents.length }} vinculado(s)</span>
                             </div>
+                            
+                            <!-- Ingredients -->
+                            <div v-if="recipe.ingredients?.length" class="flex items-center gap-2 text-sm text-gray-600">
+                                <span class="font-medium">🥕 Ingredientes:</span>
+                                <span>{{ recipe.ingredients.length }} vinculado(s)</span>
+                            </div>
                         </div>
                         
                         <div class="mt-3 flex gap-2">
@@ -432,7 +512,7 @@
 
 <script setup>
 import { router, useForm, Head } from '@inertiajs/vue3'
-import {ref, nextTick} from 'vue'
+import {ref, nextTick, onMounted, reactive} from 'vue'
 import AppLayout from '@/layouts/AppLayout.vue'
 
 
@@ -447,12 +527,16 @@ const breadcrumbs = [
 const props = defineProps({
     recipes: Array,
     products: Array,
-    contents: Array
+    contents: Array,
+    ingredients: Array
 })
 
 // Toast notification system
 const toasts = ref([])
 let toastIdCounter = 0
+
+// Reactive ingredients state
+const selectedIngredients = ref([])
 
 function showToast(message, type = 'info', duration = 5000) {
     const toast = {
@@ -506,6 +590,85 @@ function removeProduct(index) {
     form.selected_products.splice(index, 1)
 }
 
+// Ingredient management functions
+function addIngredient() {
+    const newIngredient = { 
+        ingredient_id: null,
+        ingredient_name: '',
+        search_term: '',
+        search_results: [],
+        show_dropdown: false,
+        primary_ingredient: true
+    }
+    
+    selectedIngredients.value.push(newIngredient)
+}
+
+function removeIngredient(index) {
+    if (selectedIngredients.value[index]) {
+        selectedIngredients.value.splice(index, 1)
+    }
+}
+
+function showIngredientDropdown(index) {
+    if (selectedIngredients.value[index]) {
+        selectedIngredients.value[index].show_dropdown = true
+    }
+}
+
+function hideIngredientDropdown(index) {
+    setTimeout(() => {
+        if (selectedIngredients.value[index]) {
+            selectedIngredients.value[index].show_dropdown = false
+        }
+    }, 200)
+}
+
+function searchIngredients(index) {
+    const ingredient = selectedIngredients.value[index]
+    if (!ingredient) return
+    
+    const query = ingredient.search_term.trim()
+    
+    if (query.length < 2) {
+        ingredient.search_results = []
+        return
+    }
+    
+    // Search in existing ingredients first
+    const existingIngredients = props.ingredients.filter(ing => 
+        ing.name.toLowerCase().includes(query.toLowerCase())
+    )
+    
+    ingredient.search_results = existingIngredients.slice(0, 5)
+}
+
+function selectIngredient(index, selectedIngredient) {
+    const ingredient = selectedIngredients.value[index]
+    if (!ingredient) return
+    
+    ingredient.ingredient_id = selectedIngredient.id
+    ingredient.ingredient_name = selectedIngredient.name
+    ingredient.search_term = selectedIngredient.name
+    ingredient.show_dropdown = false
+    ingredient.search_results = []
+}
+
+function updateIngredientSearchTerm(index, value) {
+    if (selectedIngredients.value[index]) {
+        selectedIngredients.value[index].search_term = value
+        // Keep ingredient_name mirrored so backend can create when id is missing
+        selectedIngredients.value[index].ingredient_name = value
+        searchIngredients(index)
+    }
+}
+
+function updateIngredientPrimary(index, value) {
+    if (selectedIngredients.value[index]) {
+        selectedIngredients.value[index].primary_ingredient = value
+    }
+}
+
 function showValidationErrors(errors) {
     // Show first error as a toast
     const firstError = Object.values(errors)[0]
@@ -536,6 +699,7 @@ function confirmResetForm() {
         form.reset()
         form.selected_products = []
         form.selected_contents = []
+        selectedIngredients.value = []
         form.id = null
         showToast('Edição cancelada', 'info')
     } else {
@@ -543,6 +707,8 @@ function confirmResetForm() {
         if (confirm('Tem certeza que deseja limpar todos os dados do formulário?')) {
             form.reset()
             form.selected_products = []
+            form.selected_contents = []
+            selectedIngredients.value = []
             showToast('Formulário limpo', 'info')
         }
     }
@@ -570,13 +736,16 @@ const form = useForm({
     // Product associations
     selected_products: [],
     // Content associations
-    selected_contents: []
+    selected_contents: [],
+    // Ingredient associations
+    selected_ingredients: []
 })
 
 const resetForm = () => {
     form.reset()
     form.selected_products = []
     form.selected_contents = []
+    selectedIngredients.value = []
     form.id = null
     showToast('Formulário limpo para nova receita', 'info')
 }
@@ -612,6 +781,16 @@ function editRecipe(recipe) {
         content_id: content.id,
         top_dish: content.pivot.top_dish || 'nao'
     })) : []
+    
+    // Load associated ingredients
+    selectedIngredients.value = recipe.ingredients ? recipe.ingredients.map(ingredient => ({
+        ingredient_id: ingredient.id,
+        ingredient_name: ingredient.name,
+        search_term: ingredient.name,
+        search_results: [],
+        show_dropdown: false,
+        primary_ingredient: ingredient.pivot.primary_ingredient
+    })) : []
 }
 
 function deleteRecipe(recipe) {
@@ -631,6 +810,9 @@ function deleteRecipe(recipe) {
 }
 
 const submit = () => {
+    // Add selected ingredients to form data before submission
+    form.selected_ingredients = selectedIngredients.value
+    
     form.post("/recipes", {
         onSuccess: () => {
             const isUpdate = form.id !== null
@@ -641,6 +823,7 @@ const submit = () => {
             form.reset()
             form.selected_products = []
             form.selected_contents = []
+            selectedIngredients.value = []
             
             // Clear form ID to indicate new recipe creation
             form.id = null

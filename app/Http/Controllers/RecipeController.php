@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Recipe;
 use App\Models\Product;
 use App\Models\Content;
+use App\Models\Ingredient;
 use App\Services\PrismService;
 use App\Services\EmbeddingService;
 use App\Services\AIToolService;
@@ -20,14 +21,16 @@ class RecipeController extends Controller
      */
     public function index()
     {
-        $recipes = Recipe::with(['products', 'contents'])->latest()->get();
+        $recipes = Recipe::with(['products', 'contents', 'ingredients'])->latest()->get();
         $products = Product::where('status', true)->orderBy('descricao')->get();
         $contents = Content::where('status', true)->orderBy('nome_conteudo')->get();
+        $ingredients = Ingredient::orderBy('name')->get();
 
         return Inertia::render('Recipes/Manage', [
             'recipes' => $recipes,
             'products' => $products,
-            'contents' => $contents
+            'contents' => $contents,
+            'ingredients' => $ingredients
         ]);
     }
 
@@ -68,11 +71,17 @@ class RecipeController extends Controller
             // Content associations
             'selected_contents' => 'nullable|array',
             'selected_contents.*.content_id' => 'required_with:selected_contents|exists:contents,id',
+            
+            // Ingredient associations
+            'selected_ingredients' => 'nullable|array',
+            'selected_ingredients.*.ingredient_id' => 'nullable|exists:ingredients,id',
+            'selected_ingredients.*.ingredient_name' => 'nullable|string|max:255',
+            'selected_ingredients.*.primary_ingredient' => 'nullable|boolean',
         ]);
 
         $recipe = Recipe::updateOrCreate(
             ['id' => $request->id],
-            collect($data)->except(['selected_products', 'selected_contents'])->toArray()
+            collect($data)->except(['selected_products', 'selected_contents', 'selected_ingredients'])->toArray()
         );
 
         // Sync products if provided
@@ -99,6 +108,39 @@ class RecipeController extends Controller
             $recipe->contents()->sync($contentData);
         }
 
+        // Sync ingredients if provided
+        if ($request->has('selected_ingredients') && is_array($request->selected_ingredients)) {
+            $ingredientData = [];
+            foreach ($request->selected_ingredients as $index => $ingredientInfo) {
+                $ingredientId = $ingredientInfo['ingredient_id'] ?? null;
+
+                // Determine candidate name: ingredient_name or search_term
+                $candidateName = null;
+                if (!empty($ingredientInfo['ingredient_name'])) {
+                    $candidateName = $ingredientInfo['ingredient_name'];
+                } elseif (!empty($ingredientInfo['search_term'])) {
+                    $candidateName = $ingredientInfo['search_term'];
+                }
+
+                // If no ingredient_id is provided but we have a name, create or find it
+                if (!$ingredientId && $candidateName) {
+                    $name = trim($candidateName);
+                    if ($name !== '') {
+                        $ingredient = Ingredient::firstOrCreate(['name' => $name]);
+                        $ingredientId = $ingredient->id;
+                    }
+                }
+
+                if ($ingredientId) {
+                    $ingredientData[$ingredientId] = [
+                        'primary_ingredient' => (bool)($ingredientInfo['primary_ingredient'] ?? true),
+                    ];
+                }
+            }
+            // Use sync to replace current ingredient set with the provided set
+            $recipe->ingredients()->sync($ingredientData);
+        }
+
         return null;
     }
 
@@ -108,6 +150,27 @@ class RecipeController extends Controller
     public function destroy(Recipe $recipe)
     {
         $recipe->delete();
+    }
+
+    /**
+     * Search for ingredients by name
+     */
+    public function searchIngredients(Request $request)
+    {
+        $request->validate([
+            'query' => 'required|string|min:1',
+            'limit' => 'nullable|integer|min:1|max:20'
+        ]);
+
+        $query = $request->query('query');
+        $limit = $request->query('limit', 10);
+
+        $ingredients = Ingredient::where('name', 'ilike', "%{$query}%")
+            ->orderBy('name')
+            ->limit($limit)
+            ->get(['id', 'name']);
+
+        return response()->json($ingredients);
     }
 
     public function search(Request $request)

@@ -33,9 +33,6 @@ class Recipe extends Model
         'usage_groups',
         'preparation_techniques',
         'consumption_occasion',
-        'general_images_link',
-        'product_code',
-        'content_code'
     ];
 
     protected $casts = [
@@ -94,5 +91,34 @@ class Recipe extends Model
             ->withPivot(['order'])
             ->withTimestamps()
             ->orderByPivot('order');
+    }
+
+    /**
+     * The ingredients that belong to this recipe.
+     */
+    public function ingredients(): BelongsToMany
+    {
+        return $this->belongsToMany(Ingredient::class)
+            ->withPivot([
+                'primary_ingredient'
+            ])
+            ->withTimestamps()
+            ->orderByPivot('primary_ingredient');
+    }
+
+    /**
+     * Get only main ingredients.
+     */
+    public function mainIngredients(): BelongsToMany
+    {
+        return $this->ingredients()->wherePivot('primary_ingredient', true);
+    }
+
+    /**
+     * Get only supporting ingredients.
+     */
+    public function supportingIngredients(): BelongsToMany
+    {
+        return $this->ingredients()->wherePivot('primary_ingredient', false);
     }
 }

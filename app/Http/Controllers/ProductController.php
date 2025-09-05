@@ -46,9 +46,7 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
-        // Debug: Log the incoming request data
-        Log::info('Product store request data:', $request->all());
-        Log::info('Packaging data specifically:', $request->get('packaging'));
+        //
         
         // Validate product basic data
         $productData = $request->validate([
@@ -109,7 +107,7 @@ class ProductController extends Controller
         ]);
 
         try {
-            Log::info('Validation passed, starting database transaction');
+            //
             DB::beginTransaction();
 
             // Create or update product
@@ -137,19 +135,16 @@ class ProductController extends Controller
 
             // Handle recipe relationships
             if ($request->has('recipe_ids') && is_array($request->recipe_ids)) {
-                Log::info('Syncing recipes:', $request->recipe_ids);
                 $product->recipes()->sync($request->recipe_ids);
             }
 
             // Handle content relationships
             if ($request->has('content_ids') && is_array($request->content_ids)) {
-                Log::info('Syncing contents:', $request->content_ids);
                 $product->contents()->sync($request->content_ids);
             }
 
             // Handle packaging data
             if ($request->has('packaging') && is_array($request->packaging)) {
-                Log::info('Handling packaging data:', $request->packaging);
                 
                 // Handle multiple packagings
                 if (isset($request->packaging['packagings']) && is_array($request->packaging['packagings'])) {

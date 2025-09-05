@@ -23,6 +23,7 @@ class ImportProducts extends Command
         $token = $this->option('token') ?? config('services.products_api.token');
         if ($token) {
             $headers['Authorization'] = 'Bearer ' . $token;
+            $headers['tenant'] = '01K3M4JEQNR5STSDC795K2MQNA';
         }
 
         $this->info('Starting product import...');
@@ -31,5 +32,3 @@ class ImportProducts extends Command
         return self::SUCCESS;
     }
 }
-
-

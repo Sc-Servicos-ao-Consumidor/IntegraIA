@@ -38,8 +38,6 @@ class RecipeSeeder extends Seeder
                 'usage_groups' => ['Restaurantes', 'Food Service'],
                 'preparation_techniques' => ['Refogado', 'Cozimento lento'],
                 'consumption_occasion' => ['Almoço', 'Jantar'],
-                'general_images_link' => 'https://example.com/images/molho-bolonhesa.jpg',
-                'product_code' => 'KNR-BT-750',
             ],
 
             // Ragú de Carne com Base de Tomate Knorr
@@ -61,8 +59,6 @@ class RecipeSeeder extends Seeder
                 'usage_groups' => ['Restaurantes', 'Food Service'],
                 'preparation_techniques' => ['Cozimento lento', 'Redução'],
                 'consumption_occasion' => ['Almoço', 'Jantar'],
-                'general_images_link' => 'https://example.com/images/ragu-carne.jpg',
-                'product_code' => 'KNR-BT-750',
             ],
 
             // Molho de Pizza com Base de Tomate Knorr
@@ -84,8 +80,6 @@ class RecipeSeeder extends Seeder
                 'usage_groups' => ['Pizzarias', 'Food Service'],
                 'preparation_techniques' => ['Mistura simples'],
                 'consumption_occasion' => ['Almoço', 'Jantar', 'Lanche'],
-                'general_images_link' => 'https://example.com/images/molho-pizza.jpg',
-                'product_code' => 'KNR-BT-750',
             ]
         ];
 
