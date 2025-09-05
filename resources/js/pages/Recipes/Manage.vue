@@ -34,29 +34,10 @@
     </div>
 
     <AppLayout :breadcrumbs="breadcrumbs">
-        <div class="max-w-7xl mx-auto">
-            <!-- Quick Actions -->
-            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
-                <h2 class="text-lg font-semibold text-gray-900 mb-4">⚡ Ações Rápidas</h2>
-                
-                <div class="flex gap-3">
-                    <a 
-                        href="/recipes/semantic-search"
-                        class="bg-orange-600 hover:bg-orange-700 text-white font-medium px-6 py-2 rounded-md text-sm transition-colors inline-flex items-center gap-2"
-                    >
-                        🔍 Busca Semântica
-                    </a>
-                    <button 
-                        @click="resetForm"
-                        class="bg-gray-600 hover:bg-gray-700 text-white font-medium px-6 py-2 rounded-md text-sm transition-colors"
-                    >
-                        ✨ Nova Receita
-                    </button>
-                </div>
-            </div>
-    
+        <div>
             <!-- Recipe Form -->
-            <form @submit.prevent="submit" class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <FormCard title="Cadastro de Receitas" icon="🍳" class="mt-8">
+                <form @submit.prevent="submit">
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <!-- Left Column - Select/Smaller Fields -->
                     <div class="space-y-4">
@@ -237,190 +218,166 @@
                     
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         <!-- Product Associations -->
-                        <div class="bg-gray-50 p-4 rounded-lg">
-                            <div class="bg-orange-100 px-4 py-2 rounded-md mb-4">
-                                <h4 class="text-sm font-semibold text-orange-900">🛒 Produtos (N para N)</h4>
-                            </div>
-                            
-                            <div class="space-y-3">
-                                <p class="text-sm font-medium text-gray-700">Produtos Vinculados</p>
-                                <div class="space-y-2">
-                                    <div v-for="(product, index) in form.selected_products" :key="index" class="flex items-center gap-3 p-3 border border-gray-200 rounded bg-white">
-                                        <div class="w-8 h-8 bg-orange-100 rounded flex items-center justify-center">
-                                            <svg class="w-4 h-4 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
-                                            </svg>
-                                        </div>
-                                        
-                                        <select
-                                            v-model="product.product_id"
-                                            class="flex-1 border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-                                        >
-                                            <option value="">Selecione um produto...</option>
-                                            <option v-for="availableProduct in props.products" :key="availableProduct.id" :value="availableProduct.id">
-                                                {{ availableProduct.descricao || 'Sem descrição' }}
-                                            </option>
-                                        </select>
-                                        
-                                        <select
-                                            v-model="product.ingredient_type"
-                                            class="w-32 border border-gray-300 rounded-md px-2 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-                                        >
-                                            <option value="main">Principal</option>
-                                            <option value="supporting">Secundário</option>
-                                        </select>
-
-                                        <button 
-                                            type="button"
-                                            @click="removeProduct(index)"
-                                            class="text-red-600 hover:text-red-800 text-sm font-medium px-2 py-1 rounded hover:bg-red-50"
-                                        >
-                                            Remover
-                                        </button>
-                                    </div>
-                                    
-                                    <button 
-                                        type="button"
-                                        @click="addProduct"
-                                        class="text-orange-600 hover:text-orange-800 text-sm font-medium px-3 py-2 border border-orange-300 rounded-md hover:bg-orange-50 transition-colors"
+                        <ConnectionCard title="Produtos (N para N)" icon="🛒" type="product" color="orange">
+                            <ConnectionItem
+                                v-for="(product, index) in form.selected_products"
+                                :key="index"
+                                color="orange"
+                            >
+                                <select
+                                    v-model="product.product_id"
+                                    class="flex-1 border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                                >
+                                    <option value="">Selecione um produto...</option>
+                                    <option v-for="availableProduct in props.products" :key="availableProduct.id" :value="availableProduct.id">
+                                        {{ availableProduct.descricao || 'Sem descrição' }}
+                                    </option>
+                                </select>
+                                
+                                <template #actions>
+                                    <select
+                                        v-model="product.ingredient_type"
+                                        class="w-32 border border-gray-300 rounded-md px-2 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                                     >
-                                        + Adicionar Produto
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Content Associations -->
-                        <div class="bg-gray-50 p-4 rounded-lg">
-                            <div class="bg-blue-100 px-4 py-2 rounded-md mb-4">
-                                <h4 class="text-sm font-semibold text-blue-900">📄 Conteúdos (N para N)</h4>
-                            </div>
-
-                            <div class="space-y-3">
-                                <p class="text-sm font-medium text-gray-700">Conteúdos Vinculados</p>
-                                <div class="space-y-2">
-                                    <div v-for="(content, index) in form.selected_contents" :key="index" class="flex items-center gap-3 p-3 border border-gray-200 rounded bg-white">
-                                        <div class="w-8 h-8 bg-blue-100 rounded flex items-center justify-center">
-                                            <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                                            </svg>
-                                        </div>
-                                        
-                                        <select
-                                            v-model="content.content_id"
-                                            class="flex-1 border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                        >
-                                            <option value="">Selecione um conteúdo...</option>
-                                            <option v-for="availableContent in props.contents" :key="availableContent.id" :value="availableContent.id">
-                                                {{ availableContent.nome_conteudo || 'Sem nome' }}
-                                            </option>
-                                        </select>
-                                        
-                                        <label class="flex items-center gap-2 text-sm">
-                                            <input
-                                                type="checkbox"
-                                                v-model="content.top_dish"
-                                                :true-value="'sim'"
-                                                :false-value="'nao'"
-                                                class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
-                                            />
-                                            <span class="text-gray-700">Top Dish</span>
-                                        </label>
-
-                                        <button 
-                                            type="button"
-                                            @click="removeContent(index)"
-                                            class="text-red-600 hover:text-red-800 text-sm font-medium px-2 py-1 rounded hover:bg-red-50"
-                                        >
-                                            Remover
-                                        </button>
-                                    </div>
-                                    
+                                        <option value="main">Principal</option>
+                                        <option value="supporting">Secundário</option>
+                                    </select>
+                                </template>
+                                
+                                <template #remove>
                                     <button 
                                         type="button"
-                                        @click="addContent"
-                                        class="text-blue-600 hover:text-blue-800 text-sm font-medium px-3 py-2 border border-blue-300 rounded-md hover:bg-blue-50 transition-colors"
-                                    >
-                                        + Adicionar Conteúdo
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Ingredient Associations -->
-                    <div class="bg-gray-50 p-4 rounded-lg">
-                        <div class="bg-green-100 px-4 py-2 rounded-md mb-4">
-                            <h4 class="text-sm font-semibold text-green-900">🥕 Ingredientes (N para N)</h4>
-                        </div>
-
-                        <div class="space-y-3">
-                            <p class="text-sm font-medium text-gray-700">Ingredientes da Receita</p>
-                            <div class="space-y-2">
-                                <div v-for="(ingredient, index) in selectedIngredients" :key="index" class="flex items-center gap-3 p-3 border border-gray-200 rounded bg-white">
-                                    <div class="w-8 h-8 bg-green-100 rounded flex items-center justify-center">
-                                        <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
-                                        </svg>
-                                    </div>
-                                    
-                                    <!-- Ingredient Search Input -->
-                                    <div class="flex-1 relative">
-                                        <input
-                                            :value="ingredient.search_term"
-                                            @input="updateIngredientSearchTerm(index, $event.target.value)"
-                                            @focus="showIngredientDropdown(index)"
-                                            @blur="hideIngredientDropdown(index)"
-                                            type="text"
-                                            placeholder="Digite o nome do ingrediente..."
-                                            class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
-                                        />
-                                        
-                                        <!-- Dropdown Results -->
-                                        <div 
-                                            v-if="ingredient.show_dropdown && ingredient.search_results.length > 0"
-                                            class="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-48 overflow-y-auto"
-                                        >
-                                            <div 
-                                                v-for="result in ingredient.search_results" 
-                                                :key="result.id"
-                                                @mousedown="selectIngredient(index, result)"
-                                                class="px-3 py-2 hover:bg-gray-100 cursor-pointer text-sm"
-                                            >
-                                                {{ result.name }}
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    <label class="flex items-center gap-2 text-sm">
-                                        <input
-                                            type="checkbox"
-                                            :checked="ingredient.primary_ingredient"
-                                            @change="updateIngredientPrimary(index, $event.target.checked)"
-                                            class="w-4 h-4 text-green-600 bg-gray-100 border-gray-300 rounded focus:ring-green-500 focus:ring-2"
-                                        />
-                                        <span class="text-gray-700">Principal</span>
-                                    </label>
-
-                                    <button 
-                                        type="button"
-                                        @click="removeIngredient(index)"
-                                        class="text-red-600 hover:text-red-800 text-sm font-medium px-2 py-1 rounded hover:bg-red-50"
+                                        @click="removeProduct(index)"
                                     >
                                         Remover
                                     </button>
-                                </div>
+                                </template>
+                            </ConnectionItem>
+                            
+                            <button 
+                                type="button"
+                                @click="addProduct"
+                                class="text-orange-600 hover:text-orange-800 text-sm font-medium px-3 py-2 border border-orange-300 rounded-md hover:bg-orange-50 transition-colors"
+                            >
+                                + Adicionar Produto
+                            </button>
+                        </ConnectionCard>
+
+                        <!-- Content Associations -->
+                        <ConnectionCard title="Conteúdos (N para N)" icon="📄" type="content" color="blue">
+                            <ConnectionItem
+                                v-for="(content, index) in form.selected_contents"
+                                :key="index"
+                                color="blue"
+                            >
+                                <select
+                                    v-model="content.content_id"
+                                    class="flex-1 border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                >
+                                    <option value="">Selecione um conteúdo...</option>
+                                    <option v-for="availableContent in props.contents" :key="availableContent.id" :value="availableContent.id">
+                                        {{ availableContent.nome_conteudo || 'Sem nome' }}
+                                    </option>
+                                </select>
                                 
+                                <template #actions>
+                                    <label class="flex items-center gap-2 text-sm">
+                                        <input
+                                            type="checkbox"
+                                            v-model="content.top_dish"
+                                            :true-value="'sim'"
+                                            :false-value="'nao'"
+                                            class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+                                        />
+                                        <span class="text-gray-700">Top Dish</span>
+                                    </label>
+                                </template>
+                                
+                                <template #remove>
+                                    <button 
+                                        type="button"
+                                        @click="removeContent(index)"
+                                    >
+                                        Remover
+                                    </button>
+                                </template>
+                            </ConnectionItem>
+                            
+                            <button 
+                                type="button"
+                                @click="addContent"
+                                class="text-blue-600 hover:text-blue-800 text-sm font-medium px-3 py-2 border border-blue-300 rounded-md hover:bg-blue-50 transition-colors"
+                            >
+                                + Adicionar Conteúdo
+                            </button>
+                        </ConnectionCard>
+                    </div>
+
+                    <!-- Ingredient Associations -->
+                    <ConnectionCard title="Ingredientes (N para N)" icon="🥕" type="ingredient" color="green">
+                        <ConnectionItem
+                            v-for="(ingredient, index) in selectedIngredients"
+                            :key="index"
+                            color="green"
+                        >
+                            <!-- Ingredient Search Input -->
+                            <div class="flex-1 relative">
+                                <input
+                                    :value="ingredient.search_term"
+                                    @input="updateIngredientSearchTerm(index, $event.target.value)"
+                                    @focus="showIngredientDropdown(index)"
+                                    @blur="hideIngredientDropdown(index)"
+                                    type="text"
+                                    placeholder="Digite o nome do ingrediente..."
+                                    class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                                />
+                                
+                                <!-- Dropdown Results -->
+                                <div 
+                                    v-if="ingredient.show_dropdown && ingredient.search_results.length > 0"
+                                    class="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-48 overflow-y-auto"
+                                >
+                                    <div 
+                                        v-for="result in ingredient.search_results" 
+                                        :key="result.id"
+                                        @mousedown="selectIngredient(index, result)"
+                                        class="px-3 py-2 hover:bg-gray-100 cursor-pointer text-sm"
+                                    >
+                                        {{ result.name }}
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <template #actions>
+                                <label class="flex items-center gap-2 text-sm">
+                                    <input
+                                        type="checkbox"
+                                        :checked="ingredient.primary_ingredient"
+                                        @change="updateIngredientPrimary(index, $event.target.checked)"
+                                        class="w-4 h-4 text-green-600 bg-gray-100 border-gray-300 rounded focus:ring-green-500 focus:ring-2"
+                                    />
+                                    <span class="text-gray-700">Principal</span>
+                                </label>
+                            </template>
+                            
+                            <template #remove>
                                 <button 
                                     type="button"
-                                    @click="addIngredient"
-                                    class="text-green-600 hover:text-green-800 text-sm font-medium px-3 py-2 border border-green-300 rounded-md hover:bg-green-50 transition-colors"
+                                    @click="removeIngredient(index)"
                                 >
-                                    + Adicionar Ingrediente
+                                    Remover
                                 </button>
-                            </div>
-                        </div>
-                    </div>
+                            </template>
+                        </ConnectionItem>
+                        
+                        <button 
+                            type="button"
+                            @click="addIngredient"
+                            class="text-green-600 hover:text-green-800 text-sm font-medium px-3 py-2 border border-green-300 rounded-md hover:bg-green-50 transition-colors"
+                        >
+                            + Adicionar Ingrediente
+                        </button>
+                    </ConnectionCard>
                 </div>
 
                 <!-- Action Buttons -->
@@ -447,65 +404,53 @@
                         <span v-else>{{ form.id ? 'Atualizar Receita' : 'Salvar Receita' }}</span>
                     </button>
                 </div>
-            </form>
+                </form>
+            </FormCard>
 
             <!-- Saved Recipes Section -->
-            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mt-6">
-                <h2 class="text-lg font-semibold text-gray-900 mb-4">📋 Receitas Salvas</h2>
-                
-                <div v-if="props.recipes?.length" class="space-y-3">
-                    <div 
-                        v-for="recipe in props.recipes" 
-                        :key="recipe.id"
-                        class="border border-gray-200 rounded-md p-4 bg-gray-50"
-                    >
-                        <h3 class="font-medium text-gray-900">{{ recipe.recipe_name || 'Sem título' }}</h3>
-                        <p class="text-sm text-gray-600 mt-2 line-clamp-2">
-                            {{ recipe.recipe_description || 'Sem descrição' }}...
-                        </p>
-                        
-                        <!-- Associations Info -->
-                        <div class="mt-3 space-y-2">
-                            <!-- Products -->
-                            <div v-if="recipe.products?.length" class="flex items-center gap-2 text-sm text-gray-600">
-                                <span class="font-medium">🛒 Produtos:</span>
-                                <span>{{ recipe.products.length }} vinculado(s)</span>
-                            </div>
-                            
-                            <!-- Contents -->
-                            <div v-if="recipe.contents?.length" class="flex items-center gap-2 text-sm text-gray-600">
-                                <span class="font-medium">📄 Conteúdos:</span>
-                                <span>{{ recipe.contents.length }} vinculado(s)</span>
-                            </div>
-                            
-                            <!-- Ingredients -->
-                            <div v-if="recipe.ingredients?.length" class="flex items-center gap-2 text-sm text-gray-600">
-                                <span class="font-medium">🥕 Ingredientes:</span>
-                                <span>{{ recipe.ingredients.length }} vinculado(s)</span>
-                            </div>
+            <ListCard title="Receitas Salvas" icon="📋" empty-message="Nenhuma receita cadastrada" empty-icon="🍳" class="mt-8">
+                <ListItem
+                    v-for="recipe in props.recipes"
+                    :key="recipe.id"
+                    :title="recipe.recipe_name || 'Sem título'"
+                    :description="recipe.recipe_description || 'Sem descrição'"
+                >
+                    <template #associations>
+                        <!-- Products -->
+                        <div v-if="recipe.products?.length" class="flex items-center gap-2 text-sm text-gray-600">
+                            <span class="font-medium">🛒 Produtos:</span>
+                            <span>{{ recipe.products.length }} vinculado(s)</span>
                         </div>
                         
-                        <div class="mt-3 flex gap-2">
-                            <button 
-                                @click="editRecipe(recipe)" 
-                                class="text-sm text-orange-600 hover:text-orange-800 font-medium"
-                            >
-                                Editar
-                            </button>
-                            <button 
-                                @click="deleteRecipe(recipe)" 
-                                class="text-sm text-red-600 hover:text-red-800 font-medium"
-                            >
-                                Excluir
-                            </button>
+                        <!-- Contents -->
+                        <div v-if="recipe.contents?.length" class="flex items-center gap-2 text-sm text-gray-600">
+                            <span class="font-medium">📄 Conteúdos:</span>
+                            <span>{{ recipe.contents.length }} vinculado(s)</span>
                         </div>
-                    </div>
-                </div>
-                
-                <div v-else class="text-center py-8 text-gray-500">
-                    <p>Nenhuma receita cadastrada</p>
-                </div>
-            </div>
+                        
+                        <!-- Ingredients -->
+                        <div v-if="recipe.ingredients?.length" class="flex items-center gap-2 text-sm text-gray-600">
+                            <span class="font-medium">🥕 Ingredientes:</span>
+                            <span>{{ recipe.ingredients.length }} vinculado(s)</span>
+                        </div>
+                    </template>
+                    
+                    <template #actions>
+                        <button 
+                            @click="editRecipe(recipe)" 
+                            class="text-sm text-orange-600 hover:text-orange-800 font-medium"
+                        >
+                            Editar
+                        </button>
+                        <button 
+                            @click="deleteRecipe(recipe)" 
+                            class="text-sm text-red-600 hover:text-red-800 font-medium"
+                        >
+                            Excluir
+                        </button>
+                    </template>
+                </ListItem>
+            </ListCard>
         </div>
     </AppLayout>
 </template>
@@ -514,6 +459,14 @@
 import { router, useForm, Head } from '@inertiajs/vue3'
 import {ref, nextTick, onMounted, reactive} from 'vue'
 import AppLayout from '@/layouts/AppLayout.vue'
+import { 
+    FormCard, 
+    ListCard, 
+    SectionCard, 
+    ConnectionCard, 
+    ListItem, 
+    ConnectionItem 
+} from '@/components/ui/patterns'
 
 
 

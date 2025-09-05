@@ -34,7 +34,7 @@
     </div>
 
     <AppLayout :breadcrumbs="breadcrumbs">
-        <div class="max-w-7xl mx-auto">
+        <div>
             <div class="mb-6">
                 <h1 class="text-3xl font-bold text-gray-900">🔍 Busca Semântica</h1>
                 <p class="text-gray-600 mt-2">Encontre receitas, produtos e conteúdos usando inteligência artificial</p>
