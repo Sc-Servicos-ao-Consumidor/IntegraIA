@@ -52,48 +52,6 @@
                         <p v-if="form.errors.nome_conteudo" class="text-red-500 text-xs mt-1">{{ form.errors.nome_conteudo }}</p>
                     </div>
 
-                    <!-- Cozinheiro -->
-                    <div>
-                        <label for="cozinheiro" class="block text-sm font-medium text-gray-700 mb-1">Cozinheiro</label>
-                        <select
-                            v-model="form.cozinheiro"
-                            id="cozinheiro"
-                            class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-                        >
-                            <option value="" disabled selected>Selecione...</option>
-                            <option :value="true">Sim</option>
-                            <option :value="false">Não</option>
-                        </select>
-                    </div>
-
-                    <!-- Comprador -->
-                    <div>
-                        <label for="comprador" class="block text-sm font-medium text-gray-700 mb-1">Comprador</label>
-                        <select
-                            v-model="form.comprador"
-                            id="comprador"
-                            class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-                        >
-                            <option value="" disabled selected>Selecione...</option>
-                            <option :value="true">Sim</option>
-                            <option :value="false">Não</option>
-                        </select>
-                    </div>
-
-                    <!-- Administrador -->
-                    <div>
-                        <label for="administrador" class="block text-sm font-medium text-gray-700 mb-1">Administrador</label>
-                        <select
-                            v-model="form.administrador"
-                            id="administrador"
-                            class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-                        >
-                            <option value="" disabled selected>Selecione...</option>
-                            <option :value="true">Sim</option>
-                            <option :value="false">Não</option>
-                        </select>
-                    </div>
-
                     <!-- Tipo de Conteúdo -->
                     <div>
                         <label for="tipo_conteudo" class="block text-sm font-medium text-gray-700 mb-1">Tipo de Conteúdo</label>
@@ -102,7 +60,7 @@
                             id="tipo_conteudo"
                             class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                         >
-                            <option value="" disabled selected>Selecione...</option>
+                            <option selected disabled value="">Selecione</option>
                             <option value="ebook">E-book</option>
                             <option value="ufs-academy">UFS Academy</option>
                             <option value="artigos">Artigos</option>
@@ -119,11 +77,53 @@
                             id="pilares"
                             class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                         >
-                            <option value="" disabled selected>Selecione...</option>
+                            <option selected disabled value="">Selecione</option>
                             <option value="treinamento">Treinamento</option>
                             <option value="inspiracao">Inspiração</option>
                             <option value="comprar">Comprar</option>
                             <option value="sac">SAC</option>
+                        </select>
+                    </div>
+
+                    <!-- Cozinheiro -->
+                    <div>
+                        <label for="cozinheiro" class="block text-sm font-medium text-gray-700 mb-1">Cozinheiro</label>
+                        <select
+                            v-model="form.cozinheiro"
+                            id="cozinheiro"
+                            class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                        >
+                            <option selected disabled value="">Selecione</option>
+                            <option :value="true">Sim</option>
+                            <option :value="false">Não</option>
+                        </select>
+                    </div>
+
+                    <!-- Comprador -->
+                    <div>
+                        <label for="comprador" class="block text-sm font-medium text-gray-700 mb-1">Comprador</label>
+                        <select
+                            v-model="form.comprador"
+                            id="comprador"
+                            class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                        >
+                            <option selected disabled value="">Selecione</option>
+                            <option :value="true">Sim</option>
+                            <option :value="false">Não</option>
+                        </select>
+                    </div>
+
+                    <!-- Administrador -->
+                    <div>
+                        <label for="administrador" class="block text-sm font-medium text-gray-700 mb-1">Administrador</label>
+                        <select
+                            v-model="form.administrador"
+                            id="administrador"
+                            class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                        >
+                            <option selected disabled value="">Selecione</option>
+                            <option :value="true">Sim</option>
+                            <option :value="false">Não</option>
                         </select>
                     </div>
 
@@ -135,7 +135,7 @@
                             id="canal"
                             class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                         >
-                            <option value="" disabled selected>Selecione...</option>
+                            <option selected disabled value="">Selecione</option>
                             <option value="padaria">Padaria</option>
                             <option value="lanchonete">Lanchonete</option>
                             <option value="buffet">Buffet</option>

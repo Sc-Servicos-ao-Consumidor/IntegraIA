@@ -53,7 +53,7 @@ class ProductController extends Controller
             'descricao' => 'required|string|max:255',
             'codigo_padrao' => 'nullable|string|max:255',
             'sku' => 'nullable|string|max:255',
-            'group_product_id' => 'nullable|exists:group_products,id',
+            'group_product_id' => 'required|exists:group_products,id',
             'marca' => 'nullable|string|max:255',
             'escolha_embalagem' => 'nullable|string|max:255',
             'prompt_uso_informacoes_produto' => 'nullable|string',

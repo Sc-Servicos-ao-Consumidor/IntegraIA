@@ -61,7 +61,7 @@
                                 id="cuisine"
                                 class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                             >
-                                <option value="">Selecione</option>
+                                <option selected disabled value="">Selecione</option>
                                 <option value="italiana">Italiana</option>
                                 <option value="mexicana">Mexicana</option>
                                 <option value="asiatica">Asiática</option>
@@ -79,7 +79,7 @@
                                 id="recipe_type"
                                 class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                             >
-                                <option value="">Doce ou Salgada</option>
+                                <option selected disabled value="">Selecione</option>
                                 <option value="doce">Doce</option>
                                 <option value="salgada">Salgada</option>
                             </select>
@@ -94,7 +94,7 @@
                                 id="service_order"
                                 class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                             >
-                                <option value="">Selecione</option>
+                                <option selected disabled value="">Selecione</option>
                                 <option value="entrada">Entrada</option>
                                 <option value="prato_principal">Prato Principal</option>
                                 <option value="sobremesa">Sobremesa</option>
@@ -126,7 +126,7 @@
                                 id="difficulty_level"
                                 class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                             >
-                                <option value="">Selecione</option>
+                                <option selected disabled value="">Selecione</option>
                                 <option value="facil">Fácil</option>
                                 <option value="medio">Médio</option>
                                 <option value="dificil">Difícil</option>
@@ -142,7 +142,7 @@
                                 id="yield"
                                 class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                             >
-                                <option value="">Selecione</option>
+                                <option selected disabled value="">Selecione</option>
                                 <option value="1">1 porção</option>
                                 <option value="2">2 porções</option>
                                 <option value="4">4 porções</option>
@@ -161,7 +161,7 @@
                                 id="channel"
                                 class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                             >
-                                <option value="">Selecione</option>
+                                <option selected disabled value="">Selecione</option>
                                 <option value="padaria">Padaria</option>
                                 <option value="lanchonete">Lanchonete</option>
                                 <option value="buffet">Buffet</option>
@@ -684,13 +684,13 @@ const form = useForm({
     id: null,
     recipe_code: null,
     recipe_name: null,
-    cuisine: null,
-    recipe_type: null,
-    service_order: null,
+    cuisine: '',
+    recipe_type: '',
+    service_order: '',
     preparation_time: null,
-    difficulty_level: null,
-    yield: null,
-    channel: null,
+    difficulty_level: '',
+    yield: '',
+    channel: '',
     recipe_description: null,
     ingredients_description: null,
     preparation_method: null,
