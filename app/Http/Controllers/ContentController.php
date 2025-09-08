@@ -32,7 +32,7 @@ class ContentController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'nome_conteudo' => 'nullable|string|max:255',
+            'nome_conteudo' => 'required|string|max:255',
             'content_code' => 'nullable|string|max:255|unique:contents,content_code,' . $request->id,
             'descricao_tabela_nutricional' => 'nullable|string',
             'descricao_lista_ingredientes' => 'nullable|string',
@@ -46,7 +46,7 @@ class ContentController extends Controller
             'imagens_ingredientes_cadastradas' => 'nullable|array',
             'imagens_preparo_cadastradas' => 'nullable|array',
             'imagens_rendimentos_cadastradas' => 'nullable|array',
-            'tipo_conteudo' => 'nullable|string|max:255',
+            'tipo_conteudo' => 'required|string|max:255',
             'pilares' => 'nullable|string|max:255',
             'canal' => 'nullable|string|max:255',
             'links_conteudo' => 'nullable|array',
