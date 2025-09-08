@@ -35,7 +35,7 @@
 
     <AppLayout :breadcrumbs="breadcrumbs">
         <div>
-            <div class="mb-6">
+            <div class="mb-6 border-t border-gray-200 pt-4">
                 <h1 class="text-3xl font-bold text-gray-900">🔍 Busca Semântica</h1>
                 <p class="text-gray-600 mt-2">Encontre receitas, produtos e conteúdos usando inteligência artificial</p>
             </div>
@@ -483,10 +483,6 @@ const renderedMarkdown = computed(() => {
 })
 
 const breadcrumbs = [
-    {
-        title: 'Receitas',
-        href: '/recipes',
-    },
     {
         title: 'Busca Semântica',
         href: '/recipes/semantic-search',
