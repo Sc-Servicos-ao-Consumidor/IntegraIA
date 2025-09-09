@@ -14,6 +14,7 @@ class Content extends Model
     use HasNeighbors;
 
     protected $fillable = [
+        'tenant_id',
         'nome_conteudo',
         'content_code',
         'descricao_tabela_nutricional',

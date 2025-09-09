@@ -15,6 +15,7 @@ class Recipe extends Model
     use HasNeighbors;
 
     protected $fillable = [
+        'tenant_id',
         'embedding',
         'recipe_code',
         'recipe_name', 

@@ -17,6 +17,7 @@ class Product extends Model
     use HasNeighbors;
 
     protected $fillable = [
+        'tenant_id',
         'ulid',
         'slug',
         'codigo_padrao',
