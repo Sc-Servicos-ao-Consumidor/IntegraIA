@@ -138,9 +138,8 @@
                             <option selected disabled value="">Selecione</option>
                             <option value="padaria">Padaria</option>
                             <option value="lanchonete">Lanchonete</option>
-                            <option value="buffet">Buffet</option>
-                            <option value="ala-carte">A la Carte</option>
-                            <option value="industrial">Industrial</option>
+                            <option value="restaurante">Restaurante</option>
+                            <option value="confeitaria">Confeitaria</option>
                         </select>
                     </div>
                 </div>
@@ -189,6 +188,19 @@
                         rows="4"
                         class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-vertical"
                     ></textarea>
+                </div>
+
+                <!-- Prompt do Conteúdo -->
+                <div class="mt-4">
+                    <label for="content_prompt" class="block text-sm font-medium text-gray-700 mb-1">Prompt do Conteúdo</label>
+                    <textarea
+                        v-model="form.content_prompt"
+                        id="content_prompt"
+                        rows="4"
+                        placeholder="Instruções/briefing sobre o conteúdo para geração de conteúdo por IA..."
+                        class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-vertical"
+                    ></textarea>
+                    <p v-if="form.errors.content_prompt" class="text-red-500 text-xs mt-1">{{ form.errors.content_prompt }}</p>
                 </div>
 
                 <!-- Connections Section -->
@@ -491,6 +503,7 @@ const form = useForm({
     administrador: '',
     status: true,
     descricao_conteudo: null,
+    content_prompt: null,
     selected_recipes: [],
     selected_products: []
 })
@@ -580,6 +593,7 @@ function editContent(content) {
     form.administrador = content.administrador
     form.status = content.status
     form.descricao_conteudo = content.descricao_conteudo
+    form.content_prompt = content.content_prompt
     
     // Load associated recipes
     form.selected_recipes = content.recipes ? content.recipes.map(recipe => ({

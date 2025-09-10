@@ -37,6 +37,7 @@ class Content extends Model
         'administrador',
         'status',
         'descricao_conteudo',
+        'content_prompt',
         'embedding'
     ];
 

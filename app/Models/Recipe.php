@@ -18,7 +18,6 @@ class Recipe extends Model
         'embedding',
         'recipe_code',
         'recipe_name', 
-        'cuisine',
         'recipe_type',
         'service_order',
         'preparation_time',
@@ -26,6 +25,7 @@ class Recipe extends Model
         'yield',
         'channel',
         'recipe_description',
+        'recipe_prompt',
         'ingredients_description',
         'preparation_method',
         'main_ingredients',
@@ -121,5 +121,13 @@ class Recipe extends Model
     public function supportingIngredients(): BelongsToMany
     {
         return $this->ingredients()->wherePivot('primary_ingredient', false);
+    }
+
+    /**
+     * The cuisines that belong to this recipe.
+     */
+    public function cuisines(): BelongsToMany
+    {
+        return $this->belongsToMany(Cuisine::class)->withTimestamps();
     }
 }

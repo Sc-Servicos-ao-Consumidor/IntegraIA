@@ -6,6 +6,7 @@ use App\Models\Recipe;
 use App\Models\Product;
 use App\Models\Content;
 use App\Models\Ingredient;
+use App\Models\Cuisine;
 use App\Services\PrismService;
 use App\Services\EmbeddingService;
 use App\Services\AIToolService;
@@ -21,16 +22,18 @@ class RecipeController extends Controller
      */
     public function index()
     {
-        $recipes = Recipe::with(['products', 'contents', 'ingredients'])->latest()->get();
+        $recipes = Recipe::with(['products', 'contents', 'ingredients', 'cuisines'])->latest()->get();
         $products = Product::where('status', true)->orderBy('descricao')->get();
         $contents = Content::where('status', true)->orderBy('nome_conteudo')->get();
         $ingredients = Ingredient::orderBy('name')->get();
+        $cuisines = Cuisine::active()->orderBy('name')->get();
 
         return Inertia::render('Recipes/Manage', [
             'recipes' => $recipes,
             'products' => $products,
             'contents' => $contents,
-            'ingredients' => $ingredients
+            'ingredients' => $ingredients,
+            'cuisines' => $cuisines
         ]);
     }
 
@@ -43,16 +46,16 @@ class RecipeController extends Controller
             // Recipe fields
             'recipe_code' => 'nullable|string|max:255',
             'recipe_name' => 'string|max:255',
-            'cuisine' => 'nullable|string|max:255',
             'recipe_type' => 'string|max:255',
             'service_order' => 'nullable|string|max:255',
             'preparation_time' => 'nullable|integer|min:1',
-            'difficulty_level' => 'nullable|string|in:facil,medio,dificil,expert',
+            'difficulty_level' => 'nullable|string|in:muito_facil,facil,elaborada,muito_elaborada',
             'yield' => 'nullable|string|max:255',
             'channel' => 'nullable|string|max:255',
             
             // Content fields
             'recipe_description' => 'string',
+            'recipe_prompt' => 'nullable|string',
             'ingredients_description' => 'string',
             'preparation_method' => 'string',
             
@@ -78,11 +81,16 @@ class RecipeController extends Controller
             'selected_ingredients.*.ingredient_id' => 'nullable|exists:ingredients,id',
             'selected_ingredients.*.ingredient_name' => 'nullable|string|max:255',
             'selected_ingredients.*.primary_ingredient' => 'nullable|boolean',
+
+            // Cuisine associations
+            'selected_cuisines' => 'nullable|array',
+            'selected_cuisines.*.cuisine_id' => 'nullable|exists:cuisines,id',
+            'selected_cuisines.*.name' => 'nullable|string|max:255',
         ]);
 
         $recipe = Recipe::updateOrCreate(
             ['id' => $request->id],
-            collect($data)->except(['selected_products', 'selected_contents', 'selected_ingredients'])->toArray()
+            collect($data)->except(['selected_products', 'selected_contents', 'selected_ingredients', 'selected_cuisines'])->toArray()
         );
 
         // Sync products if provided
@@ -143,6 +151,23 @@ class RecipeController extends Controller
             $recipe->ingredients()->sync($ingredientData);
         }
 
+        // Sync cuisines if provided
+        if ($request->has('selected_cuisines') && is_array($request->selected_cuisines)) {
+            $cuisineIds = [];
+            foreach ($request->selected_cuisines as $cuisineInfo) {
+                $cuisineId = $cuisineInfo['cuisine_id'] ?? null;
+                $name = $cuisineInfo['name'] ?? null;
+                if (!$cuisineId && $name) {
+                    $cuisine = Cuisine::firstOrCreate(['name' => trim($name)]);
+                    $cuisineId = $cuisine->id;
+                }
+                if ($cuisineId) {
+                    $cuisineIds[] = $cuisineId;
+                }
+            }
+            $recipe->cuisines()->sync($cuisineIds);
+        }
+
         return null;
     }
 
@@ -173,6 +198,28 @@ class RecipeController extends Controller
             ->get(['id', 'name']);
 
         return response()->json($ingredients);
+    }
+
+    /**
+     * Search for cuisines by name
+     */
+    public function searchCuisines(Request $request)
+    {
+        $request->validate([
+            'query' => 'required|string|min:1',
+            'limit' => 'nullable|integer|min:1|max:20'
+        ]);
+
+        $query = $request->query('query');
+        $limit = $request->query('limit', 10);
+
+        $cuisines = Cuisine::active()
+            ->where('name', 'ilike', "%{$query}%")
+            ->orderBy('name')
+            ->limit($limit)
+            ->get(['id', 'name']);
+
+        return response()->json($cuisines);
     }
 
     public function search(Request $request)

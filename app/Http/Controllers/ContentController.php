@@ -55,6 +55,7 @@ class ContentController extends Controller
             'administrador' => 'required|boolean',
             'status' => 'nullable|boolean',
             'descricao_conteudo' => 'required|string',
+            'content_prompt' => 'nullable|string',
             // Recipe associations
             'selected_recipes' => 'nullable|array',
             'selected_recipes.*.recipe_id' => 'required_with:selected_recipes|exists:recipes,id',

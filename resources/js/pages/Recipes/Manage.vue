@@ -49,26 +49,55 @@
                                 id="recipe_name"
                                 type="text"
                                 class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                                required
+                                placeholder="Digite o nome da receita"
                             />
                             <p v-if="form.errors.recipe_name" class="text-red-500 text-xs mt-1">{{ form.errors.recipe_name }}</p>
                         </div>
 
-                        <!-- Culinária -->
+                        <!-- Culinária (múltiplas) -->
                         <div>
-                            <label for="cuisine" class="block text-sm font-medium text-gray-700 mb-1">Culinária</label>
-                            <select
-                                v-model="form.cuisine"
-                                id="cuisine"
-                                class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-                            >
-                                <option selected disabled value="">Selecione</option>
-                                <option value="italiana">Italiana</option>
-                                <option value="mexicana">Mexicana</option>
-                                <option value="asiatica">Asiática</option>
-                                <option value="brasileira">Brasileira</option>
-                                <option value="francesa">Francesa</option>
-                            </select>
-                            <p v-if="form.errors.cuisine" class="text-red-500 text-xs mt-1">{{ form.errors.cuisine }}</p>
+                            <label for="cuisine" class="block text-sm font-medium text-gray-700 mb-1">Culinária(s)</label>
+                            <!-- Selected cuisines chips -->
+                            <div v-if="form.selected_cuisines.length" class="flex flex-wrap gap-2 mb-2">
+                                <span 
+                                    v-for="(c, idx) in form.selected_cuisines" 
+                                    :key="`${c.cuisine_id || c.name}-${idx}`"
+                                    class="inline-flex items-center gap-2 bg-orange-50 text-orange-800 border border-orange-200 px-2 py-1 rounded text-xs"
+                                >
+                                    {{ c.name }}
+                                    <button type="button" class="text-orange-600 hover:text-orange-800" @click="removeCuisine(idx)">×</button>
+                                </span>
+                            </div>
+                            <div class="relative">
+                                <input
+                                    :value="cuisineSearchTerm"
+                                    @input="updateCuisineSearchTerm($event.target.value)"
+                                    @keydown.enter.prevent="addCuisineFromInput"
+                                    @focus="showCuisineDropdown"
+                                    @blur="hideCuisineDropdown"
+                                    type="text"
+                                    id="cuisine"
+                                    placeholder="Digite e selecione ou pressione Enter..."
+                                    class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                                />
+                                
+                                <!-- Dropdown Results -->
+                                <div 
+                                    v-if="cuisineShowDropdown && cuisineSearchResults.length > 0"
+                                    class="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-48 overflow-y-auto"
+                                >
+                                    <div 
+                                        v-for="result in cuisineSearchResults" 
+                                        :key="result.id"
+                                        @mousedown="addCuisine(result)"
+                                        class="px-3 py-2 hover:bg-gray-100 cursor-pointer text-sm"
+                                    >
+                                        {{ result.name }}
+                                    </div>
+                                </div>
+                            </div>
+                            <p v-if="form.errors.selected_cuisines" class="text-red-500 text-xs mt-1">{{ form.errors.selected_cuisines }}</p>
                         </div>
 
                         <!-- Tipo de Receita -->
@@ -106,15 +135,34 @@
 
                         <!-- Tempo de Preparo -->
                         <div>
-                            <label for="preparation_time" class="block text-sm font-medium text-gray-700 mb-1">Tempo de Preparo (minutos)</label>
-                            <input
-                                type="number"
+                            <label for="preparation_time" class="block text-sm font-medium text-gray-700 mb-1">Tempo de Preparo</label>
+                            <select
                                 v-model="form.preparation_time"
                                 id="preparation_time"
-                                min="1"
-                                placeholder="Ex: 45"
                                 class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-                            />
+                            >
+                                <option selected disabled value="">Selecione</option>
+                                <option value="15">15 minutos</option>
+                                <option value="30">30 minutos</option>
+                                <option value="45">45 minutos</option>
+                                <option value="60">1 hora</option>
+                                <option value="75">1h 15min</option>
+                                <option value="90">1h 30min</option>
+                                <option value="105">1h 45min</option>
+                                <option value="120">2 horas</option>
+                                <option value="135">2h 15min</option>
+                                <option value="150">2h 30min</option>
+                                <option value="165">2h 45min</option>
+                                <option value="180">3 horas</option>
+                                <option value="195">3h 15min</option>
+                                <option value="210">3h 30min</option>
+                                <option value="225">3h 45min</option>
+                                <option value="240">4 horas</option>
+                                <option value="255">4h 15min</option>
+                                <option value="270">4h 30min</option>
+                                <option value="285">4h 45min</option>
+                                <option value="300">5 horas</option>
+                            </select>
                             <p v-if="form.errors.preparation_time" class="text-red-500 text-xs mt-1">{{ form.errors.preparation_time }}</p>
                         </div>
 
@@ -127,9 +175,10 @@
                                 class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                             >
                                 <option selected disabled value="">Selecione</option>
+                                <option value="muito_facil">Muito fácil</option>
                                 <option value="facil">Fácil</option>
-                                <option value="medio">Médio</option>
-                                <option value="dificil">Difícil</option>
+                                <option value="elaborada">Elaborada</option>
+                                <option value="muito_elaborada">Muito elaborada</option>
                             </select>
                             <p v-if="form.errors.difficulty_level" class="text-red-500 text-xs mt-1">{{ form.errors.difficulty_level }}</p>
                         </div>
@@ -143,12 +192,16 @@
                                 class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                             >
                                 <option selected disabled value="">Selecione</option>
-                                <option value="1">1 porção</option>
-                                <option value="2">2 porções</option>
-                                <option value="4">4 porções</option>
-                                <option value="6">6 porções</option>
-                                <option value="8">8 porções</option>
-                                <option value="10">10 porções</option>
+                                <option value="1-2">1 a 2 porções</option>
+                                <option value="2-4">2 a 4 porções</option>
+                                <option value="4-6">4 a 6 porções</option>
+                                <option value="6-8">6 a 8 porções</option>
+                                <option value="8-10">8 a 10 porções</option>
+                                <option value="10-12">10 a 12 porções</option>
+                                <option value="12-14">12 a 14 porções</option>
+                                <option value="14-16">14 a 16 porções</option>
+                                <option value="16-18">16 a 18 porções</option>
+                                <option value="18-20">18 a 20 porções</option>
                             </select>
                             <p v-if="form.errors.yield" class="text-red-500 text-xs mt-1">{{ form.errors.yield }}</p>
                         </div>
@@ -164,18 +217,17 @@
                                 <option selected disabled value="">Selecione</option>
                                 <option value="padaria">Padaria</option>
                                 <option value="lanchonete">Lanchonete</option>
-                                <option value="buffet">Buffet</option>
-                                <option value="ala-carte">A la Carte</option>
-                                <option value="industrial">Industrial</option>
+                                <option value="restaurante">Restaurante</option>
+                                <option value="confeitaria">Confeitaria</option>
                             </select>
                             <p v-if="form.errors.channel" class="text-red-500 text-xs mt-1">{{ form.errors.channel }}</p>
                         </div>
                     </div>
 
                     <!-- Right Column - Larger Text Fields -->
-                    <div class="space-y-4">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         <!-- Descrição da Receita -->
-                        <div>
+                        <div class="lg:col-span-2">
                             <label for="recipe_description" class="block text-sm font-medium text-gray-700 mb-1">Descrição da Receita</label>
                             <textarea
                                 v-model="form.recipe_description"
@@ -184,6 +236,19 @@
                                 class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-vertical"
                             ></textarea>
                             <p v-if="form.errors.recipe_description" class="text-red-500 text-xs mt-1">{{ form.errors.recipe_description }}</p>
+                        </div>
+
+                        <!-- Prompt da Receita -->
+                        <div class="lg:col-span-2">
+                            <label for="recipe_prompt" class="block text-sm font-medium text-gray-700 mb-1">Prompt da Receita</label>
+                            <textarea
+                                v-model="form.recipe_prompt"
+                                id="recipe_prompt"
+                                rows="7"
+                                placeholder="Instruções/briefing sobre a receita para geração de conteúdo por IA..."
+                                class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-vertical"
+                            ></textarea>
+                            <p v-if="form.errors.recipe_prompt" class="text-red-500 text-xs mt-1">{{ form.errors.recipe_prompt }}</p>
                         </div>
 
                         <!-- Descrição dos Ingredientes -->
@@ -493,7 +558,8 @@ const props = defineProps({
     recipes: Array,
     products: Array,
     contents: Array,
-    ingredients: Array
+    ingredients: Array,
+    cuisines: Array
 })
 
 // Toast notification system
@@ -502,6 +568,11 @@ let toastIdCounter = 0
 
 // Reactive ingredients state
 const selectedIngredients = ref([])
+
+// Reactive cuisine state (multi)
+const cuisineSearchTerm = ref('')
+const cuisineSearchResults = ref([])
+const cuisineShowDropdown = ref(false)
 
 function showToast(message, type = 'info', duration = 5000) {
     const toast = {
@@ -635,6 +706,78 @@ function updateIngredientPrimary(index, value) {
     }
 }
 
+// Cuisine management functions
+function showCuisineDropdown() {
+    cuisineShowDropdown.value = true
+}
+
+function hideCuisineDropdown() {
+    setTimeout(() => {
+        cuisineShowDropdown.value = false
+    }, 200)
+}
+
+async function searchCuisines() {
+    const query = cuisineSearchTerm.value.trim()
+    
+    if (query.length < 2) {
+        cuisineSearchResults.value = []
+        return
+    }
+    
+    try {
+        const response = await fetch(`/recipes/search-cuisines?query=${encodeURIComponent(query)}&limit=5`)
+        const data = await response.json()
+        cuisineSearchResults.value = data
+    } catch (error) {
+        console.error('Error searching cuisines:', error)
+        // Fallback to local search
+        const existingCuisines = props.cuisines ? props.cuisines.filter(cuisine => 
+            cuisine.name.toLowerCase().includes(query.toLowerCase())
+        ) : []
+        cuisineSearchResults.value = existingCuisines.slice(0, 5)
+    }
+}
+
+function addCuisine(selectedCuisine) {
+    const exists = form.selected_cuisines.some(c => (c.cuisine_id && c.cuisine_id === selectedCuisine.id) || (c.name && c.name.toLowerCase() === selectedCuisine.name.toLowerCase()))
+    if (!exists) {
+        form.selected_cuisines.push({ cuisine_id: selectedCuisine.id, name: selectedCuisine.name })
+    }
+    cuisineSearchTerm.value = ''
+    cuisineShowDropdown.value = false
+    cuisineSearchResults.value = []
+}
+
+function addCuisineFromInput() {
+    const name = cuisineSearchTerm.value.trim()
+    if (!name) return
+    const exists = form.selected_cuisines.some(c => c.name && c.name.toLowerCase() === name.toLowerCase())
+    if (!exists) {
+        form.selected_cuisines.push({ cuisine_id: null, name })
+    }
+    cuisineSearchTerm.value = ''
+    // keep dropdown logic to reopen on next input
+    cuisineShowDropdown.value = false
+    cuisineSearchResults.value = []
+}
+
+function removeCuisine(index) {
+    form.selected_cuisines.splice(index, 1)
+}
+
+function updateCuisineSearchTerm(value) {
+    cuisineSearchTerm.value = value
+    const query = value.trim()
+    if (query.length >= 2) {
+        cuisineShowDropdown.value = true
+        searchCuisines()
+    } else {
+        cuisineSearchResults.value = []
+        cuisineShowDropdown.value = false
+    }
+}
+
 function showValidationErrors(errors) {
     // Show first error as a toast
     const firstError = Object.values(errors)[0]
@@ -666,6 +809,9 @@ function confirmResetForm() {
         form.selected_products = []
         form.selected_contents = []
         selectedIngredients.value = []
+        cuisineSearchTerm.value = ''
+        cuisineSearchResults.value = []
+        cuisineShowDropdown.value = false
         form.id = null
         showToast('Edição cancelada', 'info')
     } else {
@@ -675,6 +821,10 @@ function confirmResetForm() {
             form.selected_products = []
             form.selected_contents = []
             selectedIngredients.value = []
+            form.selected_cuisines = []
+            cuisineSearchTerm.value = ''
+            cuisineSearchResults.value = []
+            cuisineShowDropdown.value = false
             showToast('Formulário limpo', 'info')
         }
     }
@@ -683,15 +833,16 @@ function confirmResetForm() {
 const form = useForm({
     id: null,
     recipe_code: null,
-    recipe_name: null,
-    cuisine: '',
+    recipe_name: '',
+    // cuisines are selected via selected_cuisines
     recipe_type: '',
     service_order: '',
-    preparation_time: null,
+    preparation_time: '',
     difficulty_level: '',
     yield: '',
     channel: '',
     recipe_description: null,
+    recipe_prompt: null,
     ingredients_description: null,
     preparation_method: null,
     main_ingredients: [],
@@ -704,7 +855,9 @@ const form = useForm({
     // Content associations
     selected_contents: [],
     // Ingredient associations
-    selected_ingredients: []
+    selected_ingredients: [],
+    // Cuisine associations
+    selected_cuisines: []
 })
 
 const resetForm = () => {
@@ -712,6 +865,10 @@ const resetForm = () => {
     form.selected_products = []
     form.selected_contents = []
     selectedIngredients.value = []
+    form.selected_cuisines = []
+    cuisineSearchTerm.value = ''
+    cuisineSearchResults.value = []
+    cuisineShowDropdown.value = false
     form.id = null
     showToast('Formulário limpo para nova receita', 'info')
 }
@@ -719,15 +876,18 @@ const resetForm = () => {
 function editRecipe(recipe) {
     form.id = recipe.id
     form.recipe_code = recipe.recipe_code
-    form.recipe_name = recipe.recipe_name
-    form.cuisine = recipe.cuisine
-    form.recipe_type = recipe.recipe_type
-    form.service_order = recipe.service_order
-    form.preparation_time = recipe.preparation_time
-    form.difficulty_level = recipe.difficulty_level
-    form.yield = recipe.yield
-    form.channel = recipe.channel
-    form.recipe_description = recipe.recipe_description
+    form.recipe_name = recipe.recipe_name || ''
+    // Load cuisines relation into chips
+    form.selected_cuisines = recipe.cuisines ? recipe.cuisines.map(c => ({ cuisine_id: c.id, name: c.name })) : []
+    cuisineSearchTerm.value = ''
+    form.recipe_type = recipe.recipe_type || ''
+    form.service_order = recipe.service_order || ''
+    form.preparation_time = recipe.preparation_time || ''
+    form.difficulty_level = recipe.difficulty_level || ''
+    form.yield = recipe.yield || ''
+    form.channel = recipe.channel || ''
+    form.recipe_description = recipe.recipe_description || ''
+    form.recipe_prompt = recipe.recipe_prompt || ''
     form.ingredients_description = recipe.ingredients_description
     form.preparation_method = recipe.preparation_method
     form.main_ingredients = recipe.main_ingredients || []
@@ -777,7 +937,7 @@ function deleteRecipe(recipe) {
 }
 
 const submit = () => {
-    // Add selected ingredients to form data before submission
+    // Add selected associations to form data before submission
     form.selected_ingredients = selectedIngredients.value
     
     form.post("/recipes", {
@@ -791,6 +951,15 @@ const submit = () => {
             form.selected_products = []
             form.selected_contents = []
             selectedIngredients.value = []
+            form.selected_cuisines = []
+            form.reset()
+            form.selected_products = []
+            form.selected_contents = []
+            selectedIngredients.value = []
+            form.selected_cuisines = []
+            cuisineSearchTerm.value = ''
+            cuisineSearchResults.value = []
+            cuisineShowDropdown.value = false
             
             // Clear form ID to indicate new recipe creation
             form.id = null

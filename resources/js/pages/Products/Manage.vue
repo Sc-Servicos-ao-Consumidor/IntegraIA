@@ -44,7 +44,7 @@
                 <form @submit.prevent="submit">
                 <div class="space-y-8">
                     <!-- Informações do Produto -->
-                    <section class="bg-gray-50 p-6 rounded-lg">
+                    <div>
                         <h3 class="text-base font-semibold text-gray-900 mb-4">Informações do Produto</h3>
                         
                         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -100,10 +100,10 @@
                                 />
                             </div>
                         </div>
-                    </section>
+                    </div>
 
                     <!-- Embalagens -->
-                    <section class="bg-gray-50 p-6 rounded-lg">
+                    <div>
                         <h3 class="text-base font-semibold text-gray-900 mb-4">Informações do Produto</h3>
                         
                         <div class="space-y-4">
@@ -119,15 +119,15 @@
                                 ></textarea>
                             </div>
                         </div>
-                    </section>
+                    </div>
 
                     <!-- Product Specifications -->
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         <!-- Left Column -->
                         <div class="space-y-6">
                             <!-- Especificação do Produto -->
-                            <div class="bg-gray-50 p-4 rounded-lg">
-                                <label for="especificacao_produto" class="block text-sm font-medium text-gray-700 mb-2">Especificação do Produto</label>
+                            <div>
+                                <label for="especificacao_produto" class="block text-sm font-medium text-gray-700 mb-1">Especificação do Produto</label>
                                 <textarea
                                     v-model="form.especificacao_produto"
                                     id="especificacao_produto"
@@ -138,19 +138,19 @@
                             </div>
 
                             <!-- Descrição Tabela da Nutricional -->
-                            <div class="bg-gray-50 p-4 rounded-lg">
-                                <label for="descricao_tabela_nutricional" class="block text-sm font-medium text-gray-700 mb-2">Descrição Tabela da Nutricional</label>
+                            <div>
+                                <label for="descricao_tabela_nutricional" class="block text-sm font-medium text-gray-700 mb-1">Descrição Tabela da Nutricional</label>
                                 <textarea
                                     v-model="form.descricao_tabela_nutricional"
                                     id="descricao_tabela_nutricional"
-                                    rows="4"
+                                    rows="6"
                                     placeholder="Informações nutricionais do produto..."
                                     class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-vertical"
                                 ></textarea>
                             </div>
 
                             <!-- Imagem Tabela Nutricional -->
-                            <div class="bg-gray-50 p-4 rounded-lg">
+                            <!-- <div class="bg-gray-50 p-4 rounded-lg">
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Imagem Tabela Nutricional</label>
                                 <div class="border border-dashed border-gray-300 rounded-md p-4 text-center">
                                     <input
@@ -160,10 +160,10 @@
                                         class="w-full border-0 text-center text-sm focus:outline-none cursor-not-allowed"
                                         disabled
                                     />
-                                </div>
+                                </div> -->
                                 
                                 <!-- Imagens Cadastradas -->
-                                <div class="mt-3">
+                                <!-- <div class="mt-3">
                                     <p class="text-xs text-gray-600 mb-2">Imagens Cadastradas</p>
                                     <div class="grid grid-cols-2 gap-2">
                                         <div v-for="i in 2" :key="i" class="border border-gray-300 rounded p-2 text-center bg-gray-100">
@@ -174,38 +174,28 @@
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            </div> -->
 
                             <!-- Descrição dos Modos de Preparo -->
-                            <div class="bg-gray-50 p-4 rounded-lg">
-                                <label for="descricao_modos_preparo" class="block text-sm font-medium text-gray-700 mb-2">Descrição dos Modos de Preparo</label>
+                            <div>
+                                <label for="descricao_modos_preparo" class="block text-sm font-medium text-gray-700 mb-1">Descrição dos Modos de Preparo</label>
                                 <textarea
                                     v-model="form.descricao_modos_preparo"
                                     id="descricao_modos_preparo"
-                                    rows="8"
+                                    rows="6"
                                     placeholder="Instruções de preparo..."
                                     class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-vertical"
                                 ></textarea>
                             </div>
 
-                            <!-- Descrição dos Rendimentos -->
-                            <div class="bg-gray-50 p-4 rounded-lg">
-                                <label for="descricao_rendimentos" class="block text-sm font-medium text-gray-700 mb-2">Descrição dos Rendimentos</label>
-                                <textarea
-                                    v-model="form.descricao_rendimentos"
-                                    id="descricao_rendimentos"
-                                    rows="8"
-                                    placeholder="Informações sobre rendimento..."
-                                    class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-vertical"
-                                ></textarea>
-                            </div>
+                            
                         </div>
 
                         <!-- Right Column -->
                         <div class="space-y-6">
                             <!-- Perfil de Sabor -->
-                            <div class="bg-gray-50 p-4 rounded-lg">
-                                <label for="perfil_sabor" class="block text-sm font-medium text-gray-700 mb-2">Perfil de Sabor</label>
+                            <div>
+                                <label for="perfil_sabor" class="block text-sm font-medium text-gray-700 mb-1">Perfil de Sabor</label>
                                 <textarea
                                     v-model="form.perfil_sabor"
                                     id="perfil_sabor"
@@ -215,20 +205,32 @@
                                 ></textarea>
                             </div>
 
+                            <!-- Descrição dos Rendimentos -->
+                            <div>
+                                <label for="descricao_rendimentos" class="block text-sm font-medium text-gray-700 mb-1">Descrição dos Rendimentos</label>
+                                <textarea
+                                    v-model="form.descricao_rendimentos"
+                                    id="descricao_rendimentos"
+                                    rows="6"
+                                    placeholder="Informações sobre rendimento..."
+                                    class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-vertical"
+                                ></textarea>
+                            </div>
+
                             <!-- Descrição Lista de Ingredientes -->
-                            <div class="bg-gray-50 p-4 rounded-lg">
-                                <label for="descricao_lista_ingredientes" class="block text-sm font-medium text-gray-700 mb-2">Descrição Lista de Ingredientes</label>
+                            <div>
+                                <label for="descricao_lista_ingredientes" class="block text-sm font-medium text-gray-700 mb-1">Descrição Lista de Ingredientes</label>
                                 <textarea
                                     v-model="form.descricao_lista_ingredientes"
                                     id="descricao_lista_ingredientes"
-                                    rows="4"
+                                    rows="6"
                                     placeholder="Lista de ingredientes do produto..."
                                     class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-vertical"
                                 ></textarea>
                             </div>
 
                             <!-- Imagem Lista de Ingredientes -->
-                            <div class="bg-gray-50 p-4 rounded-lg">
+                            <!-- <div class="bg-gray-50 p-4 rounded-lg">
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Imagem Lista de Ingredientes</label>
                                 <div class="border border-dashed border-gray-300 rounded-md p-4 text-center">
                                     <input
@@ -238,10 +240,10 @@
                                         class="w-full border-0 text-center text-sm focus:outline-none cursor-not-allowed"
                                         disabled
                                     />
-                                </div>
+                                </div> -->
                                 
                                 <!-- Imagens Cadastradas -->
-                                <div class="mt-3">
+                                <!-- <div class="mt-3">
                                     <p class="text-xs text-gray-600 mb-2">Imagens Cadastradas</p>
                                     <div class="grid grid-cols-2 gap-2">
                                         <div v-for="i in 2" :key="i" class="border border-gray-300 rounded p-2 text-center bg-gray-100">
@@ -252,10 +254,10 @@
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            </div> -->
 
                             <!-- Imagem dos Modos de Preparo -->
-                            <div class="bg-gray-50 p-4 rounded-lg">
+                            <!-- <div class="bg-gray-50 p-4 rounded-lg">
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Imagem dos Modos de Preparo</label>
                                 <div class="border border-dashed border-gray-300 rounded-md p-4 text-center">
                                     <input
@@ -265,10 +267,10 @@
                                         class="w-full border-0 text-center text-sm focus:outline-none cursor-not-allowed"
                                         disabled
                                     />
-                                </div>
+                                </div> -->
                                 
                                 <!-- Imagens Cadastradas -->
-                                <div class="mt-3">
+                                <!-- <div class="mt-3">
                                     <p class="text-xs text-gray-600 mb-2">Imagens Cadastradas</p>
                                     <div class="grid grid-cols-2 gap-2">
                                         <div v-for="i in 2" :key="i" class="border border-gray-300 rounded p-2 text-center bg-gray-100">
@@ -279,10 +281,10 @@
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            </div> -->
 
                             <!-- Imagem dos Rendimentos -->
-                            <div class="bg-gray-50 p-4 rounded-lg">
+                            <!-- <div class="bg-gray-50 p-4 rounded-lg">
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Imagem dos Rendimentos</label>
                                 <div class="border border-dashed border-gray-300 rounded-md p-4 text-center">
                                     <input
@@ -292,10 +294,10 @@
                                         class="w-full border-0 text-center text-sm focus:outline-none cursor-not-allowed"
                                         disabled
                                     />
-                                </div>
+                                </div> -->
                                 
                                 <!-- Imagens Cadastradas -->
-                                <div class="mt-3">
+                                <!-- <div class="mt-3">
                                     <p class="text-xs text-gray-600 mb-2">Imagens Cadastradas</p>
                                     <div class="grid grid-cols-2 gap-2">
                                         <div v-for="i in 2" :key="i" class="border border-gray-300 rounded p-2 text-center bg-gray-100">
@@ -306,7 +308,7 @@
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            </div> -->
                         </div>
                     </div>
 
@@ -403,7 +405,7 @@
                     </div>
 
                     <!-- Additional Product Information -->
-                    <section class="bg-gray-50 p-6 rounded-lg">
+                    <div>
                         <h3 class="text-base font-semibold text-gray-900 mb-4">Informações Adicionais</h3>
                         
                         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -449,10 +451,10 @@
                                 </div>
                             </div>
                         </div>
-                    </section>
+                    </div>
 
                     <!-- Packaging Information Section -->
-                    <section class="bg-gray-50 p-6 rounded-lg mt-6">
+                    <div class="mt-6">
                         <h3 class="text-base font-semibold text-gray-900 mb-4">📦 Informações de Embalagem</h3>
                         
                         <!-- Packaging List -->
@@ -701,7 +703,7 @@
                                 </button>
                             </div>
                         </div>
-                    </section>
+                    </div>
                 </div>
 
                 <!-- Action Buttons -->
@@ -740,6 +742,16 @@
                     :subtitle="product.codigo_padrao || product.sku ? `${product.codigo_padrao ? 'Código: ' + product.codigo_padrao : ''}${product.codigo_padrao && product.sku ? ' • ' : ''}${product.sku ? 'SKU: ' + product.sku : ''}` : ''"
                     :status="product.status ? 'active' : 'inactive'"
                 >
+                    <template #associations>
+                        <div v-if="product.recipes?.length" class="flex items-center gap-2 text-sm text-gray-600">
+                            <span class="font-medium">🍳 Receitas:</span>
+                            <span>{{ product.recipes.length }} vinculado(s)</span>
+                        </div>
+                        <div v-if="product.contents?.length" class="flex items-center gap-2 text-sm text-gray-600">
+                            <span class="font-medium">📄 Conteúdos:</span>
+                            <span>{{ product.contents.length }} vinculado(s)</span>
+                        </div>
+                    </template>
                     <template #actions>
                         <button 
                             @click="editProduct(product)" 
@@ -1092,9 +1104,6 @@ function submit() {
             
             // Reset form after successful submission
             resetForm()
-            
-            // Refresh the page to show updated data
-            router.reload()
         },
         onError: (errors) => {
             console.error('Form submission errors:', errors)
