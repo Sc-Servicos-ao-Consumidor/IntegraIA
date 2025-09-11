@@ -263,7 +263,7 @@ class RecipeController extends Controller
                     ->nearestNeighbors('embedding', $embedding, Distance::Cosine)
                     ->take($limit)
                     ->where('status', true)
-                    ->with(['groupProduct', 'detail'])
+                    ->with(['groupProduct'])
                     ->get()
                     ->map(function ($product) {
                         return collect($product)->except('embedding')->toArray();
