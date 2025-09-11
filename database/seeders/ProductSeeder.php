@@ -14,7 +14,7 @@ class ProductSeeder extends Seeder
 {
     public function run(): void
     {
-        $tenantId = Tenant::where('slug', 'default')->value('id');
+        $tenantId = Tenant::where('slug', 'unilever')->value('id');
 
         // Get group products for relationships
         $basesGroup = GroupProduct::where('descricao', 'Knorr Professional - Bases e Molhos')->first();

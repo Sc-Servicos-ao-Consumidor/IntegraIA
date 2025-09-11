@@ -96,7 +96,7 @@ class ContentSeeder extends Seeder
 
     private function getContentData()
     {
-        $tenantId = Tenant::where('slug', 'default')->value('id');
+        $tenantId = Tenant::where('slug', 'unilever')->value('id');
 
         return [
             [

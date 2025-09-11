@@ -11,7 +11,7 @@ class RecipeSeeder extends Seeder
 {
     public function run(): void
     {
-        $tenantId = Tenant::where('slug', 'default')->value('id');
+        $tenantId = Tenant::where('slug', 'unilever')->value('id');
         // Get products for relationships
         $baseTomateKnorr = Product::where('descricao', 'Base de Tomate Knorr Professional')->first();
         $caldoCarneKnorr = Product::where('descricao', 'Caldo de Carne Knorr Professional')->first();

@@ -12,14 +12,12 @@ class TenantSeeder extends Seeder
     {
         // Create a default tenant
         Tenant::firstOrCreate(
-            ['slug' => 'default'],
+            ['slug' => 'unilever'],
             [
-                'name' => 'Default Tenant',
-                'domain' => null,
-                'subdomain' => 'default',
+                'name' => 'Unilever',
+                'domain' => 'unilever.com',
+                'status' => true,
             ]
         );
     }
 }
-
-

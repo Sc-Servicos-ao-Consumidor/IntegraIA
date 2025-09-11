@@ -13,7 +13,7 @@ class Tenant extends Model
         'name',
         'slug',
         'domain',
-        'subdomain',
+        'status',
     ];
 }
 
