@@ -18,8 +18,8 @@ class RecipeEmbeddingService
             $recipe->recipe_description,
             $recipe->ingredients_description,
             $recipe->preparation_method,
-            collect($recipe->main_ingredients ?? [])->implode(', '),
-            collect($recipe->supporting_ingredients ?? [])->implode(', '),
+            // todo, change to new ingredients table
+            collect($recipe->ingredients ?? [])->implode(', '),
             collect($recipe->usage_groups ?? [])->implode(', '),
             collect($recipe->preparation_techniques ?? [])->implode(', '),
             collect($recipe->consumption_occasion ?? [])->implode(', '),

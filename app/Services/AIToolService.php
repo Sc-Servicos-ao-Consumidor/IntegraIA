@@ -206,7 +206,6 @@ class AIToolService
                     'preparation_time' => $recipe->preparation_time,
                     'yield' => $recipe->yield,
                     'recipe_description' => $recipe->recipe_description,
-                    'main_ingredients' => $recipe->main_ingredients,
                     'products_count' => $recipe->products->count(),
                 ];
             });
@@ -320,8 +319,6 @@ class AIToolService
                 'recipe_description' => $recipe->recipe_description,
                 'ingredients_description' => $recipe->ingredients_description,
                 'preparation_method' => $recipe->preparation_method,
-                'main_ingredients' => $recipe->main_ingredients,
-                'supporting_ingredients' => $recipe->supporting_ingredients,
                 'usage_groups' => $recipe->usage_groups,
                 'preparation_techniques' => $recipe->preparation_techniques,
                 'consumption_occasion' => $recipe->consumption_occasion,

@@ -60,8 +60,6 @@ class RecipeController extends Controller
             'preparation_method' => 'string',
             
             // Array fields (stored as JSON)
-            'main_ingredients' => 'required|array',
-            'supporting_ingredients' => 'nullable|array',
             'usage_groups' => 'nullable|array',
             'preparation_techniques' => 'nullable|array',
             'consumption_occasion' => 'nullable|array',

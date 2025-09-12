@@ -28,16 +28,12 @@ class Recipe extends Model
         'recipe_prompt',
         'ingredients_description',
         'preparation_method',
-        'main_ingredients',
-        'supporting_ingredients',
         'usage_groups',
         'preparation_techniques',
         'consumption_occasion',
     ];
 
     protected $casts = [
-        'main_ingredients' => 'array',
-        'supporting_ingredients' => 'array',
         'usage_groups' => 'array',
         'preparation_techniques' => 'array',
         'consumption_occasion' => 'array',

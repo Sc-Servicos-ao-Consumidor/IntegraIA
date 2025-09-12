@@ -845,8 +845,6 @@ const form = useForm({
     recipe_prompt: null,
     ingredients_description: null,
     preparation_method: null,
-    main_ingredients: [],
-    supporting_ingredients: [],
     usage_groups: [],
     preparation_techniques: [],
     consumption_occasion: [],
@@ -890,8 +888,6 @@ function editRecipe(recipe) {
     form.recipe_prompt = recipe.recipe_prompt || ''
     form.ingredients_description = recipe.ingredients_description
     form.preparation_method = recipe.preparation_method
-    form.main_ingredients = recipe.main_ingredients || []
-    form.supporting_ingredients = recipe.supporting_ingredients || []
     form.usage_groups = recipe.usage_groups || []
     form.preparation_techniques = recipe.preparation_techniques || []
     form.consumption_occasion = recipe.consumption_occasion || []
