@@ -25,7 +25,7 @@
                 </div>
                 <button
                     @click="removeToast(toast.id)"
-                    class="ml-2 text-white hover:text-gray-200 focus:outline-none"
+                    class="ml-2 text-white hover:text-slate-200 focus:outline-none"
                 >
                     ×
                 </button>
@@ -45,40 +45,40 @@
                 <div class="space-y-8">
                     <!-- Informações do Produto -->
                     <div>
-                        <h3 class="text-base font-semibold text-gray-900 mb-4">Informações do Produto</h3>
+                        <h3 class="text-base font-semibold text-slate-900 dark:text-slate-100 mb-4">Informações do Produto</h3>
                         
                         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                             <!-- Código Padrão -->
                             <div>
-                                <label for="codigo_padrao" class="block text-sm font-medium text-gray-700 mb-1">Código Padrão</label>
+                                <label for="codigo_padrao" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Código Padrão</label>
                                 <input
                                     v-model="form.codigo_padrao"
                                     id="codigo_padrao"
                                     type="text"
                                     placeholder="Código interno"
-                                    class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                                    class="w-full border border-gray-300 dark:border-gray-600 dark:border-gray-600 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                                 />
                             </div>
 
                             <!-- Marca -->
                             <div>
-                                <label for="marca" class="block text-sm font-medium text-gray-700 mb-1">Marca</label>
+                                <label for="marca" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Marca</label>
                                 <input
                                     v-model="form.marca"
                                     id="marca"
                                     type="text"
                                     placeholder="Nome da marca"
-                                    class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                                    class="w-full border border-gray-300 dark:border-gray-600 dark:border-gray-600 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                                 />
                             </div>
 
                             <!-- Grupo de Produtos -->
                             <div>
-                                <label for="group_product_id" class="block text-sm font-medium text-gray-700 mb-1">Grupo de Produtos*</label>
+                                <label for="group_product_id" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Grupo de Produtos*</label>
                                 <select
                                     v-model="form.group_product_id"
                                     id="group_product_id"
-                                    class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                                    class="w-full border border-gray-300 dark:border-gray-600 dark:border-gray-600 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                                 >
                                     <option value="">Selecione</option>
                                     <option v-for="group in props.groupProducts" :key="group.id" :value="group.id">
@@ -89,13 +89,13 @@
 
                             <!-- Descrição do Produto -->
                             <div>
-                                <label for="descricao" class="block text-sm font-medium text-gray-700 mb-1">Descrição do Produto*</label>
+                                <label for="descricao" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Descrição do Produto*</label>
                                 <input
                                     v-model="form.descricao"
                                     id="descricao"
                                     type="text"
                                     placeholder="Nome do produto"
-                                    class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                                    class="w-full border border-gray-300 dark:border-gray-600 dark:border-gray-600 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                                     required
                                 />
                             </div>
@@ -104,7 +104,7 @@
 
                     <!-- Embalagens -->
                     <div>
-                        <h3 class="text-base font-semibold text-gray-900 mb-4">Informações do Produto</h3>
+                        <h3 class="text-base font-semibold text-slate-900 dark:text-slate-100 mb-4">Embalagens</h3>
                         
                         <div class="space-y-4">
                         </div>
@@ -116,32 +116,32 @@
                         <div class="space-y-6">
                             <!-- Especificação do Produto -->
                             <div>
-                                <label for="especificacao_produto" class="block text-sm font-medium text-gray-700 mb-1">Especificação do Produto</label>
+                                <label for="especificacao_produto" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Especificação do Produto</label>
                                 <textarea
                                     v-model="form.especificacao_produto"
                                     id="especificacao_produto"
                                     rows="6"
                                     placeholder="Especificações técnicas do produto..."
-                                    class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-vertical"
+                                    class="w-full border border-gray-300 dark:border-gray-600 dark:border-gray-600 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-vertical"
                                 ></textarea>
                             </div>
 
                             <!-- Descrição Tabela da Nutricional -->
                             <div>
-                                <label for="descricao_tabela_nutricional" class="block text-sm font-medium text-gray-700 mb-1">Descrição Tabela da Nutricional</label>
+                                <label for="descricao_tabela_nutricional" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Descrição Tabela da Nutricional</label>
                                 <textarea
                                     v-model="form.descricao_tabela_nutricional"
                                     id="descricao_tabela_nutricional"
                                     rows="6"
                                     placeholder="Informações nutricionais do produto..."
-                                    class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-vertical"
+                                    class="w-full border border-gray-300 dark:border-gray-600 dark:border-gray-600 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-vertical"
                                 ></textarea>
                             </div>
 
                             <!-- Imagem Tabela Nutricional -->
-                            <!-- <div class="bg-gray-50 p-4 rounded-lg">
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Imagem Tabela Nutricional</label>
-                                <div class="border border-dashed border-gray-300 rounded-md p-4 text-center">
+                            <!-- <div class="bg-slate-50 dark:bg-slate-800 p-4 rounded-lg">
+                                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Imagem Tabela Nutricional</label>
+                                <div class="border border-dashed border-gray-300 dark:border-gray-600 rounded-md p-4 text-center">
                                     <input
                                         v-model="nutritionalImageUrl"
                                         type="url"
@@ -153,13 +153,13 @@
                                 
                                 <!-- Imagens Cadastradas -->
                                 <!-- <div class="mt-3">
-                                    <p class="text-xs text-gray-600 mb-2">Imagens Cadastradas</p>
+                                    <p class="text-xs text-slate-600 dark:text-slate-400 mb-2">Imagens Cadastradas</p>
                                     <div class="grid grid-cols-2 gap-2">
-                                        <div v-for="i in 2" :key="i" class="border border-gray-300 rounded p-2 text-center bg-gray-100">
+                                        <div v-for="i in 2" :key="i" class="border border-gray-300 dark:border-gray-600 rounded p-2 text-center bg-gray-100">
                                             <div class="w-full h-12 bg-gray-200 rounded mb-1 flex items-center justify-center">
-                                                <span class="text-gray-500 text-xs">🖼️</span>
+                                                <span class="text-slate-500 dark:text-slate-400 text-xs">🖼️</span>
                                             </div>
-                                            <p class="text-xs text-gray-600">Nome da Imagem (configurado na inserção)</p>
+                                            <p class="text-xs text-slate-600 dark:text-slate-400">Nome da Imagem (configurado na inserção)</p>
                                         </div>
                                     </div>
                                 </div>
@@ -167,25 +167,25 @@
 
                             <!-- Descrição dos Modos de Preparo -->
                             <div>
-                                <label for="descricao_modos_preparo" class="block text-sm font-medium text-gray-700 mb-1">Descrição dos Modos de Preparo</label>
+                                <label for="descricao_modos_preparo" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Descrição dos Modos de Preparo</label>
                                 <textarea
                                     v-model="form.descricao_modos_preparo"
                                     id="descricao_modos_preparo"
                                     rows="6"
                                     placeholder="Instruções de preparo..."
-                                    class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-vertical"
+                                    class="w-full border border-gray-300 dark:border-gray-600 dark:border-gray-600 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-vertical"
                                 ></textarea>
                             </div>
 
                             <!-- Dicas de Utilização -->
                             <div>
-                                <label for="dicas_utilizacao" class="block text-sm font-medium text-gray-700 mb-1">Dicas de Utilização</label>
+                                <label for="dicas_utilizacao" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Dicas de Utilização</label>
                                 <textarea
                                     v-model="form.dicas_utilizacao"
                                     id="dicas_utilizacao"
                                     rows="6"
                                     placeholder="Dicas e orientações para melhor utilização do produto..."
-                                    class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-vertical"
+                                    class="w-full border border-gray-300 dark:border-gray-600 dark:border-gray-600 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-vertical"
                                 ></textarea>
                             </div>
                             
@@ -195,56 +195,56 @@
                         <div class="space-y-6">
                             <!-- Perfil de Sabor -->
                             <div>
-                                <label for="perfil_sabor" class="block text-sm font-medium text-gray-700 mb-1">Perfil de Sabor</label>
+                                <label for="perfil_sabor" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Perfil de Sabor</label>
                                 <textarea
                                     v-model="form.perfil_sabor"
                                     id="perfil_sabor"
                                     rows="6"
                                     placeholder="Características de sabor do produto..."
-                                    class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-vertical"
+                                    class="w-full border border-gray-300 dark:border-gray-600 dark:border-gray-600 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-vertical"
                                 ></textarea>
                             </div>
 
                             <!-- Descrição dos Rendimentos -->
                             <div>
-                                <label for="descricao_rendimentos" class="block text-sm font-medium text-gray-700 mb-1">Descrição dos Rendimentos</label>
+                                <label for="descricao_rendimentos" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Descrição dos Rendimentos</label>
                                 <textarea
                                     v-model="form.descricao_rendimentos"
                                     id="descricao_rendimentos"
                                     rows="6"
                                     placeholder="Informações sobre rendimento..."
-                                    class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-vertical"
+                                    class="w-full border border-gray-300 dark:border-gray-600 dark:border-gray-600 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-vertical"
                                 ></textarea>
                             </div>
 
                             <!-- Descrição Lista de Ingredientes -->
                             <div>
-                                <label for="descricao_lista_ingredientes" class="block text-sm font-medium text-gray-700 mb-1">Descrição Lista de Ingredientes</label>
+                                <label for="descricao_lista_ingredientes" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Descrição Lista de Ingredientes</label>
                                 <textarea
                                     v-model="form.descricao_lista_ingredientes"
                                     id="descricao_lista_ingredientes"
                                     rows="6"
                                     placeholder="Lista de ingredientes do produto..."
-                                    class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-vertical"
+                                    class="w-full border border-gray-300 dark:border-gray-600 dark:border-gray-600 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-vertical"
                                 ></textarea>
                             </div>
 
                             <!-- Prompt para uso das informações do Produto -->
                             <div>
-                                <label for="prompt_uso_informacoes_produto" class="block text-sm font-medium text-gray-700 mb-1">Prompt para uso das informações do Produto</label>
+                                <label for="prompt_uso_informacoes_produto" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Prompt para uso das informações do Produto</label>
                                 <textarea
                                     v-model="form.prompt_uso_informacoes_produto"
                                     id="prompt_uso_informacoes_produto"
                                     rows="6"
                                     placeholder="Descreva como usar as informações do produto..."
-                                    class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-vertical"
+                                    class="w-full border border-gray-300 dark:border-gray-600 dark:border-gray-600 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-vertical"
                                 ></textarea>
                             </div>
 
                             <!-- Imagem Lista de Ingredientes -->
-                            <!-- <div class="bg-gray-50 p-4 rounded-lg">
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Imagem Lista de Ingredientes</label>
-                                <div class="border border-dashed border-gray-300 rounded-md p-4 text-center">
+                            <!-- <div class="bg-slate-50 dark:bg-slate-800 p-4 rounded-lg">
+                                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Imagem Lista de Ingredientes</label>
+                                <div class="border border-dashed border-gray-300 dark:border-gray-600 rounded-md p-4 text-center">
                                     <input
                                         v-model="ingredientsImageUrl"
                                         type="url"
@@ -256,22 +256,22 @@
                                 
                                 <!-- Imagens Cadastradas -->
                                 <!-- <div class="mt-3">
-                                    <p class="text-xs text-gray-600 mb-2">Imagens Cadastradas</p>
+                                    <p class="text-xs text-slate-600 dark:text-slate-400 mb-2">Imagens Cadastradas</p>
                                     <div class="grid grid-cols-2 gap-2">
-                                        <div v-for="i in 2" :key="i" class="border border-gray-300 rounded p-2 text-center bg-gray-100">
+                                        <div v-for="i in 2" :key="i" class="border border-gray-300 dark:border-gray-600 rounded p-2 text-center bg-gray-100">
                                             <div class="w-full h-12 bg-gray-200 rounded mb-1 flex items-center justify-center">
-                                                <span class="text-gray-500 text-xs">🖼️</span>
+                                                <span class="text-slate-500 dark:text-slate-400 text-xs">🖼️</span>
                                             </div>
-                                            <p class="text-xs text-gray-600">Nome da Imagem (configurado na inserção)</p>
+                                            <p class="text-xs text-slate-600 dark:text-slate-400">Nome da Imagem (configurado na inserção)</p>
                                         </div>
                                     </div>
                                 </div>
                             </div> -->
 
                             <!-- Imagem dos Modos de Preparo -->
-                            <!-- <div class="bg-gray-50 p-4 rounded-lg">
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Imagem dos Modos de Preparo</label>
-                                <div class="border border-dashed border-gray-300 rounded-md p-4 text-center">
+                            <!-- <div class="bg-slate-50 dark:bg-slate-800 p-4 rounded-lg">
+                                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Imagem dos Modos de Preparo</label>
+                                <div class="border border-dashed border-gray-300 dark:border-gray-600 rounded-md p-4 text-center">
                                     <input
                                         v-model="preparationImageUrl"
                                         type="url"
@@ -283,22 +283,22 @@
                                 
                                 <!-- Imagens Cadastradas -->
                                 <!-- <div class="mt-3">
-                                    <p class="text-xs text-gray-600 mb-2">Imagens Cadastradas</p>
+                                    <p class="text-xs text-slate-600 dark:text-slate-400 mb-2">Imagens Cadastradas</p>
                                     <div class="grid grid-cols-2 gap-2">
-                                        <div v-for="i in 2" :key="i" class="border border-gray-300 rounded p-2 text-center bg-gray-100">
+                                        <div v-for="i in 2" :key="i" class="border border-gray-300 dark:border-gray-600 rounded p-2 text-center bg-gray-100">
                                             <div class="w-full h-12 bg-gray-200 rounded mb-1 flex items-center justify-center">
-                                                <span class="text-gray-500 text-xs">🖼️</span>
+                                                <span class="text-slate-500 dark:text-slate-400 text-xs">🖼️</span>
                                             </div>
-                                            <p class="text-xs text-gray-600">Nome da Imagem (configurado na inserção)</p>
+                                            <p class="text-xs text-slate-600 dark:text-slate-400">Nome da Imagem (configurado na inserção)</p>
                                         </div>
                                     </div>
                                 </div>
                             </div> -->
 
                             <!-- Imagem dos Rendimentos -->
-                            <!-- <div class="bg-gray-50 p-4 rounded-lg">
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Imagem dos Rendimentos</label>
-                                <div class="border border-dashed border-gray-300 rounded-md p-4 text-center">
+                            <!-- <div class="bg-slate-50 dark:bg-slate-800 p-4 rounded-lg">
+                                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Imagem dos Rendimentos</label>
+                                <div class="border border-dashed border-gray-300 dark:border-gray-600 rounded-md p-4 text-center">
                                     <input
                                         v-model="yieldsImageUrl"
                                         type="url"
@@ -310,13 +310,13 @@
                                 
                                 <!-- Imagens Cadastradas -->
                                 <!-- <div class="mt-3">
-                                    <p class="text-xs text-gray-600 mb-2">Imagens Cadastradas</p>
+                                    <p class="text-xs text-slate-600 dark:text-slate-400 mb-2">Imagens Cadastradas</p>
                                     <div class="grid grid-cols-2 gap-2">
-                                        <div v-for="i in 2" :key="i" class="border border-gray-300 rounded p-2 text-center bg-gray-100">
+                                        <div v-for="i in 2" :key="i" class="border border-gray-300 dark:border-gray-600 rounded p-2 text-center bg-gray-100">
                                             <div class="w-full h-12 bg-gray-200 rounded mb-1 flex items-center justify-center">
-                                                <span class="text-gray-500 text-xs">🖼️</span>
+                                                <span class="text-slate-500 dark:text-slate-400 text-xs">🖼️</span>
                                             </div>
-                                            <p class="text-xs text-gray-600">Nome da Imagem (configurado na inserção)</p>
+                                            <p class="text-xs text-slate-600 dark:text-slate-400">Nome da Imagem (configurado na inserção)</p>
                                         </div>
                                     </div>
                                 </div>
@@ -325,8 +325,8 @@
                     </div>
 
                     <!-- Connections Section -->
-                    <div class="mt-8 pt-6 border-t border-gray-200">
-                        <h3 class="text-lg font-semibold text-gray-900 mb-4">🔗 Conexões e Associações</h3>
+                    <div class="mt-8 pt-6">
+                        <h3 class="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-4">🔗 Conexões e Associações</h3>
                         
                         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                             <!-- Recipe Associations -->
@@ -338,7 +338,7 @@
                                 >
                                     <select
                                         v-model="recipe.recipe_id"
-                                        class="flex-1 border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                                        class="flex-1 border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                                     >
                                         <option value="">Selecione uma receita...</option>
                                         <option v-for="availableRecipe in props.recipes" :key="availableRecipe.id" :value="availableRecipe.id">
@@ -353,9 +353,9 @@
                                                 v-model="recipe.top_dish"
                                                 :true-value="true"
                                                 :false-value="false"
-                                                class="w-4 h-4 text-orange-600 bg-gray-100 border-gray-300 rounded focus:ring-orange-500 focus:ring-2"
+                                                class="w-4 h-4 text-orange-600 bg-gray-100 border-gray-300 dark:border-gray-600 rounded focus:ring-orange-500 focus:ring-2"
                                             />
-                                            <span class="text-gray-700">Top Dish</span>
+                                            <span class="text-slate-700 dark:text-slate-300">Top Dish</span>
                                         </label>
                                     </template>
                                     
@@ -363,6 +363,7 @@
                                         <button 
                                             type="button"
                                             @click="removeRecipe(index)"
+                                            class="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 text-sm font-medium px-3 py-2 rounded-md hover:bg-red-50 dark:hover:bg-red-900 transition-colors"
                                         >
                                             Remover
                                         </button>
@@ -372,7 +373,7 @@
                                 <button 
                                     type="button"
                                     @click="addRecipe"
-                                    class="text-orange-600 hover:text-orange-800 text-sm font-medium px-3 py-2 border border-orange-300 rounded-md hover:bg-orange-50 transition-colors"
+                                    class="text-orange-600 dark:text-orange-400 hover:text-orange-800 dark:hover:text-orange-300 text-sm font-medium px-3 py-2 border border-orange-300 dark:border-orange-600 rounded-md hover:bg-orange-50 dark:hover:bg-orange-900 transition-colors"
                                 >
                                     + Adicionar Receita
                                 </button>
@@ -387,7 +388,7 @@
                                 >
                                     <select
                                         v-model="content.content_id"
-                                        class="flex-1 border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                        class="flex-1 border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                                     >
                                         <option value="">Selecione um conteúdo...</option>
                                         <option v-for="availableContent in props.contents" :key="availableContent.id" :value="availableContent.id">
@@ -399,6 +400,7 @@
                                         <button 
                                             type="button"
                                             @click="removeContent(index)"
+                                            class="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 text-sm font-medium px-3 py-2 rounded-md hover:bg-red-50 dark:hover:bg-red-900 transition-colors"
                                         >
                                             Remover
                                         </button>
@@ -408,7 +410,7 @@
                                 <button 
                                     type="button"
                                     @click="addContent"
-                                    class="text-blue-600 hover:text-blue-800 text-sm font-medium px-3 py-2 border border-blue-300 rounded-md hover:bg-blue-50 transition-colors"
+                                    class="text-orange-600 dark:text-orange-400 hover:text-orange-800 dark:hover:text-orange-300 text-sm font-medium px-3 py-2 border border-orange-300 dark:border-orange-600 rounded-md hover:bg-orange-50 dark:hover:bg-orange-900 transition-colors"
                                 >
                                     + Adicionar Conteúdo
                                 </button>
@@ -419,32 +421,32 @@
 
                         <!-- Status Checkboxes -->
                     <div class="mt-6 space-y-3">
-                        <h4 class="text-sm font-medium text-gray-700">Status do Produto</h4>
+                        <h4 class="text-sm font-medium text-slate-700 dark:text-slate-300">Status do Produto</h4>
                         <div class="flex flex-wrap gap-6">
                             <div class="flex items-center">
                                 <input
                                     v-model="form.status"
                                     id="status"
                                     type="checkbox"
-                                    class="h-4 w-4 text-orange-600 focus:ring-orange-500 border-gray-300 rounded"
+                                    class="h-4 w-4 text-orange-600 focus:ring-orange-500 border-gray-300 dark:border-gray-600 rounded"
                                 />
-                                <label for="status" class="ml-2 text-sm text-gray-700">Produto Ativo</label>
+                                <label for="status" class="ml-2 text-sm text-slate-700 dark:text-slate-300">Produto Ativo</label>
                             </div>
                         </div>
                     </div>
 
                     <!-- Packaging Information Section -->
                     <div class="mt-6">
-                        <h3 class="text-base font-semibold text-gray-900 mb-4">📦 Informações de Embalagem</h3>
+                        <h3 class="text-base font-semibold text-slate-900 dark:text-slate-100 mb-4">📦 Informações de Embalagem</h3>
                         
                         <!-- Packaging List -->
                         <div v-if="form.packagings && form.packagings.length > 0" class="mb-6">
-                            <h4 class="text-sm font-medium text-gray-700 mb-3">Embalagens Cadastradas</h4>
+                            <h4 class="text-sm font-medium text-slate-700 dark:text-slate-300 mb-3">Embalagens Cadastradas</h4>
                             <div class="space-y-3">
                                 <div
                                     v-for="(packaging, index) in form.packagings"
                                     :key="index"
-                                    class="border border-gray-200 rounded-lg p-4 bg-white"
+                                    class="border border-gray-200 dark:border-gray-700 dark:border-gray-700 rounded-lg p-4 bg-white dark:bg-card"
                                 >
                                     <div class="flex items-center justify-between mb-3">
                                         <div class="flex items-center space-x-3">
@@ -452,8 +454,8 @@
                                                 <span class="text-orange-600 text-sm">📦</span>
                                             </div>
                                             <div>
-                                                <h5 class="font-medium text-gray-900">{{ packaging.descricao || 'Embalagem sem descrição' }}</h5>
-                                                <p class="text-sm text-gray-600">
+                                                <h5 class="font-medium text-slate-900 dark:text-slate-100">{{ packaging.descricao || 'Embalagem sem descrição' }}</h5>
+                                                <p class="text-sm text-slate-600 dark:text-slate-400">
                                                     {{ packaging.codigo_padrao ? `Código: ${packaging.codigo_padrao}` : '' }}
                                                     {{ packaging.sku ? `SKU: ${packaging.sku}` : '' }}
                                                 </p>
@@ -477,7 +479,7 @@
                                             <button
                                                 type="button"
                                                 @click="removePackaging(index)"
-                                                class="text-gray-600 hover:text-gray-800 text-sm font-medium"
+                                                class="text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:text-slate-300 text-sm font-medium"
                                             >
                                             </button>
                                         </div>
@@ -485,19 +487,19 @@
                                     
                                     <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
                                         <div>
-                                            <span class="text-gray-500">Tipo:</span>
+                                            <span class="text-slate-500 dark:text-slate-400">Tipo:</span>
                                             <span class="ml-1 font-medium">{{ packaging.embalagem_tipo || 'N/A' }}</span>
                                         </div>
                                         <div>
-                                            <span class="text-gray-500">Qtd/Caixa:</span>
+                                            <span class="text-slate-500 dark:text-slate-400">Qtd/Caixa:</span>
                                             <span class="ml-1 font-medium">{{ packaging.quantidade_caixa || 'N/A' }}</span>
                                         </div>
                                         <div>
-                                            <span class="text-gray-500">Peso Líquido:</span>
+                                            <span class="text-slate-500 dark:text-slate-400">Peso Líquido:</span>
                                             <span class="ml-1 font-medium">{{ packaging.peso_liquido ? `${packaging.peso_liquido}kg` : 'N/A' }}</span>
                                         </div>
                                         <div>
-                                            <span class="text-gray-500">Peso Bruto:</span>
+                                            <span class="text-slate-500 dark:text-slate-400">Peso Bruto:</span>
                                             <span class="ml-1 font-medium">{{ packaging.peso_bruto ? `${packaging.peso_bruto}kg` : 'N/A' }}</span>
                                         </div>
                                     </div>
@@ -505,73 +507,73 @@
                             </div>
                         </div>
                         <div v-else class="mb-6">
-                            <div class="p-4 bg-gray-50 border border-dashed border-gray-300 rounded-lg text-sm text-gray-600">
+                            <div class="p-4 bg-slate-50 dark:bg-slate-800 border border-dashed border-gray-300 dark:border-gray-600 rounded-lg text-sm text-slate-600 dark:text-slate-400">
                                 Nenhuma embalagem cadastrada ainda.
                             </div>
                         </div>
 
                         <!-- Note about packaging management -->
                         <!-- <div class="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                            <p class="text-sm text-blue-800">
+                            <p class="text-sm text-orange-800 dark:text-orange-200">
                                 💡 <strong>Nota:</strong> As embalagens são criadas automaticamente quando você salva um produto pela primeira vez. 
                                 Use o botão "Editar" para atualizar as informações da embalagem.
                             </p>
                         </div> -->
 
                         <!-- Packaging Form -->
-                        <div v-if="showPackagingForm" class="border border-gray-200 rounded-lg p-4 bg-white">
-                            <h4 class="text-sm font-medium text-gray-700 mb-4">
+                        <div v-if="showPackagingForm" class="border border-gray-200 dark:border-gray-700 dark:border-gray-700 rounded-lg p-4 bg-white dark:bg-card">
+                            <h4 class="text-sm font-medium text-slate-700 dark:text-slate-300 mb-4">
                                 Editar Embalagem
                             </h4>
                             
                             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                                 <!-- Basic Information -->
                                 <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Descrição*</label>
+                                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Descrição*</label>
                                     <input
                                         v-model="packagingForm.descricao"
                                         type="text"
                                         placeholder="Descrição da embalagem"
-                                        class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                                        class="w-full border border-gray-300 dark:border-gray-600 dark:border-gray-600 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                                         required
                                     />
                                 </div>
 
                                 <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Código Padrão</label>
+                                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Código Padrão</label>
                                     <input
                                         v-model="packagingForm.codigo_padrao"
                                         type="text"
                                         placeholder="Código interno"
-                                        class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                                        class="w-full border border-gray-300 dark:border-gray-600 dark:border-gray-600 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                                     />
                                 </div>
 
                                 <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">SKU</label>
+                                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">SKU</label>
                                     <input
                                         v-model="packagingForm.sku"
                                         type="text"
                                         placeholder="Stock Keeping Unit"
-                                        class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                                        class="w-full border border-gray-300 dark:border-gray-600 dark:border-gray-600 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                                     />
                                 </div>
 
                                 <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">EAN</label>
+                                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">EAN</label>
                                     <input
                                         v-model="packagingForm.ean"
                                         type="text"
                                         placeholder="Código de Barras"
-                                        class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                                        class="w-full border border-gray-300 dark:border-gray-600 dark:border-gray-600 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                                     />
                                 </div>
 
                                 <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Tipo de Embalagem</label>
+                                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Tipo de Embalagem</label>
                                     <select
                                         v-model="packagingForm.embalagem_tipo"
-                                        class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                                        class="w-full border border-gray-300 dark:border-gray-600 dark:border-gray-600 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                                     >
                                         <option value="">Selecione...</option>
                                         <option value="kg">Quilogramas (kg)</option>
@@ -589,93 +591,93 @@
                                 </div>
 
                                 <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Quantidade por Caixa</label>
+                                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Quantidade por Caixa</label>
                                     <input
                                         v-model="packagingForm.quantidade_caixa"
                                         type="text"
                                         placeholder="Ex: 12 unidades"
-                                        class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                                        class="w-full border border-gray-300 dark:border-gray-600 dark:border-gray-600 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                                     />
                                 </div>
 
                                 <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Peso Líquido (kg)</label>
+                                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Peso Líquido (kg)</label>
                                     <input
                                         v-model="packagingForm.peso_liquido"
                                         type="number"
                                         step="0.01"
                                         min="0"
                                         placeholder="0.00"
-                                        class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                                        class="w-full border border-gray-300 dark:border-gray-600 dark:border-gray-600 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                                     />
                                 </div>
 
                                 <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Peso Bruto (kg)</label>
+                                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Peso Bruto (kg)</label>
                                     <input
                                         v-model="packagingForm.peso_bruto"
                                         type="number"
                                         step="0.01"
                                         min="0"
                                         placeholder="0.00"
-                                        class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                                        class="w-full border border-gray-300 dark:border-gray-600 dark:border-gray-600 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                                     />
                                 </div>
 
                                 <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Data de Validade</label>
+                                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Data de Validade</label>
                                     <input
                                         v-model="packagingForm.validade"
                                         type="date"
-                                        class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                                        class="w-full border border-gray-300 dark:border-gray-600 dark:border-gray-600 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                                     />
                                 </div>
                             </div>
 
                             <!-- AI Specifications -->
                             <div class="mt-4">
-                                <label class="block text-sm font-medium text-gray-700 mb-2">🤖 Especificações para IA</label>
+                                <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">🤖 Especificações para IA</label>
                                 <textarea
                                     v-model="packagingForm.prompt_especificacao_embalagens"
                                     rows="4"
                                     placeholder="Descreva detalhadamente as especificações da embalagem para geração de conteúdo por IA..."
-                                    class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-vertical"
+                                    class="w-full border border-gray-300 dark:border-gray-600 dark:border-gray-600 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-vertical"
                                 ></textarea>
-                                <p class="text-xs text-gray-500 mt-1">
+                                <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">
                                     Este texto será usado para gerar descrições automáticas da embalagem
                                 </p>
                             </div>
 
                             <!-- Status -->
                             <div class="mt-4 space-y-3">
-                                <h5 class="text-sm font-medium text-gray-700">Status da Embalagem</h5>
+                                <h5 class="text-sm font-medium text-slate-700 dark:text-slate-300">Status da Embalagem</h5>
                                 <div class="flex flex-wrap gap-6">
                                     <div class="flex items-center">
                                         <input
                                             v-model="packagingForm.status"
                                             type="checkbox"
-                                            class="h-4 w-4 text-orange-600 focus:ring-orange-500 border-gray-300 rounded"
+                                            class="h-4 w-4 text-orange-600 focus:ring-orange-500 border-gray-300 dark:border-gray-600 rounded"
                                         />
-                                        <label class="ml-2 text-sm text-gray-700">Embalagem Ativa</label>
+                                        <label class="ml-2 text-sm text-slate-700 dark:text-slate-300">Embalagem Ativa</label>
                                     </div>
                                     
                                     <div class="flex items-center">
                                         <input
                                             v-model="packagingForm.descontinuado"
                                             type="checkbox"
-                                            class="h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300 rounded"
+                                            class="h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300 dark:border-gray-600 rounded"
                                         />
-                                        <label class="ml-2 text-sm text-gray-700">Embalagem Descontinuada</label>
+                                        <label class="ml-2 text-sm text-slate-700 dark:text-slate-300">Embalagem Descontinuada</label>
                                     </div>
                                 </div>
                             </div>
 
                             <!-- Packaging Form Actions -->
-                            <div class="flex gap-3 mt-6 pt-4 border-t border-gray-200">
+                            <div class="flex gap-3 mt-6 pt-4">
                                 <button
                                     type="button"
                                     @click="cancelPackagingForm"
-                                    class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"
+                                    class="px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 dark:text-gray-300 bg-white dark:bg-secondary border border-gray-300 dark:border-gray-600 dark:border-gray-600 rounded-md hover:bg-slate-50 dark:bg-slate-800 dark:hover:bg-accent focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"
                                 >
                                     Cancelar
                                 </button>
@@ -692,11 +694,11 @@
                 </div>
 
                 <!-- Action Buttons -->
-                <div class="flex gap-3 mt-8 pt-6 border-t border-gray-200">
+                <div class="flex gap-3 mt-8 pt-6">
                     <button
                         type="button"
                         @click="confirmResetForm"
-                        class="px-6 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"
+                        class="px-6 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 dark:text-gray-300 bg-white dark:bg-secondary border border-gray-300 dark:border-gray-600 dark:border-gray-600 rounded-md hover:bg-slate-50 dark:bg-slate-800 dark:hover:bg-accent focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"
                     >
                         {{ form.id ? 'Cancelar' : 'Limpar' }}
                     </button>
@@ -728,11 +730,11 @@
                     :status="product.status ? 'active' : 'inactive'"
                 >
                     <template #associations>
-                        <div v-if="product.recipes?.length" class="flex items-center gap-2 text-sm text-gray-600">
+                        <div v-if="product.recipes?.length" class="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
                             <span class="font-medium">🍳 Receitas:</span>
                             <span>{{ product.recipes.length }} vinculado(s)</span>
                         </div>
-                        <div v-if="product.contents?.length" class="flex items-center gap-2 text-sm text-gray-600">
+                        <div v-if="product.contents?.length" class="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
                             <span class="font-medium">📄 Conteúdos:</span>
                             <span>{{ product.contents.length }} vinculado(s)</span>
                         </div>

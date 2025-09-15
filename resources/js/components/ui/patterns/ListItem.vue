@@ -25,13 +25,13 @@ const statusVariants = {
 }
 
 const badgeVariants = {
-  gray: 'bg-gray-50 text-gray-700 border-gray-200',
-  blue: 'bg-blue-50 text-blue-700 border-blue-200',
-  green: 'bg-green-50 text-green-700 border-green-200',
-  red: 'bg-red-50 text-red-700 border-red-200',
-  yellow: 'bg-yellow-50 text-yellow-700 border-yellow-200',
-  purple: 'bg-purple-50 text-purple-700 border-purple-200',
-  orange: 'bg-orange-50 text-orange-700 border-orange-200'
+  gray: 'bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-gray-700',
+  blue: 'bg-orange-50 dark:bg-slate-800 text-orange-700 dark:text-slate-300 border-orange-200 dark:border-gray-700',
+  green: 'bg-orange-50 dark:bg-slate-800 text-orange-700 dark:text-slate-300 border-orange-200 dark:border-gray-700',
+  red: 'bg-red-50 dark:bg-slate-800 text-red-700 dark:text-slate-300 border-red-200 dark:border-gray-700',
+  yellow: 'bg-orange-50 dark:bg-slate-800 text-orange-700 dark:text-slate-300 border-orange-200 dark:border-gray-700',
+  purple: 'bg-orange-50 dark:bg-slate-800 text-orange-700 dark:text-slate-300 border-orange-200 dark:border-gray-700',
+  orange: 'bg-orange-50 dark:bg-slate-800 text-orange-700 dark:text-slate-300 border-orange-200 dark:border-gray-700'
 }
 </script>
 
@@ -39,7 +39,7 @@ const badgeVariants = {
   <div
     :class="
       cn(
-        'border border-gray-200 rounded-md p-4 bg-gray-50',
+        'border border-gray-200 dark:border-gray-700 rounded-md p-4 bg-white dark:bg-card shadow-sm',
         props.class
       )
     "
@@ -48,7 +48,7 @@ const badgeVariants = {
       <div class="flex-1">
         <!-- Header with title and badges -->
         <div class="flex items-center gap-2 mb-2">
-          <h3 class="font-medium text-gray-900">{{ title }}</h3>
+          <h3 class="font-medium text-slate-900 dark:text-slate-100">{{ title }}</h3>
           
           <!-- Status Badge -->
           <span 
@@ -74,12 +74,12 @@ const badgeVariants = {
         </div>
         
         <!-- Subtitle -->
-        <div v-if="subtitle" class="text-xs text-gray-500 space-y-1 mb-2">
+        <div v-if="subtitle" class="text-xs text-slate-500 dark:text-slate-400 space-y-1 mb-2">
           {{ subtitle }}
         </div>
         
         <!-- Description -->
-        <p v-if="description" class="text-sm text-gray-600 mt-2 line-clamp-2">
+        <p v-if="description" class="text-sm text-slate-600 dark:text-slate-400 mt-2 line-clamp-2">
           {{ description }}
         </p>
         

@@ -25,39 +25,39 @@ const typeConfig = {
 
 const colorVariants = {
   orange: {
-    bg: 'bg-orange-100',
-    text: 'text-orange-900',
-    border: 'border-orange-200',
-    icon: 'bg-orange-100',
-    iconText: 'text-orange-600'
+    bg: 'bg-orange-100 dark:bg-slate-800',
+    text: 'text-orange-900 dark:text-slate-100',
+    border: 'border-orange-200 dark:border-gray-700',
+    icon: 'bg-orange-100 dark:bg-slate-800',
+    iconText: 'text-orange-600 dark:text-slate-400'
   },
   blue: {
-    bg: 'bg-blue-100',
-    text: 'text-blue-900',
-    border: 'border-blue-200',
-    icon: 'bg-blue-100',
-    iconText: 'text-blue-600'
+    bg: 'bg-orange-100 dark:bg-slate-800',
+    text: 'text-orange-900 dark:text-slate-100',
+    border: 'border-orange-200 dark:border-gray-700',
+    icon: 'bg-orange-100 dark:bg-slate-800',
+    iconText: 'text-orange-600 dark:text-slate-400'
   },
   green: {
-    bg: 'bg-green-100',
-    text: 'text-green-900',
-    border: 'border-green-200',
-    icon: 'bg-green-100',
-    iconText: 'text-green-600'
+    bg: 'bg-orange-100 dark:bg-slate-800',
+    text: 'text-orange-900 dark:text-slate-100',
+    border: 'border-orange-200 dark:border-gray-700',
+    icon: 'bg-orange-100 dark:bg-slate-800',
+    iconText: 'text-orange-600 dark:text-slate-400'
   },
   purple: {
-    bg: 'bg-purple-100',
-    text: 'text-purple-900',
-    border: 'border-purple-200',
-    icon: 'bg-purple-100',
-    iconText: 'text-purple-600'
+    bg: 'bg-orange-100 dark:bg-slate-800',
+    text: 'text-orange-900 dark:text-slate-100',
+    border: 'border-orange-200 dark:border-gray-700',
+    icon: 'bg-orange-100 dark:bg-slate-800',
+    iconText: 'text-orange-600 dark:text-slate-400'
   },
   yellow: {
-    bg: 'bg-yellow-100',
-    text: 'text-yellow-900',
-    border: 'border-yellow-200',
-    icon: 'bg-yellow-100',
-    iconText: 'text-yellow-600'
+    bg: 'bg-orange-100 dark:bg-slate-800',
+    text: 'text-orange-900 dark:text-slate-100',
+    border: 'border-orange-200 dark:border-gray-700',
+    icon: 'bg-orange-100 dark:bg-slate-800',
+    iconText: 'text-orange-600 dark:text-slate-400'
   }
 }
 
@@ -69,7 +69,7 @@ const colors = colorVariants[config.color]
   <div
     :class="
       cn(
-        'bg-gray-50 p-4 rounded-lg',
+        'bg-white dark:bg-card p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700',
         props.class
       )
     "
@@ -86,14 +86,14 @@ const colors = colorVariants[config.color]
     >
       <div class="flex items-center gap-2">
         <span class="text-lg">{{ config.icon }}</span>
-        <h4 class="text-sm font-semibold">{{ title || `${type} Connections` }}</h4>
+        <h4 class="text-base font-bold">{{ title || `${type} Connections` }}</h4>
       </div>
       <p v-if="subtitle" class="text-xs mt-1 opacity-80">{{ subtitle }}</p>
     </div>
 
     <!-- Content -->
     <div class="space-y-3">
-      <p class="text-sm font-medium text-gray-700">
+      <p class="text-sm font-medium text-slate-700 dark:text-slate-300 mb-3">
         {{ title || `${type}s` }} Vinculados
       </p>
       <div class="space-y-2">

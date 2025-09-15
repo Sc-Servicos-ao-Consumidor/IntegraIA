@@ -21,7 +21,7 @@ const props = withDefaults(defineProps<Props>(), {
   <div
     :class="
       cn(
-        'bg-white rounded-lg shadow-sm border border-gray-200 p-8 min-h-[400px]',
+        'bg-white dark:bg-card rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-8 min-h-[400px]',
         props.class
       )
     "
@@ -29,12 +29,12 @@ const props = withDefaults(defineProps<Props>(), {
     <!-- Header Section -->
     <div v-if="title || subtitle || icon" class="mb-6">
       <div class="flex items-center gap-3">
-        <span v-if="icon" class="text-xl">{{ icon }}</span>
+        <span v-if="icon" class="text-2xl">{{ icon }}</span>
         <div>
-          <h2 v-if="title" class="text-lg font-semibold text-gray-900">
+          <h2 v-if="title" class="text-xl font-bold text-slate-900 dark:text-slate-100">
             {{ title }}
           </h2>
-          <p v-if="subtitle" class="text-sm text-gray-600 mt-1">
+          <p v-if="subtitle" class="text-sm text-slate-600 dark:text-slate-400 mt-1">
             {{ subtitle }}
           </p>
         </div>
@@ -47,8 +47,8 @@ const props = withDefaults(defineProps<Props>(), {
     </div>
 
     <!-- Empty State -->
-    <div v-else class="text-center py-8 text-gray-500">
-      <div class="text-4xl mb-2">{{ emptyIcon }}</div>
+    <div v-else class="text-center py-12 text-slate-500 dark:text-slate-400">
+      <div class="text-5xl mb-4">{{ emptyIcon }}</div>
       <p>{{ emptyMessage }}</p>
     </div>
   </div>
