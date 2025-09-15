@@ -404,51 +404,19 @@
                         </div>
                     </div>
 
-                    <!-- Additional Product Information -->
-                    <div>
-                        <h3 class="text-base font-semibold text-gray-900 mb-4">Informações Adicionais</h3>
-                        
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                            <!-- SKU -->
-                            <div>
-                                <label for="sku" class="block text-sm font-medium text-gray-700 mb-1">SKU</label>
-                                <input
-                                    v-model="form.sku"
-                                    id="sku"
-                                    type="text"
-                                    placeholder="Stock Keeping Unit"
-                                    class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-                                />
-                            </div>
-
-                            <!-- EAN -->
-                            <div>
-                                <label for="ean" class="block text-sm font-medium text-gray-700 mb-1">EAN</label>
-                                <input
-                                    v-model="form.ean"
-                                    id="ean"
-                                    type="text"
-                                    placeholder="Código de Barras"
-                                    class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-                                />
-                            </div>
-
-
-                        </div>
 
                         <!-- Status Checkboxes -->
-                        <div class="mt-6 space-y-3">
-                            <h4 class="text-sm font-medium text-gray-700">Status do Produto</h4>
-                            <div class="flex flex-wrap gap-6">
-                                <div class="flex items-center">
-                                    <input
-                                        v-model="form.status"
-                                        id="status"
-                                        type="checkbox"
-                                        class="h-4 w-4 text-orange-600 focus:ring-orange-500 border-gray-300 rounded"
-                                    />
-                                    <label for="status" class="ml-2 text-sm text-gray-700">Produto Ativo</label>
-                                </div>
+                    <div class="mt-6 space-y-3">
+                        <h4 class="text-sm font-medium text-gray-700">Status do Produto</h4>
+                        <div class="flex flex-wrap gap-6">
+                            <div class="flex items-center">
+                                <input
+                                    v-model="form.status"
+                                    id="status"
+                                    type="checkbox"
+                                    class="h-4 w-4 text-orange-600 focus:ring-orange-500 border-gray-300 rounded"
+                                />
+                                <label for="status" class="ml-2 text-sm text-gray-700">Produto Ativo</label>
                             </div>
                         </div>
                     </div>
@@ -524,7 +492,12 @@
                                 </div>
                             </div>
                         </div>
-                        
+                        <div v-else class="mb-6">
+                            <div class="p-4 bg-gray-50 border border-dashed border-gray-300 rounded-lg text-sm text-gray-600">
+                                Nenhuma embalagem cadastrada ainda.
+                            </div>
+                        </div>
+
                         <!-- Note about packaging management -->
                         <!-- <div class="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
                             <p class="text-sm text-blue-800">

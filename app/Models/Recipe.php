@@ -33,12 +33,6 @@ class Recipe extends Model
         'consumption_occasion',
     ];
 
-    protected $casts = [
-        'usage_groups' => 'array',
-        'preparation_techniques' => 'array',
-        'consumption_occasion' => 'array',
-    ];
-
     public function getEmbeddingVector(): ?Vector
     {
         return $this->embedding ? new Vector($this->embedding) : null;

@@ -222,6 +222,78 @@
                             </select>
                             <p v-if="form.errors.channel" class="text-red-500 text-xs mt-1">{{ form.errors.channel }}</p>
                         </div>
+
+                        <!-- Grupo de Uso -->
+                        <div>
+                            <label for="usage_groups" class="block text-sm font-medium text-gray-700 mb-1">Grupo de Uso</label>
+                            <select
+                                v-model="form.usage_groups"
+                                id="usage_groups"
+                                class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                            >
+                                <option selected disabled value="">Selecione</option>
+                                <option value="bolos">Bolos</option>
+                                <option value="tortas">Tortas</option>
+                                <option value="paves">Pavês</option>
+                                <option value="sorvetes">Sorvetes</option>
+                                <option value="paes">Pães</option>
+                                <option value="docinhos_de_festa">Docinhos de Festa</option>
+                                <option value="bombons">Bombons</option>
+                                <option value="paes_de_mel">Pães de Mel</option>
+                                <option value="massas">Massas</option>
+                                <option value="molhos">Molhos</option>
+                                <option value="carnes">Carnes</option>
+                                <option value="saladas">Saladas</option>
+                                <option value="sopas">Sopas</option>
+                                <option value="cozidos">Cozidos</option>
+                                <option value="sem_acucar">Sem açúcar</option>
+                                <option value="sem_gluten">Sem gluten</option>
+                                <option value="sem_lactose">Sem lactose</option>
+                                <option value="vegetarianas">Vegetarianas</option>
+                                <option value="veganas">Veganas</option>
+                                <option value="sem_alcool">Sem alcool</option>
+                            </select>
+                            <p v-if="form.errors.usage_groups" class="text-red-500 text-xs mt-1">{{ form.errors.usage_groups }}</p>
+                        </div>
+
+                        <!-- Técnica -->
+                        <div>
+                            <label for="preparation_techniques" class="block text-sm font-medium text-gray-700 mb-1">Técnica</label>
+                            <select
+                                v-model="form.preparation_techniques"
+                                id="preparation_techniques"
+                                class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                            >
+                                <option selected disabled value="">Selecione</option>
+                                <option value="fritura_por_imersao">Fritura por imersão</option>
+                                <option value="fritura_rasa">Fritura rasa</option>
+                                <option value="grelhados">Grelhados</option>
+                                <option value="refogados">Refogados</option>
+                                <option value="ensopados_e_molhos">Ensopados e Molhos</option>
+                                <option value="assados">Assados</option>
+                                <option value="cozimento_por_absorcao">Cozimento por absorção</option>
+                                <option value="cozimento_em_agua_quente">Cozimento em água quente</option>
+
+                            </select>
+                            <p v-if="form.errors.preparation_techniques" class="text-red-500 text-xs mt-1">{{ form.errors.preparation_techniques }}</p>
+                        </div>
+
+                        <!-- Ocasião de Consumo -->
+                        <div>
+                            <label for="consumption_occasion" class="block text-sm font-medium text-gray-700 mb-1">Ocasião de Consumo</label>
+                            <select
+                                v-model="form.consumption_occasion"
+                                id="consumption_occasion"
+                                class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                            >
+                                <option selected disabled value="">Selecione</option>
+                                <option value="datas_comemorativas">Datas Comemorativas</option>
+                                <option value="dia_a_dia">Dia a Dia</option>
+                                <option value="para_dias_quentes">Para dias quentes</option>
+                                <option value="para_dias_frios">Para dias frios</option>
+                            </select>
+                            <p v-if="form.errors.consumption_occasion" class="text-red-500 text-xs mt-1">{{ form.errors.consumption_occasion }}</p>
+                        </div>
                     </div>
 
                     <!-- Right Column - Larger Text Fields -->
@@ -232,7 +304,7 @@
                             <textarea
                                 v-model="form.recipe_description"
                                 id="recipe_description"
-                                rows="7"
+                                 rows="10"
                                 class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-vertical"
                             ></textarea>
                             <p v-if="form.errors.recipe_description" class="text-red-500 text-xs mt-1">{{ form.errors.recipe_description }}</p>
@@ -244,7 +316,7 @@
                             <textarea
                                 v-model="form.recipe_prompt"
                                 id="recipe_prompt"
-                                rows="7"
+                                rows="11"
                                 placeholder="Instruções/briefing sobre a receita para geração de conteúdo por IA..."
                                 class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-vertical"
                             ></textarea>
@@ -257,7 +329,7 @@
                             <textarea
                                 v-model="form.ingredients_description"
                                 id="ingredients_description"
-                                rows="7"
+                                rows="11"
                                 class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-vertical"
                             ></textarea>
                             <p v-if="form.errors.ingredients_description" class="text-red-500 text-xs mt-1">{{ form.errors.ingredients_description }}</p>
@@ -269,7 +341,7 @@
                             <textarea
                                 v-model="form.preparation_method"
                                 id="preparation_method"
-                                rows="7"
+                                rows="11"
                                 class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-vertical"
                             ></textarea>
                             <p v-if="form.errors.preparation_method" class="text-red-500 text-xs mt-1">{{ form.errors.preparation_method }}</p>
@@ -845,9 +917,9 @@ const form = useForm({
     recipe_prompt: null,
     ingredients_description: null,
     preparation_method: null,
-    usage_groups: [],
-    preparation_techniques: [],
-    consumption_occasion: [],
+    usage_groups: '',
+    preparation_techniques: '',
+    consumption_occasion: '',
     // Product associations
     selected_products: [],
     // Content associations
@@ -888,9 +960,9 @@ function editRecipe(recipe) {
     form.recipe_prompt = recipe.recipe_prompt || ''
     form.ingredients_description = recipe.ingredients_description
     form.preparation_method = recipe.preparation_method
-    form.usage_groups = recipe.usage_groups || []
-    form.preparation_techniques = recipe.preparation_techniques || []
-    form.consumption_occasion = recipe.consumption_occasion || []
+    form.usage_groups = recipe.usage_groups || ''
+    form.preparation_techniques = recipe.preparation_techniques || ''
+    form.consumption_occasion = recipe.consumption_occasion || ''
     
     // Load associated products
     form.selected_products = recipe.products ? recipe.products.map(product => ({

@@ -59,10 +59,10 @@ class RecipeController extends Controller
             'ingredients_description' => 'string',
             'preparation_method' => 'string',
             
-            // Array fields (stored as JSON)
-            'usage_groups' => 'nullable|array',
-            'preparation_techniques' => 'nullable|array',
-            'consumption_occasion' => 'nullable|array',
+            // String fields
+            'usage_groups' => 'nullable|string|max:255',
+            'preparation_techniques' => 'nullable|string|max:255',
+            'consumption_occasion' => 'nullable|string|max:255',
             
             // Product associations
             'selected_products' => 'nullable|array',
