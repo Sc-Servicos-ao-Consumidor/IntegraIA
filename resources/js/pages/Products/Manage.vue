@@ -107,17 +107,6 @@
                         <h3 class="text-base font-semibold text-gray-900 mb-4">Informações do Produto</h3>
                         
                         <div class="space-y-4">
-                            <!-- Prompt para uso das informações do Produto -->
-                            <div>
-                                <label for="prompt_uso_informacoes_produto" class="block text-sm font-medium text-gray-700 mb-1">Prompt para uso das informações do Produto</label>
-                                <textarea
-                                    v-model="form.prompt_uso_informacoes_produto"
-                                    id="prompt_uso_informacoes_produto"
-                                    rows="4"
-                                    placeholder="Descreva como usar as informações do produto..."
-                                    class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-vertical"
-                                ></textarea>
-                            </div>
                         </div>
                     </div>
 
@@ -188,6 +177,17 @@
                                 ></textarea>
                             </div>
 
+                            <!-- Dicas de Utilização -->
+                            <div>
+                                <label for="dicas_utilizacao" class="block text-sm font-medium text-gray-700 mb-1">Dicas de Utilização</label>
+                                <textarea
+                                    v-model="form.dicas_utilizacao"
+                                    id="dicas_utilizacao"
+                                    rows="6"
+                                    placeholder="Dicas e orientações para melhor utilização do produto..."
+                                    class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-vertical"
+                                ></textarea>
+                            </div>
                             
                         </div>
 
@@ -225,6 +225,18 @@
                                     id="descricao_lista_ingredientes"
                                     rows="6"
                                     placeholder="Lista de ingredientes do produto..."
+                                    class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-vertical"
+                                ></textarea>
+                            </div>
+
+                            <!-- Prompt para uso das informações do Produto -->
+                            <div>
+                                <label for="prompt_uso_informacoes_produto" class="block text-sm font-medium text-gray-700 mb-1">Prompt para uso das informações do Produto</label>
+                                <textarea
+                                    v-model="form.prompt_uso_informacoes_produto"
+                                    id="prompt_uso_informacoes_produto"
+                                    rows="6"
+                                    placeholder="Descreva como usar as informações do produto..."
                                     class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-vertical"
                                 ></textarea>
                             </div>
@@ -869,6 +881,7 @@ const form = useForm({
     descricao_tabela_nutricional: '',
     descricao_lista_ingredientes: '',
     descricao_modos_preparo: '',
+    dicas_utilizacao: '',
     descricao_rendimentos: '',
     ean: '',
     
@@ -1148,6 +1161,7 @@ function editProduct(product) {
     form.descricao_tabela_nutricional = product.descricao_tabela_nutricional || ''
     form.descricao_lista_ingredientes = product.descricao_lista_ingredientes || ''
     form.descricao_modos_preparo = product.descricao_modos_preparo || ''
+    form.dicas_utilizacao = product.dicas_utilizacao || ''
     form.descricao_rendimentos = product.descricao_rendimentos || ''
     form.ean = product.ean || ''
     

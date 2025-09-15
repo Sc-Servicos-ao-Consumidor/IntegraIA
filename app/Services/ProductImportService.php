@@ -46,6 +46,7 @@ class ProductImportService
             'slug' => $item['slug'] ?? Str::slug($item['descricao'] ?? ''),
             'codigo_padrao' => $item['codigo_padrao'] ?? null,
             'sku' => $item['sku'] ?? null,
+            'marca' => $item['produto_familia']['descricao'] ?? null,
             'descricao' => $item['descricao'] ?? null,
             'descricao_breve' => $item['descricao_breve'] ?? null,
             'especificacao_produto' => $item['especificacao_produto'] ?? null,

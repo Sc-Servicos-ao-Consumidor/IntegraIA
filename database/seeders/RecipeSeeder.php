@@ -32,9 +32,9 @@ class RecipeSeeder extends Seeder
                 'recipe_description' => 'Molho à bolonhesa cremoso e saboroso, preparado com Base de Tomate Knorr Professional, garantindo qualidade e consistência em cada preparo.',
                 'ingredients_description' => 'Base de Tomate Knorr Professional, carne moída bovina, água, Meu Tempero Knorr',
                 'preparation_method' => "1. Refogue a carne moída até dourar\n2. Adicione 6L de água e 1 embalagem de Base de Tomate Knorr (750g)\n3. Adicione 100g de Meu Tempero Knorr\n4. Cozinhe em fogo baixo por 15 minutos mexendo ocasionalmente\n5. Ajuste o tempero se necessário\n6. Sirva quente",
-                'usage_groups' => ['Restaurantes', 'Food Service'],
-                'preparation_techniques' => ['Refogado', 'Cozimento lento'],
-                'consumption_occasion' => ['Almoço', 'Jantar'],
+                'usage_groups' => 'Restaurantes',
+                'preparation_techniques' => 'Refogado, Cozimento lento',
+                'consumption_occasion' => 'Almoço, Jantar',
             ],
 
             // Ragú de Carne com Base de Tomate Knorr
@@ -50,9 +50,9 @@ class RecipeSeeder extends Seeder
                 'recipe_description' => 'Ragú tradicional com carne bovina desfiada e molho de tomate encorpado, preparado com Base de Tomate Knorr Professional.',
                 'ingredients_description' => 'Base de Tomate Knorr Professional, carne bovina desfiada, água, Caldo de Carne Knorr',
                 'preparation_method' => "1. Aqueça a carne bovina desfiada\n2. Adicione 6L de água e 1 embalagem de Base de Tomate Knorr (750g)\n3. Adicione 160g de Caldo de Carne Knorr\n4. Cozinhe em fogo baixo por 25 minutos\n5. Mexe ocasionalmente até obter consistência cremosa\n6. Ajuste o tempero\n7. Sirva sobre massas ou risotos",
-                'usage_groups' => ['Restaurantes', 'Food Service'],
-                'preparation_techniques' => ['Cozimento lento', 'Redução'],
-                'consumption_occasion' => ['Almoço', 'Jantar'],
+                'usage_groups' => 'Restaurantes',
+                'preparation_techniques' => 'Cozimento lento, Redução',
+                'consumption_occasion' => 'Almoço, Jantar',
             ],
 
             // Molho de Pizza com Base de Tomate Knorr
@@ -68,9 +68,9 @@ class RecipeSeeder extends Seeder
                 'recipe_description' => 'Molho de pizza aromático e saboroso, preparado com Base de Tomate Knorr Professional e orégano fresco.',
                 'ingredients_description' => 'Base de Tomate Knorr Professional, água, orégano desidratado',
                 'preparation_method' => "1. Misture 1 embalagem de Base de Tomate Knorr (750g) com 5L de água\n2. Adicione 10g de orégano desidratado\n3. Misture bem até obter consistência homogênea\n4. Deixe repousar por 5 minutos\n5. Está pronto para usar nas pizzas",
-                'usage_groups' => ['Pizzarias', 'Food Service'],
-                'preparation_techniques' => ['Mistura simples'],
-                'consumption_occasion' => ['Almoço', 'Jantar', 'Lanche'],
+                'usage_groups' => 'Pizzarias',
+                'preparation_techniques' => 'Mistura simples',
+                'consumption_occasion' => 'Almoço, Jantar, Lanche',
             ]
         ];
 
