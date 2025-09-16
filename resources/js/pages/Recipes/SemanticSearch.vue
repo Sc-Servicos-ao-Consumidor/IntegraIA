@@ -41,11 +41,11 @@
             </div>
 
             <!-- Search Interface -->
-            <div class="bg-white dark:bg-card rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-8 mb-8">
+            <div class="dark:bg-card rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-8 mb-8">
                 <div class="max-w-4xl mx-auto">
                     <!-- Search Input -->
                     <div class="mb-6">
-                        <label for="search-query" class="block text-sm font-medium text-gray-700 mb-2">
+                        <label for="search-query" class="block text-sm font-medium text-slate-900 dark:text-slate-100 mb-2">
                             O que você está procurando?
                         </label>
                         <div class="flex gap-3">
@@ -60,7 +60,7 @@
                             <button 
                                 @click="search" 
                                 :disabled="loading || !query.trim()"
-                                class="bg-orange-600 hover:bg-orange-700 disabled:bg-gray-400 text-white font-medium px-8 py-3 rounded-lg text-base transition-colors disabled:cursor-not-allowed"
+                                class="bg-orange-600 hover:bg-orange-700 disabled:bg-orange-300 dark:disabled:bg-orange-800 text-white font-medium px-8 py-3 rounded-lg text-base transition-colors disabled:cursor-not-allowed shadow-sm hover:shadow-md"
                             >
                                 <span v-if="loading" class="flex items-center gap-2">
                                     <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -80,37 +80,37 @@
                             <input
                                 v-model="showAIAssistant"
                                 type="checkbox"
-                                class="rounded border-orange-300 text-orange-600 focus:ring-orange-500"
+                                class="rounded border-orange-300 text-orange-600 focus:ring-orange-500 hidden"
                             />
-                            <span class="text-sm font-medium text-gray-700">🤖 Ativar Assistente IA</span>
+                            <!-- <span class="text-sm font-medium text-gray-700">🤖 Ativar Assistente IA</span> -->
                         </label>
                     </div>
                     
                     <!-- Example Queries -->
                     <div class="mt-6 text-center">
-                        <h4 class="text-sm font-medium text-gray-600 mb-3">💡 Exemplos de busca:</h4>
+                        <h4 class="text-sm font-medium text-slate-900 dark:text-slate-100 mb-3">💡 Exemplos de busca:</h4>
                         <div class="flex flex-wrap justify-center gap-2">
                             <button 
                                 @click="query = 'massa cremosa vegana'; search()"
-                                class="px-3 py-1 bg-orange-100 hover:bg-orange-200 text-orange-800 text-xs rounded-full border border-orange-200 transition-colors"
+                                class="px-4 py-2 bg-orange-50 hover:bg-orange-100 dark:bg-orange-900/30 dark:hover:bg-orange-900/50 text-orange-700 dark:text-orange-300 text-sm rounded-lg border border-orange-200 dark:border-orange-800 transition-all duration-200 hover:shadow-sm"
                             >
                                 massa cremosa vegana
                             </button>
                             <button 
                                 @click="query = 'prato italiano tradicional'; search()"
-                                class="px-3 py-1 bg-orange-100 hover:bg-orange-200 text-orange-800 text-xs rounded-full border border-orange-200 transition-colors"
+                                class="px-4 py-2 bg-orange-50 hover:bg-orange-100 dark:bg-orange-900/30 dark:hover:bg-orange-900/50 text-orange-700 dark:text-orange-300 text-sm rounded-lg border border-orange-200 dark:border-orange-800 transition-all duration-200 hover:shadow-sm"
                             >
                                 prato italiano tradicional
                             </button>
                             <button 
                                 @click="query = 'receita de empanada de carne'; search()"
-                                class="px-3 py-1 bg-orange-100 hover:bg-orange-200 text-orange-800 text-xs rounded-full border border-orange-200 transition-colors"
+                                class="px-4 py-2 bg-orange-50 hover:bg-orange-100 dark:bg-orange-900/30 dark:hover:bg-orange-900/50 text-orange-700 dark:text-orange-300 text-sm rounded-lg border border-orange-200 dark:border-orange-800 transition-all duration-200 hover:shadow-sm"
                             >
                                 receita de empanada de carne
                             </button>
                             <button 
                                 @click="query = 'receita fácil para iniciantes'; search()"
-                                class="px-3 py-1 bg-orange-100 hover:bg-orange-200 text-orange-800 text-xs rounded-full border border-orange-200 transition-colors"
+                                class="px-4 py-2 bg-orange-50 hover:bg-orange-100 dark:bg-orange-900/30 dark:hover:bg-orange-900/50 text-orange-700 dark:text-orange-300 text-sm rounded-lg border border-orange-200 dark:border-orange-800 transition-all duration-200 hover:shadow-sm"
                             >
                                 receita fácil para iniciantes
                             </button>
@@ -131,7 +131,7 @@
             </div>
 
             <!-- AI Assistant Response -->
-            <div v-if="assistantResponse && showAIAssistant" class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200 p-6 mb-8">
+            <div v-if="assistantResponse && showAIAssistant" class="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-lg border border-blue-200 dark:border-blue-800 p-6 mb-8">
                 <div class="flex items-start gap-3">
                     <div class="flex-shrink-0">
                         <div class="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
@@ -300,40 +300,40 @@
             </div>
 
             <!-- Feature Highlights -->
-            <div v-if="!hasSearched" class="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl border border-green-200 p-8 mb-8">
+            <div v-if="!hasSearched" class="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-xl border border-green-200 dark:border-green-800 p-8 mb-8">
                 <div class="text-center mb-8">
-                    <h3 class="text-2xl font-bold text-green-900 mb-2">🚀 Recursos da Busca Semântica</h3>
-                    <p class="text-green-700">Descubra o poder da inteligência artificial para encontrar o que você precisa</p>
+                    <h3 class="text-2xl font-bold text-green-900 dark:text-green-100 mb-2">🚀 Recursos da Busca Semântica</h3>
+                    <p class="text-green-700 dark:text-green-300">Descubra o poder da inteligência artificial para encontrar o que você precisa</p>
                 </div>
                 
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                     <div class="text-center">
                         <div class="text-5xl mb-3">🧠</div>
-                        <h4 class="font-bold text-green-900 mb-2">IA Inteligente</h4>
-                        <p class="text-green-700 text-sm">Entende o contexto e significado das suas consultas</p>
+                        <h4 class="font-bold text-green-900 dark:text-green-100 mb-2">IA Inteligente</h4>
+                        <p class="text-green-700 dark:text-green-300 text-sm">Entende o contexto e significado das suas consultas</p>
                     </div>
                     <div class="text-center">
                         <div class="text-5xl mb-3">🔍</div>
-                        <h4 class="font-bold text-green-900 mb-2">Busca Precisa</h4>
-                        <p class="text-green-700 text-sm">Encontra resultados relevantes mesmo com termos similares</p>
+                        <h4 class="font-bold text-green-900 dark:text-green-100 mb-2">Busca Precisa</h4>
+                        <p class="text-green-700 dark:text-green-300 text-sm">Encontra resultados relevantes mesmo com termos similares</p>
                     </div>
                     <div class="text-center">
                         <div class="text-5xl mb-3">⚡</div>
-                        <h4 class="font-bold text-green-900 mb-2">Rápido e Eficiente</h4>
-                        <p class="text-green-700 text-sm">Resultados instantâneos com tecnologia de ponta</p>
+                        <h4 class="font-bold text-green-900 dark:text-green-100 mb-2">Rápido e Eficiente</h4>
+                        <p class="text-green-700 dark:text-green-300 text-sm">Resultados instantâneos com tecnologia de ponta</p>
                     </div>
                 </div>
             </div>
 
             <!-- Search Tips -->
-            <div v-if="!hasSearched" class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-200 p-8">
+            <div v-if="!hasSearched" class="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-xl border border-blue-200 dark:border-blue-800 p-8">
                 <div class="text-center mb-6">
                     <h3 class="text-2xl font-bold text-orange-900 dark:text-orange-100 mb-2">💡 Dicas para uma Busca Eficiente</h3>
                     <p class="text-orange-700 dark:text-orange-300">Aprenda a usar nossa busca semântica para obter os melhores resultados</p>
                 </div>
                 
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div class="bg-white dark:bg-card rounded-lg p-6 border border-orange-200 dark:border-orange-800 shadow-sm">
+                    <div class="dark:bg-card rounded-lg p-6 border border-orange-200 dark:border-orange-800 shadow-sm">
                         <div class="text-4xl mb-3">📖</div>
                         <h4 class="font-bold text-orange-900 dark:text-orange-100 mb-3 text-lg">Para Receitas</h4>
                         <ul class="text-sm text-orange-800 dark:text-orange-200 space-y-2">
@@ -356,7 +356,7 @@
                         </ul>
                     </div>
                     
-                    <div class="bg-white dark:bg-card rounded-lg p-6 border border-orange-200 dark:border-orange-800 shadow-sm">
+                    <div class="dark:bg-card rounded-lg p-6 border border-orange-200 dark:border-orange-800 shadow-sm">
                         <div class="text-4xl mb-3">🛍️</div>
                         <h4 class="font-bold text-orange-900 dark:text-orange-100 mb-3 text-lg">Para Produtos</h4>
                         <ul class="text-sm text-orange-800 dark:text-orange-200 space-y-2">
@@ -379,7 +379,7 @@
                         </ul>
                     </div>
                     
-                    <div class="bg-white dark:bg-card rounded-lg p-6 border border-orange-200 dark:border-orange-800 shadow-sm">
+                    <div class="dark:bg-card rounded-lg p-6 border border-orange-200 dark:border-orange-800 shadow-sm">
                         <div class="text-4xl mb-3">📰</div>
                         <h4 class="font-bold text-orange-900 dark:text-orange-100 mb-3 text-lg">Para Conteúdos</h4>
                         <ul class="text-sm text-orange-800 dark:text-orange-200 space-y-2">
@@ -404,7 +404,7 @@
                 </div>
                 
                 <div class="mt-8 text-center">
-                    <div class="bg-blue-100 rounded-lg p-4 inline-block">
+                    <div class="bg-blue-100 dark:bg-blue-900/30 rounded-lg p-4 inline-block">
                         <p class="text-orange-800 dark:text-orange-200 font-medium">
                             💡 <strong>Pro tip:</strong> Quanto mais específica for sua busca, melhores serão os resultados!
                         </p>
