@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Product;
 use App\Models\ProductPackaging;
+use App\Models\GroupProduct;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
@@ -22,6 +23,14 @@ class ProductImportService
             }
 
             $payload = $response->json();
+            
+            // Import grupo_produto first if available
+            $produtoGrupos = $payload['produto_grupo'] ?? [];
+
+            foreach ($produtoGrupos as $produtoGrupo) {
+                $this->upsertGroupProduct($produtoGrupo);
+            }
+
             $items = $payload['data'] ?? $payload['items'] ?? $payload['results'] ?? [];
             foreach ($items as $item) {
                 $this->upsertProductWithPackagings($item);
@@ -32,20 +41,64 @@ class ProductImportService
             if ($nextCursor) {
                 $separator = str_contains($baseUrl, '?') ? '&' : '?';
                 $currentUrl = $baseUrl . $separator . 'cursor=' . urlencode($nextCursor);
-                Log::info('Current URL: ' . $currentUrl);
             } else {
                 $currentUrl = null;
             }
         } while ($currentUrl);
     }
 
+    protected function upsertGroupProduct(array $produtoGrupo): void
+    {
+        $groupProductData = [
+            'ulid' => $produtoGrupo['ulid'] ?? Str::ulid(),
+            'codigo_padrao' => $produtoGrupo['codigo_padrao'] ?? null,
+            'descricao' => $produtoGrupo['descricao'] ?? null,
+            'observacao' => $produtoGrupo['observacao'] ?? null,
+            'status' => (bool)($produtoGrupo['status'] ?? true),
+        ];
+
+        // Match existing GroupProduct by codigo_padrao or ULID
+        $groupProduct = GroupProduct::query()
+            ->when(!empty($produtoGrupo['codigo_padrao']), fn($q) => $q->where('codigo_padrao', $produtoGrupo['codigo_padrao']))
+        ->first();
+
+        if ($groupProduct) {
+            $groupProduct->update($groupProductData);
+        } else {
+            GroupProduct::create($groupProductData);
+        }
+    }
+
     protected function upsertProductWithPackagings(array $item): void
     {
+        // Find GroupProduct by codigo_padrao if available
+        $groupProductId = null;
+
+        if (!empty($item['codigo_padrao'])) {
+            $groupProduct = GroupProduct::where('codigo_padrao', $item['codigo_padrao'])->first();
+
+            if ($groupProduct) {
+                $groupProductId = $groupProduct->id;
+            } else {
+                // If GroupProduct doesn't exist, create it with minimal data
+                $newGroupProduct = GroupProduct::create([
+                    'ulid' => Str::ulid(),
+                    'codigo_padrao' => $item['codigo_padrao'],
+                    'descricao' => $item['descricao'],
+                    'observacao' => 'automaticamente criado pelo importador de produtos',
+                    'status' => true,
+                ]);
+
+                $groupProductId = $newGroupProduct->id;
+            }
+        }
+
         $productData = [
             'ulid' => $item['ulid'] ?? Str::ulid(),
             'slug' => $item['slug'] ?? Str::slug($item['descricao'] ?? ''),
             'codigo_padrao' => $item['codigo_padrao'] ?? null,
             'sku' => $item['sku'] ?? null,
+            'group_product_id' => $groupProductId ?? $item['produto_grupo_id'] ?? null,
             'marca' => $item['produto_familia']['descricao'] ?? null,
             'descricao' => $item['descricao'] ?? null,
             'descricao_breve' => $item['descricao_breve'] ?? null,
@@ -58,7 +111,7 @@ class ProductImportService
             'site' => $item['site'] ?? null,
             'status' => (bool)($item['status'] ?? true),
             'produto_familia_id' => $item['produto_familia_id'] ?? null,
-            'produto_grupo_id' => $item['produto_grupo_id'] ?? null,
+            'produto_grupo_id' => $groupProductId ?? $item['produto_grupo_id'] ?? null,
             'produto_linha_id' => $item['produto_linha_id'] ?? null,
             'produto_sub_linha_id' => $item['produto_sub_linha_id'] ?? null,
         ];
