@@ -62,6 +62,7 @@ class ProductController extends Controller
             'descricao_tabela_nutricional' => 'nullable|string',
             'descricao_lista_ingredientes' => 'nullable|string',
             'descricao_modos_preparo' => 'nullable|string',
+            'dicas_utilizacao' => 'nullable|string',
             'descricao_rendimentos' => 'nullable|string',
             'ean' => 'nullable|string|max:255',
             'status' => 'boolean',

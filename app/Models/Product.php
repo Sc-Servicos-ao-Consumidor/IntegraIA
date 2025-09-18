@@ -35,6 +35,7 @@ class Product extends Model
         'descricao_breve',
         'informacao_adicional',
         'ean',
+        'dicas_utilizacao',
         'quantidade_caixa',
         'embalagem_tipo',
         'embalagem_descricao',

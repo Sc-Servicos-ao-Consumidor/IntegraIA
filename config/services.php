@@ -3,7 +3,7 @@
 return [
     'products_api' => [
         'url' => env('PRODUCTS_API_URL'),
-        'token' => env('PRODUCTS_API_TOKEN'),
+        'token' => env('PRODUCTS_APIw_TOKEN'),
     ],
 
     /*

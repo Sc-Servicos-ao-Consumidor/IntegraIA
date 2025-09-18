@@ -13,63 +13,63 @@ class IngredientSeeder extends Seeder
     public function run(): void
     {
         $ingredients = [
-            // Vegetais
-            'Cebola', 'Alho', 'Tomate', 'Cenoura', 'Batata', 'Pimentão', 'Pepino', 'Alface',
-            'Espinafre', 'Couve', 'Brócolis', 'Couve-flor', 'Abobrinha', 'Berinjela', 'Cogumelo',
-            'Salsão', 'Salsa', 'Coentro', 'Manjericão', 'Orégano', 'Tomilho', 'Alecrim',
-
-            // Carnes
-            'Peito de Frango', 'Carne Moída', 'Bisteca de Porco', 'Bacon', 'Presunto', 'Peru',
-            'Cordeiro', 'Linguiça', 'Salmão', 'Atum', 'Camarão', 'Bacalhau', 'Tilápia',
-
-            // Laticínios e Ovos
-            'Leite', 'Queijo', 'Manteiga', 'Ovos', 'Iogurte', 'Creme de Leite', 'Creme Azedo',
-            'Cheddar', 'Mussarela', 'Parmesão', 'Ricota', 'Queijo Cottage',
-
-            // Grãos e Pães
-            'Arroz', 'Macarrão', 'Pão', 'Farinha', 'Aveia', 'Quinoa', 'Cevada',
-            'Tortilha', 'Naan', 'Baguete', 'Pão Integral',
-
-            // Leguminosas
-            'Feijão Preto', 'Feijão Vermelho', 'Grão-de-bico', 'Lentilhas', 'Ervilhas',
-            'Feijão Carioca', 'Feijão Branco', 'Ervilha Partida',
-
-            // Frutas
-            'Maçã', 'Banana', 'Laranja', 'Limão', 'Lima', 'Morango',
-            'Mirtilo', 'Framboesa', 'Abacaxi', 'Manga', 'Abacate',
-
-            // Nozes e Sementes
-            'Amêndoas', 'Nozes', 'Pecãs', 'Castanhas de Caju', 'Amendoim', 'Sementes de Girassol',
-            'Sementes de Chia', 'Sementes de Linhaça', 'Sementes de Abóbora',
-
-            // Óleos e Gorduras
-            'Azeite de Oliva', 'Óleo Vegetal', 'Óleo de Coco', 'Óleo de Gergelim',
-            'Óleo de Canola', 'Óleo de Abacate',
-
-            // Condimentos e Molhos
-            'Sal', 'Pimenta-do-Reino', 'Molho de Soja', 'Ketchup', 'Mostarda',
-            'Maionese', 'Molho Picante', 'Molho Inglês', 'Vinagre',
-            'Vinagre Balsâmico', 'Vinagre de Maçã',
-
-            // Adoçantes
-            'Açúcar', 'Açúcar Mascavo', 'Mel', 'Xarope de Bordo', 'Néctar de Agave',
-            'Estévia', 'Açúcar de Confeiteiro',
-
-            // Especiarias e Ervas
-            'Canela', 'Noz-moscada', 'Gengibre', 'Cúrcuma', 'Cominho', 'Páprica',
-            'Pimenta em Pó', 'Pimenta-caiena', 'Folhas de Louro', 'Sálvia',
-            'Endro', 'Hortelã', 'Cebolinha', 'Estragão',
-
-            // Panificação
-            'Bicarbonato de Sódio', 'Fermento em Pó', 'Extrato de Baunilha', 'Fermento Biológico',
-            'Amido de Milho', 'Cacau em Pó', 'Gotas de Chocolate',
-
-            // Caldos e Fundos
-            'Caldo de Frango', 'Caldo de Carne', 'Caldo de Legumes', 'Caldo de Peixe',
-
-            // Outros
-            'Extrato de Tomate', 'Molho de Tomate', 'Leite de Coco', 'Leite Evaporado',
-            'Leite Condensado', 'Farinha de Rosca', 'Panko', 'Fubá'
+            // Vegetables
+            'Onion', 'Garlic', 'Tomato', 'Carrot', 'Potato', 'Bell Pepper', 'Cucumber', 'Lettuce',
+            'Spinach', 'Kale', 'Broccoli', 'Cauliflower', 'Zucchini', 'Eggplant', 'Mushroom',
+            'Celery', 'Parsley', 'Cilantro', 'Basil', 'Oregano', 'Thyme', 'Rosemary',
+            
+            // Meats
+            'Chicken Breast', 'Ground Beef', 'Pork Chop', 'Bacon', 'Ham', 'Turkey',
+            'Lamb', 'Sausage', 'Salmon', 'Tuna', 'Shrimp', 'Cod', 'Tilapia',
+            
+            // Dairy & Eggs
+            'Milk', 'Cheese', 'Butter', 'Eggs', 'Yogurt', 'Cream', 'Sour Cream',
+            'Cheddar', 'Mozzarella', 'Parmesan', 'Ricotta', 'Cottage Cheese',
+            
+            // Grains & Breads
+            'Rice', 'Pasta', 'Bread', 'Flour', 'Oats', 'Quinoa', 'Barley',
+            'Tortilla', 'Naan', 'Baguette', 'Whole Wheat Bread',
+            
+            // Legumes
+            'Black Beans', 'Kidney Beans', 'Chickpeas', 'Lentils', 'Peas',
+            'Pinto Beans', 'Navy Beans', 'Split Peas',
+            
+            // Fruits
+            'Apple', 'Banana', 'Orange', 'Lemon', 'Lime', 'Strawberry',
+            'Blueberry', 'Raspberry', 'Pineapple', 'Mango', 'Avocado',
+            
+            // Nuts & Seeds
+            'Almonds', 'Walnuts', 'Pecans', 'Cashews', 'Peanuts', 'Sunflower Seeds',
+            'Chia Seeds', 'Flax Seeds', 'Pumpkin Seeds',
+            
+            // Oils & Fats
+            'Olive Oil', 'Vegetable Oil', 'Coconut Oil', 'Sesame Oil',
+            'Canola Oil', 'Avocado Oil',
+            
+            // Condiments & Sauces
+            'Salt', 'Black Pepper', 'Soy Sauce', 'Ketchup', 'Mustard',
+            'Mayonnaise', 'Hot Sauce', 'Worcestershire Sauce', 'Vinegar',
+            'Balsamic Vinegar', 'Apple Cider Vinegar',
+            
+            // Sweeteners
+            'Sugar', 'Brown Sugar', 'Honey', 'Maple Syrup', 'Agave Nectar',
+            'Stevia', 'Powdered Sugar',
+            
+            // Spices & Herbs
+            'Cinnamon', 'Nutmeg', 'Ginger', 'Turmeric', 'Cumin', 'Paprika',
+            'Chili Powder', 'Cayenne Pepper', 'Bay Leaves', 'Sage',
+            'Dill', 'Mint', 'Chives', 'Tarragon',
+            
+            // Baking
+            'Baking Soda', 'Baking Powder', 'Vanilla Extract', 'Yeast',
+            'Cornstarch', 'Cocoa Powder', 'Chocolate Chips',
+            
+            // Broths & Stocks
+            'Chicken Broth', 'Beef Broth', 'Vegetable Broth', 'Fish Stock',
+            
+            // Other
+            'Tomato Paste', 'Tomato Sauce', 'Coconut Milk', 'Evaporated Milk',
+            'Condensed Milk', 'Breadcrumbs', 'Panko', 'Cornmeal'
         ];
 
         foreach ($ingredients as $ingredientName) {
