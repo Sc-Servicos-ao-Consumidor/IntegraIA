@@ -120,25 +120,17 @@ class EmbeddingService
     {
         $parts = array_filter([
             $product->descricao,
-            $product->marca,
-            $product->codigo_padrao,
-            $product->sku,
+            $product->descricao_breve,
+            $product->dicas_utilizacao,
+            $product->especificacao_produto,
+            $product->perfil_sabor,
+            $product->descricao_tabela_nutricional,
+            $product->descricao_lista_ingredientes,
+            $product->descricao_modos_preparo,
+            $product->descricao_rendimentos,
+            $product->ean,
+            $product->status,
         ]);
-
-        // Include group product information if available
-        if ($product->groupProduct) {
-            $parts[] = $product->groupProduct->nome ?? '';
-            $parts[] = $product->groupProduct->descricao ?? '';
-        }
-
-        // Include product details if available
-        if ($product->detail) {
-            $parts[] = $product->detail->descricao_produto ?? '';
-            $parts[] = $product->detail->ingredientes ?? '';
-            $parts[] = $product->detail->modo_preparo ?? '';
-            $parts[] = $product->detail->informacoes_nutricionais ?? '';
-            $parts[] = $product->detail->informacoes_uso ?? '';
-        }
 
         return implode("\n", $parts);
     }
