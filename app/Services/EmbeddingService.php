@@ -104,7 +104,7 @@ class EmbeddingService
             $recipe->difficulty_level,
             $recipe->yield,
             $recipe->service_order,
-            implode(', ', $recipe->ingredients ?? []),
+            $recipe->ingredients()->implode(', '),
             implode(', ', $recipe->usage_groups ?? []),
             implode(', ', $recipe->preparation_techniques ?? []),
             implode(', ', $recipe->consumption_occasion ?? []),
