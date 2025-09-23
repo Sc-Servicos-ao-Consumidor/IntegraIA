@@ -13,16 +13,30 @@ class ContentController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $contents = Content::with(['recipes', 'products'])->latest()->get();
-        $recipes = Recipe::where('recipe_name', '!=', null)->orderBy('recipe_name')->get();
+        $perPage = (int) $request->input('per_page', 10);
+        $search = trim((string) $request->input('search', ''));
+
+        $contents = Content::with(['recipes', 'products'])
+            ->when($search !== '', function ($query) use ($search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('nome_conteudo', 'ilike', "%{$search}%")
+                      ->orWhere('descricao_conteudo', 'ilike', "%{$search}%");
+                });
+            })
+            ->latest()
+            ->paginate($perPage)
+            ->withQueryString();
+
+        $recipes = Recipe::whereNotNull('recipe_name')->orderBy('recipe_name')->get();
         $products = Product::where('status', true)->orderBy('descricao')->get();
 
         return Inertia::render('Contents/Manage', [
             'contents' => $contents,
             'recipes' => $recipes,
-            'products' => $products
+            'products' => $products,
+            'filters' => $request->only(['search', 'per_page'])
         ]);
     }
 
@@ -34,18 +48,6 @@ class ContentController extends Controller
         $data = $request->validate([
             'nome_conteudo' => 'required|string|max:255',
             'content_code' => 'nullable|string|max:255|unique:contents,content_code,' . $request->id,
-            'descricao_tabela_nutricional' => 'nullable|string',
-            'descricao_lista_ingredientes' => 'nullable|string',
-            'descricao_modos_preparo' => 'nullable|string',
-            'descricao_rendimentos' => 'nullable|string',
-            'imagem_tabela_nutricional' => 'nullable|url',
-            'imagem_lista_ingredientes' => 'nullable|url',
-            'imagem_modos_preparo' => 'nullable|url',
-            'imagem_rendimentos' => 'nullable|url',
-            'imagens_nutricionais_cadastradas' => 'nullable|array',
-            'imagens_ingredientes_cadastradas' => 'nullable|array',
-            'imagens_preparo_cadastradas' => 'nullable|array',
-            'imagens_rendimentos_cadastradas' => 'nullable|array',
             'tipo_conteudo' => 'required|string|max:255',
             'pilares' => 'nullable|string|max:255',
             'canal' => 'nullable|string|max:255',

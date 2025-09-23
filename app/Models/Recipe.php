@@ -33,6 +33,16 @@ class Recipe extends Model
         'consumption_occasion',
     ];
 
+    /**
+     * Attribute casting definitions.
+     * Ensure JSON columns accept plain strings by encoding them properly.
+     */
+    protected $casts = [
+        'usage_groups' => 'json',
+        'preparation_techniques' => 'json',
+        'consumption_occasion' => 'json',
+    ];
+
     public function getEmbeddingVector(): ?Vector
     {
         return $this->embedding ? new Vector($this->embedding) : null;

@@ -721,9 +721,23 @@
             </FormCard>
 
             <!-- Saved Products Section -->
-            <ListCard title="Produtos Cadastrados" icon="📋" empty-message="Nenhum produto cadastrado" empty-icon="🛒" class="mt-8">
+            <ListCard
+                title="Produtos Cadastrados"
+                icon="📋"
+                empty-message="Nenhum produto cadastrado"
+                empty-icon="🛒"
+                class="mt-8"
+                searchable
+                :search="localSearch"
+                :per-page="localPerPage"
+                search-placeholder="Buscar por descrição, código, SKU ou marca..."
+                @update:search="value => localSearch = value"
+                @update:perPage="value => localPerPage = value"
+                @submit="router.get('/products', { search: localSearch || undefined, per_page: localPerPage || undefined }, { preserveState: true, preserveScroll: true, replace: true })"
+                @clear="() => { localSearch=''; localPerPage=10; router.get('/products', {}, { preserveState: true, preserveScroll: true, replace: true }) }"
+            >
                 <ListItem
-                    v-for="product in props.products"
+                    v-for="product in (props.products?.data || [])"
                     :key="product.id"
                     :title="product.descricao"
                     :subtitle="product.codigo_padrao || product.sku ? `${product.codigo_padrao ? 'Código: ' + product.codigo_padrao : ''}${product.codigo_padrao && product.sku ? ' • ' : ''}${product.sku ? 'SKU: ' + product.sku : ''}` : ''"
@@ -755,6 +769,23 @@
                     </template>
                 </ListItem>
             </ListCard>
+
+            <!-- Pagination -->
+            <div v-if="props.products?.links?.length" class="mt-4 flex flex-wrap items-center gap-2">
+                <button
+                    v-for="(link, idx) in props.products.links"
+                    :key="idx"
+                    :disabled="!link.url"
+                    @click.prevent="router.get(link.url, {}, { preserveState: true, preserveScroll: true, replace: true })"
+                    class="px-3 py-1 text-sm rounded border"
+                    :class="[
+                        'border-gray-300 dark:border-gray-600',
+                        link.active ? 'bg-orange-600 text-white border-orange-600' : 'bg-white dark:bg-secondary hover:bg-gray-50 dark:hover:bg-accent',
+                        !link.url ? 'opacity-50 cursor-not-allowed' : ''
+                    ]"
+                    v-html="link.label"
+                />
+            </div>
         </div>
     </AppLayout>
 </template>
@@ -780,10 +811,11 @@ const breadcrumbs = [
 ]
 
 const props = defineProps({
-    products: Array,
+    products: Object,
     groupProducts: Array,
     recipes: Array,
-    contents: Array
+    contents: Array,
+    filters: Object
 })
 
 // Toast notification system
@@ -848,6 +880,10 @@ function showFormSuccessMessage(isUpdate, itemName) {
         : `${itemName} criado com sucesso!`
     showToast(message, 'success')
 }
+
+// Search / pagination state
+let localSearch = ref((props.filters && props.filters.search) ? props.filters.search : '')
+let localPerPage = ref(Number((props.filters && props.filters.per_page) ? props.filters.per_page : 10))
 
 function confirmResetForm() {
     if (form.id) {

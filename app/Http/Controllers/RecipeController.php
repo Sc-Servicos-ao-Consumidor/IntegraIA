@@ -20,9 +20,22 @@ class RecipeController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $recipes = Recipe::with(['products', 'contents', 'ingredients', 'cuisines'])->latest()->get();
+        $perPage = (int) $request->input('per_page', 10);
+        $search = trim((string) $request->input('search', ''));
+
+        $recipes = Recipe::with(['products', 'contents', 'ingredients', 'cuisines'])
+            ->when($search !== '', function ($query) use ($search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('recipe_name', 'ilike', "%{$search}%")
+                      ->orWhere('recipe_description', 'ilike', "%{$search}%");
+                });
+            })
+            ->latest()
+            ->paginate($perPage)
+            ->withQueryString();
+
         $products = Product::where('status', true)->orderBy('descricao')->get();
         $contents = Content::where('status', true)->orderBy('nome_conteudo')->get();
         $ingredients = Ingredient::orderBy('name')->get();
@@ -33,7 +46,8 @@ class RecipeController extends Controller
             'products' => $products,
             'contents' => $contents,
             'ingredients' => $ingredients,
-            'cuisines' => $cuisines
+            'cuisines' => $cuisines,
+            'filters' => $request->only(['search', 'per_page'])
         ]);
     }
 
@@ -56,7 +70,6 @@ class RecipeController extends Controller
             // Content fields
             'recipe_description' => 'string',
             'recipe_prompt' => 'nullable|string',
-            'ingredients_description' => 'string',
             'preparation_method' => 'string',
             
             // String fields

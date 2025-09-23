@@ -341,9 +341,23 @@
             </FormCard>
 
             <!-- Saved Contents Section -->
-            <ListCard title="Conteúdos Salvos" icon="📋" empty-message="Nenhum conteúdo cadastrado" empty-icon="📄" class="mt-8">
+            <ListCard
+                title="Conteúdos Salvos"
+                icon="📋"
+                empty-message="Nenhum conteúdo cadastrado"
+                empty-icon="📄"
+                class="mt-8"
+                searchable
+                :search="localSearch"
+                :per-page="localPerPage"
+                search-placeholder="Buscar por nome ou descrição do conteúdo..."
+                @update:search="value => localSearch = value"
+                @update:perPage="value => localPerPage = value"
+                @submit="router.get('/contents', { search: localSearch || undefined, per_page: localPerPage || undefined }, { preserveState: true, preserveScroll: true, replace: true })"
+                @clear="() => { localSearch=''; localPerPage=10; router.get('/contents', {}, { preserveState: true, preserveScroll: true, replace: true }) }"
+            >
                 <ListItem
-                    v-for="content in props.contents"
+                    v-for="content in (props.contents?.data || [])"
                     :key="content.id"
                     :title="content.nome_conteudo || 'Sem título'"
                     :description="content.descricao_conteudo || 'Sem descrição'"
@@ -364,6 +378,23 @@
                     </template>
                 </ListItem>
             </ListCard>
+
+            <!-- Pagination -->
+            <div v-if="props.contents?.links?.length" class="mt-4 flex flex-wrap items-center gap-2">
+                <button
+                    v-for="(link, idx) in props.contents.links"
+                    :key="idx"
+                    :disabled="!link.url"
+                    @click.prevent="router.get(link.url, {}, { preserveState: true, preserveScroll: true, replace: true })"
+                    class="px-3 py-1 text-sm rounded border"
+                    :class="[
+                        'border-gray-300 dark:border-gray-600',
+                        link.active ? 'bg-orange-600 text-white border-orange-600' : 'bg-white dark:bg-secondary hover:bg-gray-50 dark:hover:bg-accent',
+                        !link.url ? 'opacity-50 cursor-not-allowed' : ''
+                    ]"
+                    v-html="link.label"
+                />
+            </div>
         </div>
     </AppLayout>
 </template>
@@ -389,12 +420,16 @@ const breadcrumbs = [
 ]
 
 const props = defineProps({
-    contents: Array,
+    contents: Object,
     recipes: Array,
-    products: Array
+    products: Array,
+    filters: Object
 })
 
 // Toast notification system
+// List search/pagination state
+const localSearch = ref((props.filters && props.filters.search) ? props.filters.search : '')
+const localPerPage = ref(Number((props.filters && props.filters.per_page) ? props.filters.per_page : 10))
 const toasts = ref([])
 let toastIdCounter = 0
 

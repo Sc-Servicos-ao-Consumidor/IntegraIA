@@ -17,8 +17,11 @@ class ProductController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
+        $perPage = (int) $request->input('per_page', 10);
+        $search = trim((string) $request->input('search', ''));
+
         $products = Product::with([
             'groupProduct', 
             'images' => function($query) {
@@ -27,7 +30,18 @@ class ProductController extends Controller
             'packagings',
             'recipes:id,recipe_name as descricao',
             'contents:id,nome_conteudo as descricao'
-        ])->latest()->get();
+        ])
+        ->when($search !== '', function ($query) use ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('descricao', 'ilike', "%{$search}%")
+                  ->orWhere('codigo_padrao', 'ilike', "%{$search}%")
+                  ->orWhere('sku', 'ilike', "%{$search}%")
+                  ->orWhere('marca', 'ilike', "%{$search}%");
+            });
+        })
+        ->latest()
+        ->paginate($perPage)
+        ->withQueryString();
         
         $groupProducts = GroupProduct::all();
         $recipes = Recipe::select('id', 'recipe_name as descricao')->get();
@@ -37,7 +51,8 @@ class ProductController extends Controller
             'products' => $products,
             'groupProducts' => $groupProducts,
             'recipes' => $recipes,
-            'contents' => $contents
+            'contents' => $contents,
+            'filters' => $request->only(['search', 'per_page'])
         ]);
     }
 
@@ -55,7 +70,6 @@ class ProductController extends Controller
             'sku' => 'nullable|string|max:255',
             'group_product_id' => 'required|exists:group_products,id',
             'marca' => 'nullable|string|max:255',
-            'escolha_embalagem' => 'nullable|string|max:255',
             'prompt_uso_informacoes_produto' => 'nullable|string',
             'especificacao_produto' => 'nullable|string',
             'perfil_sabor' => 'nullable|string',
