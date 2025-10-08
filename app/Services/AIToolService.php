@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Recipe;
 use App\Models\Product;
 use App\Models\Content;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Pgvector\Laravel\Distance;
 
@@ -128,7 +129,7 @@ class AIToolService
             [
                 'type' => 'function',
                 'function' => [
-                    'name' => 'find_recipes_with_product',
+                    'name' => 'find_recipes_with_product_id',
                     'description' => 'Encontrar receitas que usam um produto específico',
                     'parameters' => [
                         'type' => 'object',
@@ -162,10 +163,10 @@ class AIToolService
                 'search_content' => $this->searchContent($parameters),
                 'get_recipe_details' => $this->getRecipeDetails($parameters),
                 'get_product_details' => $this->getProductDetails($parameters),
-                'find_recipes_with_product' => $this->findRecipesWithProduct($parameters),
+                'find_recipes_with_product_id' => $this->findRecipesWithProductId($parameters),
                 default => ['error' => 'Unknown function: ' . $functionName]
             };
-        } catch (\Exception $e) {
+        } catch (\Exception $e) { 
             Log::error('Error executing tool function', [
                 'function' => $functionName,
                 'parameters' => $parameters,
@@ -389,7 +390,7 @@ class AIToolService
     /**
      * Find recipes that use a specific product
      */
-    protected function findRecipesWithProduct(array $parameters): array
+    protected function findRecipesWithProductId(array $parameters): array
     {
         $productId = $parameters['product_id'];
         $ingredientType = $parameters['ingredient_type'] ?? null;
@@ -428,5 +429,26 @@ class AIToolService
             ],
             'recipes' => $recipes
         ];
+    }
+
+    /**
+     * Calls an Botmaker webhook and transfers user to human agent
+     */
+    protected function transferToHumanAgent(array $parameters): array
+    {
+        $botmakerBaseUrl = config('services.botmaker.base_url');
+        $botmakerToken = config('services.botmaker.token');
+
+        $response = Http::post($botmakerBaseUrl, [
+            'token' => $botmakerToken,
+            'user_id' => $parameters['user_id'],
+        ]);
+
+        if ($response->status() !== 200) {
+            return ['status' => 'error', 'response' => 'Falha ao transferir para agente humano: ' . $response->body()];
+        }
+        else {
+            return ['status' => 'success', 'response' => 'Transferencia para agente humano realizada com sucesso'];
+        }
     }
 }

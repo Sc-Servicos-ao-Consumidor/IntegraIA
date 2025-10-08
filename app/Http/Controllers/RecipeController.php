@@ -318,18 +318,18 @@ class RecipeController extends Controller
         ]);
 
         $context = $this->cleanResultFromEmbeddings($request->context);
-        // $useTools = $request->use_tools ?? false;
+        $useTools = $request->use_tools ?? false;
 
         try {
-            // $tools = [];
+            $tools = [];
 
             // Add tools if requested
-            // if ($useTools) {
-            //     $aiToolService = new AIToolService($prism, new EmbeddingService($prism));
-            //     $tools = $aiToolService->getTools();
-            // }
+            if ($useTools) {
+                $aiToolService = new AIToolService($prism, new EmbeddingService($prism));
+                $tools = $aiToolService->getTools();
+            }
 
-            $response = $prism->getResponse($text, $context);
+            $response = $prism->getResponse($text, $context, $tools);
 
             // // Handle tool calls if present
             // if (isset($response['tool_calls']) && !empty($response['tool_calls'])) {
