@@ -147,6 +147,40 @@ class AIToolService
                         'required' => ['product_id']
                     ]
                 ]
+            ],
+            [
+                'type' => 'function',
+                'function' => [
+                    'name' => 'find_products_with_recipe_id',
+                    'description' => 'Encontrar produtos que usam uma receita específica',
+                    'parameters' => [
+                        'type' => 'object',
+                        'properties' => [
+                            'recipe_id' => [
+                                'type' => 'integer',
+                                'description' => 'ID da receita'
+                            ]
+                        ],
+                        'required' => ['recipe_id']
+                    ]
+                ]
+            ],
+            [
+                'type' => 'function',
+                'function' => [
+                    'name' => 'transfer_to_human_agent',
+                    'description' => 'Transferir o usuário para um agente humano',
+                    'parameters' => [
+                        'type' => 'object',
+                        'properties' => [
+                            'user_id' => [
+                                'type' => 'string',
+                                'description' => 'ID do usuário'
+                            ]
+                        ],
+                        'required' => ['user_id']
+                    ]
+                ]
             ]
         ];
     }
@@ -164,6 +198,7 @@ class AIToolService
                 'get_recipe_details' => $this->getRecipeDetails($parameters),
                 'get_product_details' => $this->getProductDetails($parameters),
                 'find_recipes_with_product_id' => $this->findRecipesWithProductId($parameters),
+                'transfer_to_human_agent' => $this->transferToHumanAgent($parameters),
                 default => ['error' => 'Unknown function: ' . $functionName]
             };
         } catch (\Exception $e) { 
@@ -201,13 +236,19 @@ class AIToolService
                 return [
                     'id' => $recipe->id,
                     'recipe_name' => $recipe->recipe_name,
-                    'cuisine' => $recipe->cuisine,
                     'recipe_type' => $recipe->recipe_type,
+                    'service_order' => $recipe->service_order,
                     'difficulty_level' => $recipe->difficulty_level,
                     'preparation_time' => $recipe->preparation_time,
                     'yield' => $recipe->yield,
+                    'channel' => $recipe->channel,
                     'recipe_description' => $recipe->recipe_description,
-                    'products_count' => $recipe->products->count(),
+                    'ingredients_description' => $recipe->ingredients_description,
+                    'preparation_method' => $recipe->preparation_method,
+                    'usage_groups' => $recipe->usage_groups,
+                    'preparation_techniques' => $recipe->preparation_techniques,
+                    'consumption_occasion' => $recipe->consumption_occasion,
+                    'cuisines' => $recipe->cuisines,
                 ];
             });
 
@@ -239,10 +280,17 @@ class AIToolService
                 return [
                     'id' => $product->id,
                     'descricao' => $product->descricao,
-                    'marca' => $product->marca,
                     'codigo_padrao' => $product->codigo_padrao,
                     'sku' => $product->sku,
                     'group_product' => $product->groupProduct?->nome,
+                    'marca' => $product->marca,
+                    'especificacao_produto' => $product->especificacao_produto,
+                    'perfil_sabor' => $product->perfil_sabor,
+                    'descricao_tabela_nutricional' => $product->descricao_tabela_nutricional,
+                    'descricao_lista_ingredientes' => $product->descricao_lista_ingredientes,
+                    'descricao_modos_preparo' => $product->descricao_modos_preparo,
+                    'descricao_rendimentos' => $product->descricao_rendimentos,
+                    'informacao_adicional' => $product->informacao_adicional,
                     'detail' => $product->detail ? [
                         'descricao_produto' => $product->detail->descricao_produto,
                         'ingredientes' => $product->detail->ingredientes,
@@ -282,9 +330,11 @@ class AIToolService
                     'tipo_conteudo' => $content->tipo_conteudo,
                     'pilares' => $content->pilares,
                     'canal' => $content->canal,
-                    'descricao_tabela_nutricional' => $content->descricao_tabela_nutricional,
-                    'descricao_lista_ingredientes' => $content->descricao_lista_ingredientes,
-                    'descricao_modos_preparo' => $content->descricao_modos_preparo,
+                    'links_conteudo' => $content->links_conteudo,
+                    'cozinheiro' => $content->cozinheiro,
+                    'comprador' => $content->comprador,
+                    'administrador' => $content->administrador,
+                    'descricao_conteudo' => $content->descricao_conteudo,
                 ];
             });
 
