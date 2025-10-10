@@ -306,8 +306,9 @@ class RecipeController extends Controller
         $request->validate([
             'text' => 'required|string|min:1',
             'context' => 'nullable',
-            // 'use_tools' => 'nullable|boolean'
+            'use_tools' => 'nullable|boolean'
         ]);
+
         $prism = new PrismService();
 
         $text = $prism->buildMessages([

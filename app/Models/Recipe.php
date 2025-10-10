@@ -34,14 +34,24 @@ class Recipe extends Model
     ];
 
     /**
-     * Attribute casting definitions.
-     * Ensure JSON columns accept plain strings by encoding them properly.
+     * Get a comma-separated list of ingredient names for this recipe.
      */
-    protected $casts = [
-        'usage_groups' => 'json',
-        'preparation_techniques' => 'json',
-        'consumption_occasion' => 'json',
-    ];
+    public function ingredientNamesList(): string
+    {
+        return $this->ingredients
+            ? $this->ingredients->pluck('name')->filter()->implode(', ')
+            : '';
+    }
+
+    /**
+     * Get a comma-separated list of cuisine names for this recipe.
+     */
+    public function cuisineNamesList(): string
+    {
+        return $this->cuisines
+            ? $this->cuisines->pluck('name')->filter()->implode(', ')
+            : '';
+    }
 
     public function getEmbeddingVector(): ?Vector
     {

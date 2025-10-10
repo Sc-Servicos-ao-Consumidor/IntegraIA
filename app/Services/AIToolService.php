@@ -8,6 +8,7 @@ use App\Models\Content;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Pgvector\Laravel\Distance;
+use Prism\Prism\Facades\Tool;
 
 class AIToolService
 {
@@ -25,208 +26,111 @@ class AIToolService
      */
     public function getTools(): array
     {
-        return [
-            [
-                'type' => 'function',
-                'function' => [
-                    'name' => 'search_recipes',
-                    'description' => 'Buscar receitas com base em uma consulta de texto usando busca semântica',
-                    'parameters' => [
-                        'type' => 'object',
-                        'properties' => [
-                            'query' => [
-                                'type' => 'string',
-                                'description' => 'Texto da consulta para buscar receitas'
-                            ],
-                            'limit' => [
-                                'type' => 'integer',
-                                'description' => 'Número máximo de receitas a retornar (padrão: 5)',
-                                'default' => 5
-                            ]
-                        ],
-                        'required' => ['query']
-                    ]
-                ]
-            ],
-            [
-                'type' => 'function',
-                'function' => [
-                    'name' => 'search_products',
-                    'description' => 'Buscar produtos com base em uma consulta de texto usando busca semântica',
-                    'parameters' => [
-                        'type' => 'object',
-                        'properties' => [
-                            'query' => [
-                                'type' => 'string',
-                                'description' => 'Texto da consulta para buscar produtos'
-                            ],
-                            'limit' => [
-                                'type' => 'integer',
-                                'description' => 'Número máximo de produtos a retornar (padrão: 5)',
-                                'default' => 5
-                            ]
-                        ],
-                        'required' => ['query']
-                    ]
-                ]
-            ],
-            [
-                'type' => 'function',
-                'function' => [
-                    'name' => 'search_content',
-                    'description' => 'Buscar conteúdo com base em uma consulta de texto usando busca semântica',
-                    'parameters' => [
-                        'type' => 'object',
-                        'properties' => [
-                            'query' => [
-                                'type' => 'string',
-                                'description' => 'Texto da consulta para buscar conteúdo'
-                            ],
-                            'limit' => [
-                                'type' => 'integer',
-                                'description' => 'Número máximo de conteúdos a retornar (padrão: 5)',
-                                'default' => 5
-                            ]
-                        ],
-                        'required' => ['query']
-                    ]
-                ]
-            ],
-            [
-                'type' => 'function',
-                'function' => [
-                    'name' => 'get_recipe_details',
-                    'description' => 'Obter detalhes completos de uma receita específica',
-                    'parameters' => [
-                        'type' => 'object',
-                        'properties' => [
-                            'recipe_id' => [
-                                'type' => 'integer',
-                                'description' => 'ID da receita'
-                            ]
-                        ],
-                        'required' => ['recipe_id']
-                    ]
-                ]
-            ],
-            [
-                'type' => 'function',
-                'function' => [
-                    'name' => 'get_product_details',
-                    'description' => 'Obter detalhes completos de um produto específico',
-                    'parameters' => [
-                        'type' => 'object',
-                        'properties' => [
-                            'product_id' => [
-                                'type' => 'integer',
-                                'description' => 'ID do produto'
-                            ]
-                        ],
-                        'required' => ['product_id']
-                    ]
-                ]
-            ],
-            [
-                'type' => 'function',
-                'function' => [
-                    'name' => 'find_recipes_with_product_id',
-                    'description' => 'Encontrar receitas que usam um produto específico',
-                    'parameters' => [
-                        'type' => 'object',
-                        'properties' => [
-                            'product_id' => [
-                                'type' => 'integer',
-                                'description' => 'ID do produto'
-                            ],
-                            'ingredient_type' => [
-                                'type' => 'string',
-                                'description' => 'Tipo de ingrediente (main, supporting, ou null para ambos)',
-                                'enum' => ['main', 'supporting', null]
-                            ]
-                        ],
-                        'required' => ['product_id']
-                    ]
-                ]
-            ],
-            [
-                'type' => 'function',
-                'function' => [
-                    'name' => 'find_products_with_recipe_id',
-                    'description' => 'Encontrar produtos que usam uma receita específica',
-                    'parameters' => [
-                        'type' => 'object',
-                        'properties' => [
-                            'recipe_id' => [
-                                'type' => 'integer',
-                                'description' => 'ID da receita'
-                            ]
-                        ],
-                        'required' => ['recipe_id']
-                    ]
-                ]
-            ],
-            [
-                'type' => 'function',
-                'function' => [
-                    'name' => 'transfer_to_human_agent',
-                    'description' => 'Transferir o usuário para um agente humano',
-                    'parameters' => [
-                        'type' => 'object',
-                        'properties' => [
-                            'user_id' => [
-                                'type' => 'string',
-                                'description' => 'ID do usuário'
-                            ]
-                        ],
-                        'required' => ['user_id']
-                    ]
-                ]
-            ]
-        ];
-    }
+        $tools = [];
 
-    /**
-     * Execute a tool function
-     */
-    public function executeTool(string $functionName, array $parameters): array
-    {
-        try {
-            return match ($functionName) {
-                'search_recipes' => $this->searchRecipes($parameters),
-                'search_products' => $this->searchProducts($parameters),
-                'search_content' => $this->searchContent($parameters),
-                'get_recipe_details' => $this->getRecipeDetails($parameters),
-                'get_product_details' => $this->getProductDetails($parameters),
-                'find_recipes_with_product_id' => $this->findRecipesWithProductId($parameters),
-                'transfer_to_human_agent' => $this->transferToHumanAgent($parameters),
-                default => ['error' => 'Unknown function: ' . $functionName]
-            };
-        } catch (\Exception $e) { 
-            Log::error('Error executing tool function', [
-                'function' => $functionName,
-                'parameters' => $parameters,
-                'error' => $e->getMessage()
-            ]);
-            
-            return ['error' => 'Erro ao executar função: ' . $e->getMessage()];
-        }
+        $tools[] = Tool::as('search_recipes')
+            ->for('Buscar receitas com base em uma consulta de texto usando busca semântica')
+            ->withStringParameter('query', 'Texto da consulta para buscar receitas')
+            ->withNumberParameter('limit', 'Número máximo de receitas a retornar (padrão: 5)', false)
+            ->using(function (string $query, int $limit) {
+                return $this->searchRecipes($query, $limit);
+            });
+
+        $tools[] = Tool::as('search_products')
+            ->for('Buscar produtos com base em uma consulta de texto usando busca semântica')
+            ->withStringParameter('query', 'Texto da consulta para buscar produtos')
+            ->withNumberParameter('limit', 'Número máximo de produtos a retornar (padrão: 5)', false)
+            ->using(function (string $query, int $limit) {
+                return $this->searchProducts($query, $limit);
+            });
+
+        $tools[] = Tool::as('search_content')
+            ->for('Buscar conteúdo com base em uma consulta de texto usando busca semântica')
+            ->withStringParameter('query', 'Texto da consulta para buscar conteúdo')
+            ->withNumberParameter('limit', 'Número máximo de conteúdos a retornar (padrão: 5)', false)
+            ->using(function (string $query, int $limit) {
+                return $this->searchContent($query, $limit);
+            });
+
+        $tools[] = Tool::as('get_recipe_details')
+            ->for('Obter detalhes completos de uma receita específica')
+            ->withNumberParameter('recipeId', 'ID da receita')
+            ->using(function (int $recipeId) {
+                return $this->getRecipeDetails($recipeId);
+            });
+
+        $tools[] = Tool::as('get_product_details')
+            ->for('Obter detalhes completos de um produto específico')
+            ->withNumberParameter('productId', 'ID do produto')
+            ->using(function (int $productId) {
+                return $this->getProductDetails($productId);
+            });
+        
+        $tools[] = Tool::as('get_content_details')
+            ->for('Obter detalhes completos de um conteúdo específico')
+            ->withNumberParameter('contentId', 'ID do conteúdo')
+            ->using(function (int $contentId) {
+                return $this->getContentDetails($contentId);
+            });
+
+        $tools[] = Tool::as('find_recipes_with_product_id')
+            ->for('Encontrar receitas que usam um produto específico')
+            ->withNumberParameter('productId', 'ID do produto')
+            ->withStringParameter('ingredientType', 'Tipo de ingrediente (main, supporting, ou null para ambos)', false)
+            ->using(function (int $productId, string $ingredientType) {
+                return $this->findRecipesWithProductId($productId, $ingredientType);
+            });
+
+        $tools[] = Tool::as('find_content_with_product_id')
+            ->for('Encontrar conteúdo que usa um produto específico')
+            ->withNumberParameter('productId', 'ID do produto')
+            ->using(function (int $productId) {
+                return $this->findContentWithProductId($productId);
+            });
+
+        $tools[] = Tool::as('find_product_with_recipe_id')
+            ->for('Encontrar produtos que usam uma receita específica')
+            ->withNumberParameter('recipeId', 'ID da receita')
+            ->using(function (int $recipeId) {
+                return $this->findProductsWithRecipeId($recipeId);
+            });
+
+        $tools[] = Tool::as('find_content_with_recipe_id')
+            ->for('Encontrar conteúdo que usa uma receita específica')
+            ->withNumberParameter('recipeId', 'ID da receita')
+            ->using(function (int $recipeId) {
+                return $this->findContentWithRecipeId($recipeId);
+            });
+
+        $tools[] = Tool::as('find_product_with_content_id')
+            ->for('Encontrar produtos que usam um conteúdo específico')
+            ->withNumberParameter('contentId', 'ID do conteúdo')
+            ->using(function (int $contentId) {
+                return $this->findProductsWithContentId($contentId);
+            });
+
+        $tools[] = Tool::as('find_recipes_with_content_id')
+            ->for('Encontrar receitas que usam um conteúdo específico')
+            ->withNumberParameter('contentId', 'ID do conteúdo')
+            ->using(function (int $contentId) {
+                return $this->findRecipesWithContentId($contentId);
+            });
+
+        return $tools;
     }
 
     /**
      * Search recipes using semantic search
      */
-    protected function searchRecipes(array $parameters): array
+    protected function searchRecipes(string $query, int $limit): string
     {
-        $query = $parameters['query'];
-        $limit = $parameters['limit'] ?? 5;
-
         $response = $this->prismService->getEmbedding($query);
         $embedding = $this->prismService->extractEmbeddingFromResponse($response);
         
         if (!$embedding || !is_array($embedding)) {
-            return ['error' => 'Falha ao gerar embedding para a consulta'];
+            return 'Falha ao gerar embedding para a consulta';
         }
-
+        Log::info('recipe searched: ' . $query);
         $recipes = Recipe::query()
             ->nearestNeighbors('embedding', $embedding, Distance::Cosine)
             ->take($limit)
@@ -251,35 +155,32 @@ class AIToolService
                     'cuisines' => $recipe->cuisines,
                 ];
             });
-
-        return ['recipes' => $recipes];
+        Log::info('recipes found: ' . $recipes);
+        return $recipes;
     }
 
     /**
      * Search products using semantic search
      */
-    protected function searchProducts(array $parameters): array
+    protected function searchProducts(string $query, int $limit): string
     {
-        $query = $parameters['query'];
-        $limit = $parameters['limit'] ?? 5;
-
         $response = $this->prismService->getEmbedding($query);
         $embedding = $this->prismService->extractEmbeddingFromResponse($response);
         
         if (!$embedding || !is_array($embedding)) {
-            return ['error' => 'Falha ao gerar embedding para a consulta'];
+            return 'Falha ao gerar embedding para a consulta';
         }
 
         $products = Product::query()
             ->nearestNeighbors('embedding', $embedding, Distance::Cosine)
             ->take($limit)
-            ->with(['groupProduct', 'detail'])
+            ->with(['groupProduct'])
             ->where('status', true)
             ->get()
             ->map(function ($product) {
                 return [
                     'id' => $product->id,
-                    'descricao' => $product->descricao,
+                    'nome_produto' => $product->descricao,
                     'codigo_padrao' => $product->codigo_padrao,
                     'sku' => $product->sku,
                     'group_product' => $product->groupProduct?->nome,
@@ -291,30 +192,22 @@ class AIToolService
                     'descricao_modos_preparo' => $product->descricao_modos_preparo,
                     'descricao_rendimentos' => $product->descricao_rendimentos,
                     'informacao_adicional' => $product->informacao_adicional,
-                    'detail' => $product->detail ? [
-                        'descricao_produto' => $product->detail->descricao_produto,
-                        'ingredientes' => $product->detail->ingredientes,
-                        'modo_preparo' => $product->detail->modo_preparo,
-                    ] : null,
                 ];
             });
 
-        return ['products' => $products];
+        return $products;
     }
 
     /**
      * Search content using semantic search
      */
-    protected function searchContent(array $parameters): array
+    protected function searchContent(string $query, int $limit): string
     {
-        $query = $parameters['query'];
-        $limit = $parameters['limit'] ?? 5;
-
         $response = $this->prismService->getEmbedding($query);
         $embedding = $this->prismService->extractEmbeddingFromResponse($response);
         
         if (!$embedding || !is_array($embedding)) {
-            return ['error' => 'Falha ao gerar embedding para a consulta'];
+            return 'Falha ao gerar embedding para a consulta';
         }
 
         $contents = Content::query()
@@ -338,25 +231,22 @@ class AIToolService
                 ];
             });
 
-        return ['contents' => $contents];
+        return $contents;
     }
 
     /**
      * Get detailed information about a specific recipe
      */
-    protected function getRecipeDetails(array $parameters): array
+    protected function getRecipeDetails(int $recipeId): string
     {
-        $recipeId = $parameters['recipe_id'];
-        
-        $recipe = Recipe::with(['products.detail', 'contents'])
+        $recipe = Recipe::with(['products', 'contents', 'ingredients'])
             ->find($recipeId);
 
         if (!$recipe) {
-            return ['error' => 'Receita não encontrada'];
+            return 'Receita não encontrada';
         }
 
-        return [
-            'recipe' => [
+        return json_encode([
                 'id' => $recipe->id,
                 'recipe_name' => $recipe->recipe_name,
                 'recipe_code' => $recipe->recipe_code,
@@ -373,45 +263,25 @@ class AIToolService
                 'usage_groups' => $recipe->usage_groups,
                 'preparation_techniques' => $recipe->preparation_techniques,
                 'consumption_occasion' => $recipe->consumption_occasion,
-                'products' => $recipe->products->map(function ($product) {
-                    return [
-                        'id' => $product->id,
-                        'descricao' => $product->descricao,
-                        'marca' => $product->marca,
-                        'quantity' => $product->pivot->quantity,
-                        'unit' => $product->pivot->unit,
-                        'ingredient_type' => $product->pivot->ingredient_type,
-                        'preparation_notes' => $product->pivot->preparation_notes,
-                        'optional' => $product->pivot->optional,
-                    ];
-                }),
-                'contents' => $recipe->contents->map(function ($content) {
-                    return [
-                        'id' => $content->id,
-                        'nome_conteudo' => $content->nome_conteudo,
-                        'content_code' => $content->content_code,
-                    ];
-                }),
-            ]
-        ];
+                'contents_count' => $recipe->contents->count(),
+                'products_count' => $recipe->products->count(),
+                'ingredients' => $recipe->ingredients,
+        ]);
     }
 
     /**
      * Get detailed information about a specific product
      */
-    protected function getProductDetails(array $parameters): array
+    protected function getProductDetails(int $productId): string
     {
-        $productId = $parameters['product_id'];
-        
-        $product = Product::with(['groupProduct', 'detail', 'images', 'recipes'])
+        $product = Product::with(['groupProduct', 'images', 'recipes', 'contents'])
             ->find($productId);
 
         if (!$product) {
-            return ['error' => 'Produto não encontrado'];
+            return 'Produto não encontrado';
         }
 
-        return [
-            'product' => [
+        return json_encode([
                 'id' => $product->id,
                 'descricao' => $product->descricao,
                 'marca' => $product->marca,
@@ -423,32 +293,49 @@ class AIToolService
                     'nome' => $product->groupProduct->nome,
                     'descricao' => $product->groupProduct->descricao,
                 ] : null,
-                'detail' => $product->detail ? [
-                    'descricao_produto' => $product->detail->descricao_produto,
-                    'ingredientes' => $product->detail->ingredientes,
-                    'modo_preparo' => $product->detail->modo_preparo,
-                    'informacoes_nutricionais' => $product->detail->informacoes_nutricionais,
-                    'informacoes_uso' => $product->detail->informacoes_uso,
-                ] : null,
+                'images' => $product->images,
                 'recipes_count' => $product->recipes->count(),
-                'main_recipes_count' => $product->mainRecipes()->count(),
-                'supporting_recipes_count' => $product->supportingRecipes()->count(),
-            ]
-        ];
+                'contents_count' => $product->contents->count(),
+            ]);
+    }
+
+    /**
+     * Get detailed information about a specific content
+     */
+    protected function getContentDetails(int $contentId): string
+    {
+        $content = Content::find($contentId);
+
+        if (!$content) {
+            return 'Conteúdo não encontrado';
+        }
+
+        return json_encode([
+                'id' => $content->id,
+                'nome_conteudo' => $content->nome_conteudo,
+                'content_code' => $content->content_code,
+                'tipo_conteudo' => $content->tipo_conteudo,
+                'pilares' => $content->pilares,
+                'canal' => $content->canal,
+                'links_conteudo' => $content->links_conteudo,
+                'cozinheiro' => $content->cozinheiro,
+                'comprador' => $content->comprador,
+                'administrador' => $content->administrador,
+                'descricao_conteudo' => $content->descricao_conteudo,
+                'recipe_count' => $content->recipes()->count(),
+                'product_count' => $content->products()->count(),
+            ]);
     }
 
     /**
      * Find recipes that use a specific product
      */
-    protected function findRecipesWithProductId(array $parameters): array
+    protected function findRecipesWithProductId(int $productId, string $ingredientType): string
     {
-        $productId = $parameters['product_id'];
-        $ingredientType = $parameters['ingredient_type'] ?? null;
-        
         $product = Product::find($productId);
         
         if (!$product) {
-            return ['error' => 'Produto não encontrado'];
+            return 'Produto não encontrado';
         }
 
         $query = $product->recipes();
@@ -457,8 +344,8 @@ class AIToolService
             $query->wherePivot('ingredient_type', $ingredientType);
         }
 
-        $recipes = $query->get()->map(function ($recipe) {
-            return [
+        return $query->get()->map(function ($recipe) {
+            return json_encode([
                 'id' => $recipe->id,
                 'recipe_name' => $recipe->recipe_name,
                 'cuisine' => $recipe->cuisine,
@@ -468,37 +355,125 @@ class AIToolService
                 'quantity' => $recipe->pivot->quantity,
                 'unit' => $recipe->pivot->unit,
                 'optional' => $recipe->pivot->optional,
-            ];
+            ]);
         });
 
-        return [
-            'product' => [
+    }
+
+    /**
+     * Find content that uses a specific product
+     */
+    protected function findContentWithProductId(int $productId): string
+    {
+        $content = Content::find($productId);
+
+        if (!$content) {
+            return 'Conteúdo não encontrado';
+        }
+
+        return $content->map(function ($content) {
+                return json_encode([
+                    'id' => $content->id,
+                    'nome_conteudo' => $content->nome_conteudo,
+                ]);
+            });
+    }
+
+    /**
+     * Find products that use a specific recipe
+     */
+    protected function findProductsWithRecipeId(int $recipeId): string
+    {
+        $recipe = Recipe::find($recipeId);
+
+        if (!$recipe) {
+            return 'Receita não encontrada';
+        }
+
+        return $recipe->products->map(function ($product) {
+                return json_encode([
+                    'id' => $product->id,
+                    'nome_produto' => $product->descricao,
+                    'marca' => $product->marca,
+                ]);
+            });
+    }
+
+    /**
+     * Find content that uses a specific recipe
+     */
+    protected function findContentWithRecipeId(int $recipeId): string
+    {
+        $content = Content::find($recipeId);
+
+        if (!$content) {
+            return 'Conteúdo não encontrado';
+        }
+
+        return $content->map(function ($content) {
+                return json_encode([
+                    'id' => $content->id,
+                    'nome_conteudo' => $content->nome_conteudo,
+                ]);
+            });
+    }
+
+    /**
+     * Find products that use a specific content
+     */
+    protected function findProductsWithContentId(int $contentId): string
+    {
+        $content = Content::find($contentId);
+        
+        if (!$content) {
+            return 'Conteúdo não encontrado';
+        }
+
+        return $content->products->map(function ($product) {
+            return json_encode([
                 'id' => $product->id,
-                'descricao' => $product->descricao,
-                'marca' => $product->marca,
-            ],
-            'recipes' => $recipes
-        ];
+                'nome_produto' => $product->descricao,
+            ]);
+        });
+    }
+
+    /**
+     * Find recipes that use a specific content
+     */
+    protected function findRecipesWithContentId(int $contentId): string
+    {
+        $content = Content::find($contentId);
+        
+        if (!$content) {
+            return 'Conteúdo não encontrado';
+        }
+
+        return $content->recipes->map(function ($recipe) {
+            return json_encode([
+                'id' => $recipe->id,
+                'recipe_name' => $recipe->recipe_name,
+            ]);
+        });
     }
 
     /**
      * Calls an Botmaker webhook and transfers user to human agent
      */
-    protected function transferToHumanAgent(array $parameters): array
+    protected function transferToHumanAgent(string $userId): string
     {
         $botmakerBaseUrl = config('services.botmaker.base_url');
         $botmakerToken = config('services.botmaker.token');
 
         $response = Http::post($botmakerBaseUrl, [
             'token' => $botmakerToken,
-            'user_id' => $parameters['user_id'],
+            'user_id' => $userId,
         ]);
 
         if ($response->status() !== 200) {
-            return ['status' => 'error', 'response' => 'Falha ao transferir para agente humano: ' . $response->body()];
+            return 'Falha ao transferir para agente humano: ' . $response->body();
         }
         else {
-            return ['status' => 'success', 'response' => 'Transferencia para agente humano realizada com sucesso'];
+            return 'Transferencia para agente humano realizada com sucesso';
         }
     }
 }

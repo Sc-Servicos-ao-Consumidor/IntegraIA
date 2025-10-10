@@ -24,7 +24,7 @@ class EmbeddingService
     {
         try {
             $embeddingText = $this->getEmbeddingText($model);
-            
+
             if (!$embeddingText) {
                 Log::warning("No embedding text generated for model", [
                     'model_type' => get_class($model),
@@ -104,11 +104,11 @@ class EmbeddingService
             $recipe->recipe_description,
             $recipe->ingredients_description,
             $recipe->preparation_method,
-            $recipe->ingredients()->implode(', '),
+            $recipe->ingredientNamesList(),
             $recipe->usage_groups,
             $recipe->preparation_techniques,
             $recipe->consumption_occasion,
-            $recipe->cuisines()->implode(', '),
+            $recipe->cuisineNamesList(),
         ]);
 
         return implode("\n", $parts);
