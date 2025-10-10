@@ -16,7 +16,7 @@ const mainNavItems: NavItem[] = [
     // },
     {
         title: 'Busca IA',
-        href: '/recipes/semantic-search',
+        href: '/semantic-search',
         icon: Search,
     },
     {

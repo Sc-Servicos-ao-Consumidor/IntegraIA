@@ -13,3 +13,8 @@ Schedule::command('products:import')
     ->dailyAt('00:00')
     ->withoutOverlapping()
     ->runInBackground();
+
+Schedule::command('embedding:generate-all')
+    ->dailyAt('00:00')
+    ->withoutOverlapping()
+    ->runInBackground();

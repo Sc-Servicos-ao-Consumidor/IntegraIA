@@ -485,7 +485,7 @@ const renderedMarkdown = computed(() => {
 const breadcrumbs = [
     {
         title: 'Busca Semântica',
-        href: '/recipes/semantic-search',
+        href: '/semantic-search',
     },
 ]
 
