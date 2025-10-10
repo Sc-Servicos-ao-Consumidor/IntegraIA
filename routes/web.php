@@ -12,7 +12,7 @@ Route::get('/', function () {
 })->name('home');
 
 Route::get('dashboard', function () {
-    return redirect()->route('recipes.semantic-search');
+    return redirect()->route('semantic-search');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware(['auth', 'verified'])->group(function () {
