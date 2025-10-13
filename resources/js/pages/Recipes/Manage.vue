@@ -212,9 +212,9 @@
                             <select
                                 v-model="form.channel"
                                 id="channel"
-                                class="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                                multiple
+                                class="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 min-h-[42px]"
                             >
-                                <option selected disabled value="">Selecione</option>
                                 <option value="padaria">Padaria</option>
                                 <option value="lanchonete">Lanchonete</option>
                                 <option value="restaurante">Restaurante</option>
@@ -954,7 +954,7 @@ const form = useForm({
     preparation_time: '',
     difficulty_level: '',
     yield: '',
-    channel: '',
+    channel: [],
     recipe_description: null,
     recipe_prompt: null,
     ingredients_description: null,
@@ -997,7 +997,9 @@ function editRecipe(recipe) {
     form.preparation_time = recipe.preparation_time || ''
     form.difficulty_level = recipe.difficulty_level || ''
     form.yield = recipe.yield || ''
-    form.channel = recipe.channel || ''
+    form.channel = Array.isArray(recipe.channel)
+        ? recipe.channel
+        : (recipe.channel ? String(recipe.channel).split(',').map(s => s.trim()).filter(Boolean) : [])
     form.recipe_description = recipe.recipe_description || ''
     form.recipe_prompt = recipe.recipe_prompt || ''
     form.ingredients_description = recipe.ingredients_description

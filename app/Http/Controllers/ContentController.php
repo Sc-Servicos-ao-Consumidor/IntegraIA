@@ -50,7 +50,8 @@ class ContentController extends Controller
             'content_code' => 'nullable|string|max:255|unique:contents,content_code,' . $request->id,
             'tipo_conteudo' => 'required|string|max:255',
             'pilares' => 'nullable|string|max:255',
-            'canal' => 'nullable|string|max:255',
+            'canal' => 'nullable',
+            'canal.*' => 'string|in:padaria,lanchonete,restaurante,confeitaria',
             'links_conteudo' => 'nullable|array',
             'cozinheiro' => 'required|boolean',
             'comprador' => 'required|boolean',
@@ -68,6 +69,17 @@ class ContentController extends Controller
             'selected_products.*.featured' => 'nullable|in:sim,nao',
             'selected_products.*.notes' => 'nullable|string',
         ]);
+
+        // Normalize canal: accept array and store as CSV string
+        if (isset($data['canal'])) {
+            if (is_array($data['canal'])) {
+                $data['canal'] = implode(',', array_values(array_filter(array_map('strval', $data['canal']))));
+            } elseif ($data['canal'] === null) {
+                $data['canal'] = null;
+            } else {
+                $data['canal'] = (string) $data['canal'];
+            }
+        }
 
         $content = Content::updateOrCreate(
             ['id' => $request->id],

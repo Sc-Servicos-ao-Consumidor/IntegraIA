@@ -65,7 +65,8 @@ class RecipeController extends Controller
             'preparation_time' => 'nullable|integer|min:1',
             'difficulty_level' => 'nullable|string|in:muito_facil,facil,elaborada,muito_elaborada',
             'yield' => 'nullable|string|max:255',
-            'channel' => 'nullable|string|max:255',
+            'channel' => 'nullable',
+            'channel.*' => 'string|in:padaria,lanchonete,restaurante,confeitaria',
             
             // Content fields
             'recipe_description' => 'string',
@@ -98,6 +99,17 @@ class RecipeController extends Controller
             'selected_cuisines.*.cuisine_id' => 'nullable|exists:cuisines,id',
             'selected_cuisines.*.name' => 'nullable|string|max:255',
         ]);
+
+        // Normalize channel: accept array and store as CSV string
+        if (isset($data['channel'])) {
+            if (is_array($data['channel'])) {
+                $data['channel'] = implode(',', array_values(array_filter(array_map('strval', $data['channel']))));
+            } elseif ($data['channel'] === null) {
+                $data['channel'] = null;
+            } else {
+                $data['channel'] = (string) $data['channel'];
+            }
+        }
 
         $recipe = Recipe::updateOrCreate(
             ['id' => $request->id],

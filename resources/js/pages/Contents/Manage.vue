@@ -134,9 +134,9 @@
                         <select
                             v-model="form.canal"
                             id="canal"
-                            class="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                            multiple
+                            class="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 min-h-[42px]"
                         >
-                            <option selected disabled value="">Selecione</option>
                             <option value="padaria">Padaria</option>
                             <option value="lanchonete">Lanchonete</option>
                             <option value="restaurante">Restaurante</option>
@@ -535,7 +535,7 @@ const form = useForm({
     imagens_rendimentos_cadastradas: [],
     tipo_conteudo: '',
     pilares: '',
-    canal: '',
+    canal: [],
     links_conteudo: [{ nome: '', url: '' }],
     cozinheiro: '',
     comprador: '',
@@ -625,7 +625,9 @@ function editContent(content) {
     form.imagens_rendimentos_cadastradas = content.imagens_rendimentos_cadastradas || []
     form.tipo_conteudo = content.tipo_conteudo
     form.pilares = content.pilares
-    form.canal = content.canal
+    form.canal = Array.isArray(content.canal)
+        ? content.canal
+        : (content.canal ? String(content.canal).split(',').map(s => s.trim()).filter(Boolean) : [])
     form.links_conteudo = content.links_conteudo || [{ nome: '', url: '' }]
     form.cozinheiro = content.cozinheiro
     form.comprador = content.comprador
