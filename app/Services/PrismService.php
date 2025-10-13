@@ -70,6 +70,7 @@ class PrismService
                 ->using($this->getProvider(), $this->modelName)
                 ->withSystemPrompt($prompt)
                 ->withMessages($messages)
+                ->withTools($tools)
                 ->withClientRetry(3, 100)
                 ->withMaxSteps(10)
                 ->asText();

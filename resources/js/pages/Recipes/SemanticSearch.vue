@@ -535,21 +535,22 @@ const search = async () => {
     
     try {
         // Perform semantic search
-        const searchResponse = await axios.get('/recipes/search', {
-            params: { 
-                query: query.value,
-                type: 'all',
-                limit: 2
-            }
-        })
-        results.value = searchResponse.data
+        // const searchResponse = await axios.get('/recipes/search', {
+        //     params: { 
+        //         query: query.value,
+        //         type: 'all',
+        //         limit: 2
+        //     }
+        // })
+        // results.value = searchResponse.data
 
         // Get AI assistant response if enabled
         if (showAIAssistant.value) {
             try {
                 const assistantRes = await axios.post('/recipes/assistant', {
                     text: query.value,
-                    context: results.value,
+                    context: '',
+                    use_tools: true
                 })
                 assistantResponse.value = assistantRes.data.response
             } catch (assistantError) {

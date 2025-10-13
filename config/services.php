@@ -48,4 +48,9 @@ return [
         'chat_model' => env('PRISM_CHAT_MODEL', 'gpt-4o-mini'),
     ],
 
+    'botmaker' => [
+        'base_url' => env('BOTMAKER_BASE_URL'),
+        'token' => env('BOTMAKER_TOKEN'),
+    ],
+
 ];

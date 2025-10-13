@@ -103,12 +103,6 @@ class ContentSeeder extends Seeder
                 'descricao_lista_ingredientes' => 'Lista completa dos ingredientes para preparação de massas frescas: farinha de trigo especial, ovos frescos, azeite extra virgem.',
                 'descricao_modos_preparo' => 'Passo a passo detalhado para preparação de massas artesanais: técnicas de sovamento, tempo de descanso da massa.',
                 'descricao_rendimentos' => 'Rendimento para 4-6 porções. Tempo de preparo: 45 minutos + 30 minutos de descanso.',
-                'imagens_nutricionais_cadastradas' => [
-                    ['nome' => 'Tabela Nutricional Massa Tradicional', 'url' => 'https://exemplo.com/nutricional1.jpg']
-                ],
-                'imagens_ingredientes_cadastradas' => [
-                    ['nome' => 'Ingredientes Básicos', 'url' => 'https://exemplo.com/ingredientes1.jpg']
-                ],
                 'tipo_conteudo' => 'artigos',
                 'pilares' => 'treinamento',
                 'canal' => 'padaria',
