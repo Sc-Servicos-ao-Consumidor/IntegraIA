@@ -130,7 +130,7 @@ class AIToolService
         if (!$embedding || !is_array($embedding)) {
             return 'Falha ao gerar embedding para a consulta';
         }
-        Log::info('recipe searched: ' . $query);
+
         $recipes = Recipe::query()
             ->nearestNeighbors('embedding', $embedding, Distance::Cosine)
             ->take($limit)
@@ -153,9 +153,10 @@ class AIToolService
                     'preparation_techniques' => $recipe->preparation_techniques,
                     'consumption_occasion' => $recipe->consumption_occasion,
                     'cuisines' => $recipe->cuisines,
+                    'aditional_prompt' => $recipe->recipe_prompt,
                 ];
             });
-        Log::info('recipes found: ' . $recipes);
+
         return $recipes;
     }
 
@@ -192,6 +193,7 @@ class AIToolService
                     'descricao_modos_preparo' => $product->descricao_modos_preparo,
                     'descricao_rendimentos' => $product->descricao_rendimentos,
                     'informacao_adicional' => $product->informacao_adicional,
+                    'aditional_prompt' => $product->prompt_uso_informacoes_produto,
                 ];
             });
 
@@ -228,6 +230,7 @@ class AIToolService
                     'comprador' => $content->comprador,
                     'administrador' => $content->administrador,
                     'descricao_conteudo' => $content->descricao_conteudo,
+                    'aditional_prompt' => $content->content_prompt,
                 ];
             });
 
@@ -266,6 +269,7 @@ class AIToolService
                 'contents_count' => $recipe->contents->count(),
                 'products_count' => $recipe->products->count(),
                 'ingredients' => $recipe->ingredients,
+                'recipe_prompt' => $recipe->recipe_prompt,
         ]);
     }
 
@@ -324,6 +328,7 @@ class AIToolService
                 'descricao_conteudo' => $content->descricao_conteudo,
                 'recipe_count' => $content->recipes()->count(),
                 'product_count' => $content->products()->count(),
+                'content_prompt' => $content->content_prompt,
             ]);
     }
 
