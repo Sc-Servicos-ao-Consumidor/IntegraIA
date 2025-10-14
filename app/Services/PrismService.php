@@ -129,7 +129,7 @@ class PrismService
         Você deve fornecer respostas claras e concisas, sugerindo respostas relevantes ao contexto e úteis.
         Use as ferramentas disponíveis para encontrar mais informações quando necessário.
         Sempre utilize as ferramentas disponíveis para encontrar mais informações sobre o contexto fornecido.
-        Sempre busque por informações relevantes nas ferramentas de receitas, conteúdos e produtos, independente do contexto fornecido.
+        **Sempre utilize as ferramentas search_recipes, search_products e search_content para encontrar informações mesmo que o contexto não seja relevante busque em todas as ferramentas**.
         Responda apenas receitas, produtos e conteúdos que estão no contexto fornecido.
         ";
 
