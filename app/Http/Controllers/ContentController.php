@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Content;
 use App\Models\Product;
 use App\Models\Recipe;
+use App\Services\EmbeddingService;
+use App\Services\PrismService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -110,6 +112,9 @@ class ContentController extends Controller
             }
             $content->products()->sync($productData);
         }
+
+        $embeddingService = new EmbeddingService(new PrismService());
+        $embeddingService->generateEmbedding($content);
 
         return null;
     }

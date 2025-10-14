@@ -6,6 +6,8 @@ use App\Models\Product;
 use App\Models\GroupProduct;
 use App\Models\Recipe;
 use App\Models\Content;
+use App\Services\EmbeddingService;
+use App\Services\PrismService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
@@ -226,6 +228,10 @@ class ProductController extends Controller
             }
 
             DB::commit();
+
+            $embeddingService = new EmbeddingService(new PrismService());
+            $embeddingService->generateEmbedding($product);
+
             return redirect()->route('products.index')->with('success', 'Produto salvo com sucesso!');
 
         } catch (\Exception $e) {

@@ -191,6 +191,9 @@ class RecipeController extends Controller
             $recipe->cuisines()->sync($cuisineIds);
         }
 
+        $embeddingService = new EmbeddingService(new PrismService());
+        $embeddingService->generateEmbedding($recipe);
+
         return null;
     }
 
