@@ -1002,8 +1002,8 @@ function editRecipe(recipe) {
         : (recipe.channel ? String(recipe.channel).split(',').map(s => s.trim()).filter(Boolean) : [])
     form.recipe_description = recipe.recipe_description || ''
     form.recipe_prompt = recipe.recipe_prompt || ''
-    form.ingredients_description = recipe.ingredients_description
-    form.preparation_method = recipe.preparation_method
+    form.ingredients_description = recipe.ingredients_description || ''
+    form.preparation_method = recipe.preparation_method || ''
     form.usage_groups = recipe.usage_groups || ''
     form.preparation_techniques = recipe.preparation_techniques || ''
     form.consumption_occasion = recipe.consumption_occasion || ''

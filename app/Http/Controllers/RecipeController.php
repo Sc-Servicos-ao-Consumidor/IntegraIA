@@ -70,6 +70,7 @@ class RecipeController extends Controller
             
             // Content fields
             'recipe_description' => 'string',
+            'ingredients_description' => 'nullable|string',
             'recipe_prompt' => 'nullable|string',
             'preparation_method' => 'string',
             
