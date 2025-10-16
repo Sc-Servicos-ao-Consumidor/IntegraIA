@@ -61,9 +61,9 @@ class PrismService
     /**
      * Get AI response with optional context and tools
      */
-    public function getResponse(array $messages, $context = null, array $tools = []): array
+    public function getResponse(array $messages, $context = null, array $tools = [], $basePrompt = null): array
     {
-        $prompt = $this->buildSystemPrompt($context);
+        $prompt = $this->buildSystemPrompt($context, $basePrompt);
 
         try {
             $response = Prism::text()
@@ -121,9 +121,9 @@ class PrismService
     /**
      * Build system prompt for AI assistant
      */
-    private function buildSystemPrompt($context = null): string
+    private function buildSystemPrompt($context = null, $basePrompt = null): string
     {
-        $basePrompt = " Você é um assistente virtual da empresa Unilever, especializado em receitas da plataforma Unilever, produtos e conteúdos culinários da marca.
+        $basePrompt = $basePrompt ?? " Você é um assistente virtual da empresa Unilever, especializado em receitas da plataforma Unilever, produtos e conteúdos culinários da marca.
 
 
             **Nunca** crie, deduza, invente ou complete informações e/ou receitas que **não existam nas respostas das ferramentas disponíveis**.

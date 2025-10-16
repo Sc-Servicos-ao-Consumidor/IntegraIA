@@ -157,7 +157,17 @@ class AIToolService
                 ];
             });
 
-        return $recipes;
+        $prism = new PrismService();
+        $messages = $prism->buildMessages([
+            [
+                'type' => 'user',
+                'content' => 'Verifique se as receitas encontradas são relevantes para uma consulta de IA e retorne apenas as mais relevantes. Se não houver receitas relevantes, retorne uma mensagem de que não foi possível encontrar receitas relevantes. Retorne as receitas em formato JSON.'
+            ]
+        ]);
+
+        $response = $prism->getResponse($messages, $recipes, [], 'Você é um assistente da IA Unilever. Seu objetivo é ajudar a encontrar receitas relevantes para uma consulta de IA. Pergunta original do usuário: ' . $query);
+
+        return $response['response'];
     }
 
     /**

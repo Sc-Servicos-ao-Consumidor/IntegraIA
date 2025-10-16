@@ -347,47 +347,6 @@ class RecipeController extends Controller
 
             $response = $prism->getResponse($text, $context, $tools);
 
-            // // Handle tool calls if present
-            // if (isset($response['tool_calls']) && !empty($response['tool_calls'])) {
-            //     $aiToolService = new AIToolService($prism, new EmbeddingService($prism));
-            //     $toolResults = [];
-
-            //     foreach ($response['tool_calls'] as $toolCall) {
-            //         $functionName = $toolCall['function']['name'] ?? '';
-            //         $parameters = $toolCall['function']['arguments'] ?? [];
-                    
-            //         if (is_string($parameters)) {
-            //             $parameters = json_decode($parameters, true) ?? [];
-            //         }
-
-            //         $result = $aiToolService->executeTool($functionName, $parameters);
-                    
-            //         // Clean result to remove any embedding data
-            //         $cleanResult = $this->cleanResultFromEmbeddings($result);
-                    
-            //         $toolResults[] = [
-            //             'tool_call_id' => $toolCall['id'] ?? uniqid(),
-            //             'function_name' => $functionName,
-            //             'result' => $cleanResult
-            //         ];
-            //     }
-
-            //     // Send tool results back to AI for final response
-            //     $finalResponse = $prism->getResponse(
-            //         "Com base nos resultados das ferramentas, forneça uma resposta completa ao usuário.",
-            //         [
-            //             'original_query' => $text,
-            //             'tool_results' => $toolResults,
-            //             'context' => $context
-            //         ]
-            //     );
-
-            //     return response()->json([
-            //         'response' => $finalResponse['response'] ?? $finalResponse,
-            //         'tool_calls' => $toolResults
-            //     ], 200);
-            // }
-
             if(isset($response['status']) && $response['status']){
                     return response()->json([
                     'response' => $response['response'] ?? $response
