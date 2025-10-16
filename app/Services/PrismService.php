@@ -156,6 +156,9 @@ class PrismService
             - Sempre que possível, inclua detalhes como ingredientes, instruções ou descrições obtidas pela ferramenta `search_details`.
             - Caso não existam resultados relevantes, informe isso de forma educada e ofereça alternativas ou sugestões de busca mais específicas.
             - Não faça suposições nem gere conteúdo genérico; apenas respostas verificáveis e derivadas de fontes confiáveis ou ferramentas ativas.
+            - Se a resposta incluir produtos das marcas Knorr ou Arisco, concentre-se em apenas uma das duas marcas na resposta.
+            - Dê preferência à Knorr se ambas estiverem presentes.
+            - Outros produtos de marcas diferentes podem continuar sendo mencionados normalmente, desde que não concorram diretamente com Knorr ou Arisco.
 
             ## Fluxo Ideal
             1. O usuário solicita uma receita, produto ou conteúdo.
