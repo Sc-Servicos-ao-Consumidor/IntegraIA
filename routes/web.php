@@ -19,6 +19,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/recipes/search', [RecipeController::class, 'search']);
     Route::get('/recipes/search-ingredients', [RecipeController::class, 'searchIngredients']);
     Route::get('/recipes/search-cuisines', [RecipeController::class, 'searchCuisines']);
+    Route::get('/recipes/search-allergens', [RecipeController::class, 'searchAllergens']);
     Route::get('/semantic-search', function () {
         return Inertia::render('Recipes/SemanticSearch');
     })->name('semantic-search');

@@ -6,6 +6,7 @@ use App\Models\Recipe;
 use App\Models\Product;
 use App\Models\Content;
 use App\Models\Ingredient;
+use App\Models\Allergen;
 use App\Models\Cuisine;
 use App\Services\PrismService;
 use App\Services\EmbeddingService;
@@ -25,7 +26,7 @@ class RecipeController extends Controller
         $perPage = (int) $request->input('per_page', 10);
         $search = trim((string) $request->input('search', ''));
 
-        $recipes = Recipe::with(['products', 'contents', 'ingredients', 'cuisines'])
+        $recipes = Recipe::with(['products', 'contents', 'ingredients', 'cuisines', 'allergens'])
             ->when($search !== '', function ($query) use ($search) {
                 $query->where(function ($q) use ($search) {
                     $q->where('recipe_name', 'ilike', "%{$search}%")
@@ -39,6 +40,7 @@ class RecipeController extends Controller
         $products = Product::where('status', true)->orderBy('descricao')->get();
         $contents = Content::where('status', true)->orderBy('nome_conteudo')->get();
         $ingredients = Ingredient::orderBy('name')->get();
+        $allergens = Allergen::orderBy('name')->get();
         $cuisines = Cuisine::active()->orderBy('name')->get();
 
         return Inertia::render('Recipes/Manage', [
@@ -47,6 +49,7 @@ class RecipeController extends Controller
             'contents' => $contents,
             'ingredients' => $ingredients,
             'cuisines' => $cuisines,
+            'allergens' => $allergens,
             'filters' => $request->only(['search', 'per_page'])
         ]);
     }
@@ -99,6 +102,10 @@ class RecipeController extends Controller
             'selected_cuisines' => 'nullable|array',
             'selected_cuisines.*.cuisine_id' => 'nullable|exists:cuisines,id',
             'selected_cuisines.*.name' => 'nullable|string|max:255',
+
+            // Allergen associations (IDs only; no free-text creation)
+            'selected_allergens' => 'nullable|array',
+            'selected_allergens.*.allergen_id' => 'required_with:selected_allergens|exists:allergens,id',
         ]);
 
         // Normalize channel: accept array and store as CSV string
@@ -114,7 +121,7 @@ class RecipeController extends Controller
 
         $recipe = Recipe::updateOrCreate(
             ['id' => $request->id],
-            collect($data)->except(['selected_products', 'selected_contents', 'selected_ingredients', 'selected_cuisines'])->toArray()
+            collect($data)->except(['selected_products', 'selected_contents', 'selected_ingredients', 'selected_cuisines', 'selected_allergens'])->toArray()
         );
 
         // Sync products if provided
@@ -192,6 +199,17 @@ class RecipeController extends Controller
             $recipe->cuisines()->sync($cuisineIds);
         }
 
+        // Sync allergens if provided (IDs only)
+        if ($request->has('selected_allergens') && is_array($request->selected_allergens)) {
+            $allergenIds = collect($request->selected_allergens)
+                ->pluck('allergen_id')
+                ->filter()
+                ->unique()
+                ->values()
+                ->all();
+            $recipe->allergens()->sync($allergenIds);
+        }
+
         $embeddingService = new EmbeddingService(new PrismService());
         $embeddingService->generateEmbedding($recipe);
 
@@ -247,6 +265,27 @@ class RecipeController extends Controller
             ->get(['id', 'name']);
 
         return response()->json($cuisines);
+    }
+
+    /**
+     * Search for allergens by name
+     */
+    public function searchAllergens(Request $request)
+    {
+        $request->validate([
+            'query' => 'required|string|min:1',
+            'limit' => 'nullable|integer|min:1|max:20'
+        ]);
+
+        $query = $request->query('query');
+        $limit = $request->query('limit', 10);
+
+        $allergens = Allergen::where('name', 'ilike', "%{$query}%")
+            ->orderBy('name')
+            ->limit($limit)
+            ->get(['id', 'name']);
+
+        return response()->json($allergens);
     }
 
     public function search(Request $request)

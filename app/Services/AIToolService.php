@@ -153,6 +153,7 @@ class AIToolService
                     'preparation_techniques' => $recipe->preparation_techniques,
                     'consumption_occasion' => $recipe->consumption_occasion,
                     'cuisines' => $recipe->cuisines,
+                    'allergens' => $recipe->allergens,
                     'aditional_prompt' => $recipe->recipe_prompt,
                 ];
             });

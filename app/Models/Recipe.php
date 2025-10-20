@@ -140,4 +140,12 @@ class Recipe extends Model
     {
         return $this->belongsToMany(Cuisine::class)->withTimestamps();
     }
+
+    /**
+     * The allergens associated with this recipe.
+     */
+    public function allergens(): BelongsToMany
+    {
+        return $this->belongsToMany(Allergen::class)->withTimestamps();
+    }
 }

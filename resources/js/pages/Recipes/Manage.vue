@@ -55,6 +55,52 @@
                             <p v-if="form.errors.recipe_name" class="text-red-500 text-xs mt-1">{{ form.errors.recipe_name }}</p>
                         </div>
 
+                        <!-- Alergênicos -->
+                        <div>
+                            <label for="allergens" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Alergênicos</label>
+                            <!-- Selected allergens chips -->
+                            <div v-if="form.selected_allergens.length" class="flex flex-wrap gap-2 mb-2">
+                                <span
+                                    v-for="(a, idx) in form.selected_allergens" 
+                                    :key="`${a.allergen_id || a.name}-${idx}`"
+                                    class="inline-flex items-center gap-2 bg-red-50 dark:bg-red-900 text-red-800 dark:text-red-200 border border-red-200 dark:border-red-700 px-2 py-1 rounded text-xs"
+                                >
+                                    {{ a.name }}
+                                    <button type="button" class="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300" @click="removeAllergen(idx)">x</button>
+                                </span>
+                            </div>
+                            <div class="relative">
+                                <input
+                                    :value="allergenSearchTerm"
+                                    @input="updateAllergenSearchTerm($event.target.value)"
+                                    @keydown.enter.prevent
+                                    @focus="showAllergenDropdown"
+                                    @blur="hideAllergenDropdown"
+                                    type="text"
+                                    id="allergens"
+                                    placeholder="Digite e selecione ou pressione Enter..."
+                                    class="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                                />
+                                <!-- Dropdown Results -->
+                                <div 
+                                    v-if="allergenShowDropdown && allergenSearchResults.length > 0"
+                                    class="absolute z-10 w-full mt-1 bg-white dark:bg-card border border-gray-300 dark:border-gray-600 rounded-md shadow-lg max-h-48 overflow-y-auto"
+                                >
+                                    <div 
+                                        v-for="result in allergenSearchResults" 
+                                        :key="result.id"
+                                    @mousedown="addAllergen(result)"
+                                        class="px-3 py-2 hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700 cursor-pointer text-sm"
+                                    >
+                                        {{ result.name }}
+                                    </div>
+                                </div>
+                            </div>
+                            <p v-if="form.errors['selected_allergens.0.allergen_id'] || form.errors.selected_allergens" class="text-red-500 text-xs mt-1">
+                                {{ form.errors['selected_allergens.0.allergen_id'] || form.errors.selected_allergens }}
+                            </p>
+                        </div>
+
                         <!-- Culinária -->
                         <div>
                             <label for="cuisine" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Culinária(s)</label>
@@ -670,6 +716,7 @@ const props = defineProps({
     contents: Array,
     ingredients: Array,
     cuisines: Array,
+    allergens: Array,
     filters: Object
 })
 
@@ -687,6 +734,10 @@ const localPerPage = ref(Number((props.filters && props.filters.per_page) ? prop
 const cuisineSearchTerm = ref('')
 const cuisineSearchResults = ref([])
 const cuisineShowDropdown = ref(false)
+// Reactive allergens state (multi)
+const allergenSearchTerm = ref('')
+const allergenSearchResults = ref([])
+const allergenShowDropdown = ref(false)
 
 function showToast(message, type = 'info', duration = 5000) {
     const toast = {
@@ -892,6 +943,62 @@ function updateCuisineSearchTerm(value) {
     }
 }
 
+// Allergen management
+function showAllergenDropdown() {
+    allergenShowDropdown.value = true
+}
+
+function hideAllergenDropdown() {
+    setTimeout(() => {
+        allergenShowDropdown.value = false
+    }, 200)
+}
+
+async function searchAllergens() {
+    const query = allergenSearchTerm.value.trim()
+    if (query.length < 2) {
+        allergenSearchResults.value = []
+        return
+    }
+    try {
+        const response = await fetch(`/recipes/search-allergens?query=${encodeURIComponent(query)}&limit=5`)
+        const data = await response.json()
+        allergenSearchResults.value = data
+    } catch (error) {
+        console.error('Error searching allergens:', error)
+        const existingAllergens = props.allergens ? props.allergens.filter(a => 
+            a.name.toLowerCase().includes(query.toLowerCase())
+        ) : []
+        allergenSearchResults.value = existingAllergens.slice(0, 5)
+    }
+}
+
+function addAllergen(selectedAllergen) {
+    const exists = form.selected_allergens.some(a => a.allergen_id && a.allergen_id === selectedAllergen.id)
+    if (!exists) {
+        form.selected_allergens.push({ allergen_id: selectedAllergen.id, name: selectedAllergen.name })
+    }
+    allergenSearchTerm.value = ''
+    allergenShowDropdown.value = false
+    allergenSearchResults.value = []
+}
+
+function removeAllergen(index) {
+    form.selected_allergens.splice(index, 1)
+}
+
+function updateAllergenSearchTerm(value) {
+    allergenSearchTerm.value = value
+    const query = value.trim()
+    if (query.length >= 2) {
+        allergenShowDropdown.value = true
+        searchAllergens()
+    } else {
+        allergenSearchResults.value = []
+        allergenShowDropdown.value = false
+    }
+}
+
 function showValidationErrors(errors) {
     // Show first error as a toast
     const firstError = Object.values(errors)[0]
@@ -936,9 +1043,13 @@ function confirmResetForm() {
             form.selected_contents = []
             selectedIngredients.value = []
             form.selected_cuisines = []
+            form.selected_allergens = []
             cuisineSearchTerm.value = ''
             cuisineSearchResults.value = []
             cuisineShowDropdown.value = false
+            allergenSearchTerm.value = ''
+            allergenSearchResults.value = []
+            allergenShowDropdown.value = false
             showToast('Formulário limpo', 'info')
         }
     }
@@ -969,7 +1080,9 @@ const form = useForm({
     // Ingredient associations
     selected_ingredients: [],
     // Cuisine associations
-    selected_cuisines: []
+    selected_cuisines: [],
+    // Allergen associations
+    selected_allergens: []
 })
 
 const resetForm = () => {
@@ -978,9 +1091,13 @@ const resetForm = () => {
     form.selected_contents = []
     selectedIngredients.value = []
     form.selected_cuisines = []
+    form.selected_allergens = []
     cuisineSearchTerm.value = ''
     cuisineSearchResults.value = []
     cuisineShowDropdown.value = false
+    allergenSearchTerm.value = ''
+    allergenSearchResults.value = []
+    allergenShowDropdown.value = false
     form.id = null
     showToast('Formulário limpo para nova receita', 'info')
 }
@@ -1030,6 +1147,12 @@ function editRecipe(recipe) {
         show_dropdown: false,
         primary_ingredient: ingredient.pivot.primary_ingredient
     })) : []
+
+    // Load associated allergens
+    form.selected_allergens = recipe.allergens ? recipe.allergens.map(a => ({
+        allergen_id: a.id,
+        name: a.name,
+    })) : []
 }
 
 function deleteRecipe(recipe) {
@@ -1051,6 +1174,7 @@ function deleteRecipe(recipe) {
 const submit = () => {
     // Add selected associations to form data before submission
     form.selected_ingredients = selectedIngredients.value
+    // Allergens are directly in form.selected_allergens
     
     form.post("/recipes", {
         onSuccess: () => {
@@ -1064,14 +1188,19 @@ const submit = () => {
             form.selected_contents = []
             selectedIngredients.value = []
             form.selected_cuisines = []
+            form.selected_allergens = []
             form.reset()
             form.selected_products = []
             form.selected_contents = []
             selectedIngredients.value = []
             form.selected_cuisines = []
+            form.selected_allergens = []
             cuisineSearchTerm.value = ''
             cuisineSearchResults.value = []
             cuisineShowDropdown.value = false
+            allergenSearchTerm.value = ''
+            allergenSearchResults.value = []
+            allergenShowDropdown.value = false
             
             // Clear form ID to indicate new recipe creation
             form.id = null
