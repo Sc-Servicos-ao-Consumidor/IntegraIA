@@ -103,9 +103,10 @@ class RecipeController extends Controller
             'selected_cuisines.*.cuisine_id' => 'nullable|exists:cuisines,id',
             'selected_cuisines.*.name' => 'nullable|string|max:255',
 
-            // Allergen associations (IDs only; no free-text creation)
+            // Allergen associations
             'selected_allergens' => 'nullable|array',
-            'selected_allergens.*.allergen_id' => 'required_with:selected_allergens|exists:allergens,id',
+            'selected_allergens.*.allergen_id' => 'nullable|exists:allergens,id',
+            'selected_allergens.*.name' => 'nullable|string|max:255',
         ]);
 
         // Normalize channel: accept array and store as CSV string
@@ -199,14 +200,20 @@ class RecipeController extends Controller
             $recipe->cuisines()->sync($cuisineIds);
         }
 
-        // Sync allergens if provided (IDs only)
+        // Sync allergens if provided
         if ($request->has('selected_allergens') && is_array($request->selected_allergens)) {
-            $allergenIds = collect($request->selected_allergens)
-                ->pluck('allergen_id')
-                ->filter()
-                ->unique()
-                ->values()
-                ->all();
+            $allergenIds = [];
+            foreach ($request->selected_allergens as $allergenInfo) {
+                $allergenId = $allergenInfo['allergen_id'] ?? null;
+                $name = $allergenInfo['name'] ?? null;
+                if (!$allergenId && $name) {
+                    $allergen = Allergen::firstOrCreate(['name' => trim($name)]);
+                    $allergenId = $allergen->id;
+                }
+                if ($allergenId) {
+                    $allergenIds[] = $allergenId;
+                }
+            }
             $recipe->allergens()->sync($allergenIds);
         }
 

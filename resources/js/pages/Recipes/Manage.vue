@@ -73,7 +73,7 @@
                                 <input
                                     :value="allergenSearchTerm"
                                     @input="updateAllergenSearchTerm($event.target.value)"
-                                    @keydown.enter.prevent
+                                    @keydown.enter.prevent="addAllergenFromInput"
                                     @focus="showAllergenDropdown"
                                     @blur="hideAllergenDropdown"
                                     type="text"
@@ -974,11 +974,24 @@ async function searchAllergens() {
 }
 
 function addAllergen(selectedAllergen) {
-    const exists = form.selected_allergens.some(a => a.allergen_id && a.allergen_id === selectedAllergen.id)
+    const exists = form.selected_allergens.some(a => (a.allergen_id && a.allergen_id === selectedAllergen.id) || (a.name && a.name.toLowerCase() === selectedAllergen.name.toLowerCase()))
     if (!exists) {
         form.selected_allergens.push({ allergen_id: selectedAllergen.id, name: selectedAllergen.name })
     }
     allergenSearchTerm.value = ''
+    allergenShowDropdown.value = false
+    allergenSearchResults.value = []
+}
+
+function addAllergenFromInput() {
+    const name = allergenSearchTerm.value.trim()
+    if (!name) return
+    const exists = form.selected_allergens.some(a => a.name && a.name.toLowerCase() === name.toLowerCase())
+    if (!exists) {
+        form.selected_allergens.push({ allergen_id: null, name })
+    }
+    allergenSearchTerm.value = ''
+    // keep dropdown logic to reopen on next input
     allergenShowDropdown.value = false
     allergenSearchResults.value = []
 }
