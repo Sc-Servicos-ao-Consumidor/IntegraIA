@@ -19,7 +19,6 @@ return new class extends Migration
             $table->string('recipe_name')->nullable();
             
             // Recipe classification
-            $table->string('cuisine')->nullable();
             $table->string('recipe_type')->nullable();
             $table->string('service_order')->nullable();
             $table->string('difficulty_level')->nullable();
@@ -33,8 +32,6 @@ return new class extends Migration
             $table->text('preparation_method')->nullable();
             
             // JSON fields for flexible data
-            $table->json('main_ingredients')->nullable();
-            $table->json('supporting_ingredients')->nullable();
             $table->json('usage_groups')->nullable();
             $table->json('preparation_techniques')->nullable();
             $table->json('consumption_occasion')->nullable();

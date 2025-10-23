@@ -25,9 +25,9 @@
                 </div>
                 <button
                     @click="removeToast(toast.id)"
-                    class="ml-2 text-white hover:text-gray-200 focus:outline-none"
+                    class="ml-2 text-white hover:text-slate-200 focus:outline-none"
                 >
-                    ×
+                    x
                 </button>
             </div>
         </div>
@@ -43,41 +43,116 @@
                     <div class="space-y-4">
                         <!-- Nome da Receita -->
                         <div>
-                            <label for="recipe_name" class="block text-sm font-medium text-gray-700 mb-1">Nome da Receita</label>
+                            <label for="recipe_name" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Nome da Receita</label>
                             <input
                                 v-model="form.recipe_name"
                                 id="recipe_name"
                                 type="text"
-                                class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                                class="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                                required
+                                placeholder="Digite o nome da receita"
                             />
                             <p v-if="form.errors.recipe_name" class="text-red-500 text-xs mt-1">{{ form.errors.recipe_name }}</p>
                         </div>
 
+                        <!-- Alergênicos -->
+                        <div>
+                            <label for="allergens" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Alergênicos</label>
+                            <!-- Selected allergens chips -->
+                            <div v-if="form.selected_allergens.length" class="flex flex-wrap gap-2 mb-2">
+                                <span
+                                    v-for="(a, idx) in form.selected_allergens" 
+                                    :key="`${a.allergen_id || a.name}-${idx}`"
+                                    class="inline-flex items-center gap-2 bg-red-50 dark:bg-red-900 text-red-800 dark:text-red-200 border border-red-200 dark:border-red-700 px-2 py-1 rounded text-xs"
+                                >
+                                    {{ a.name }}
+                                    <button type="button" class="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300" @click="removeAllergen(idx)">x</button>
+                                </span>
+                            </div>
+                            <div class="relative">
+                                <input
+                                    :value="allergenSearchTerm"
+                                    @input="updateAllergenSearchTerm($event.target.value)"
+                                    @keydown.enter.prevent
+                                    @focus="showAllergenDropdown"
+                                    @blur="hideAllergenDropdown"
+                                    type="text"
+                                    id="allergens"
+                                    placeholder="Digite e selecione ou pressione Enter..."
+                                    class="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                                />
+                                <!-- Dropdown Results -->
+                                <div 
+                                    v-if="allergenShowDropdown && allergenSearchResults.length > 0"
+                                    class="absolute z-10 w-full mt-1 bg-white dark:bg-card border border-gray-300 dark:border-gray-600 rounded-md shadow-lg max-h-48 overflow-y-auto"
+                                >
+                                    <div 
+                                        v-for="result in allergenSearchResults" 
+                                        :key="result.id"
+                                    @mousedown="addAllergen(result)"
+                                        class="px-3 py-2 hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700 cursor-pointer text-sm"
+                                    >
+                                        {{ result.name }}
+                                    </div>
+                                </div>
+                            </div>
+                            <p v-if="form.errors['selected_allergens.0.allergen_id'] || form.errors.selected_allergens" class="text-red-500 text-xs mt-1">
+                                {{ form.errors['selected_allergens.0.allergen_id'] || form.errors.selected_allergens }}
+                            </p>
+                        </div>
+
                         <!-- Culinária -->
                         <div>
-                            <label for="cuisine" class="block text-sm font-medium text-gray-700 mb-1">Culinária</label>
-                            <select
-                                v-model="form.cuisine"
-                                id="cuisine"
-                                class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-                            >
-                                <option selected disabled value="">Selecione</option>
-                                <option value="italiana">Italiana</option>
-                                <option value="mexicana">Mexicana</option>
-                                <option value="asiatica">Asiática</option>
-                                <option value="brasileira">Brasileira</option>
-                                <option value="francesa">Francesa</option>
-                            </select>
-                            <p v-if="form.errors.cuisine" class="text-red-500 text-xs mt-1">{{ form.errors.cuisine }}</p>
+                            <label for="cuisine" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Culinária(s)</label>
+                            <!-- Selected cuisines chips -->
+                            <div v-if="form.selected_cuisines.length" class="flex flex-wrap gap-2 mb-2">
+                                <span
+                                    v-for="(c, idx) in form.selected_cuisines" 
+                                    :key="`${c.cuisine_id || c.name}-${idx}`"
+                                    class="inline-flex items-center gap-2 bg-orange-50 dark:bg-orange-900 text-orange-800 dark:text-orange-200 border border-orange-200 dark:border-orange-700 px-2 py-1 rounded text-xs"
+                                >
+                                    {{ c.name }}
+                                    <button type="button" class="text-orange-600 dark:text-orange-400 hover:text-orange-800 dark:hover:text-orange-300" @click="removeCuisine(idx)">x</button>
+                                </span>
+                            </div>
+                            <div class="relative">
+                                <input
+                                    :value="cuisineSearchTerm"
+                                    @input="updateCuisineSearchTerm($event.target.value)"
+                                    @keydown.enter.prevent="addCuisineFromInput"
+                                    @focus="showCuisineDropdown"
+                                    @blur="hideCuisineDropdown"
+                                    type="text"
+                                    id="cuisine"
+                                    placeholder="Digite e selecione ou pressione Enter..."
+                                    class="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                                />
+                                
+                                <!-- Dropdown Results -->
+                                <div 
+                                    v-if="cuisineShowDropdown && cuisineSearchResults.length > 0"
+                                    class="absolute z-10 w-full mt-1 bg-white dark:bg-card border border-gray-300 dark:border-gray-600 dark:border-gray-600 rounded-md shadow-lg max-h-48 overflow-y-auto"
+                                >
+                                    <div 
+                                        v-for="result in cuisineSearchResults" 
+                                        :key="result.id"
+                                        @mousedown="addCuisine(result)"
+                                        class="px-3 py-2 hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700 cursor-pointer text-sm"
+                                    >
+                                        {{ result.name }}
+                                    </div>
+                                </div>
+                            </div>
+                            <p v-if="form.errors.selected_cuisines" class="text-red-500 text-xs mt-1">{{ form.errors.selected_cuisines }}</p>
                         </div>
 
                         <!-- Tipo de Receita -->
                         <div>
-                            <label for="recipe_type" class="block text-sm font-medium text-gray-700 mb-1">Tipo de Receita</label>
+                            <label for="recipe_type" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Tipo de Receita</label>
                             <select
                                 v-model="form.recipe_type"
                                 id="recipe_type"
-                                class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                                class="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                             >
                                 <option selected disabled value="">Selecione</option>
                                 <option value="doce">Doce</option>
@@ -88,11 +163,11 @@
 
                         <!-- Ordem de Serviço -->
                         <div>
-                            <label for="service_order" class="block text-sm font-medium text-gray-700 mb-1">Ordem de Serviço</label>
+                            <label for="service_order" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Ordem de Serviço</label>
                             <select
                                 v-model="form.service_order"
                                 id="service_order"
-                                class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                                class="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                             >
                                 <option selected disabled value="">Selecione</option>
                                 <option value="entrada">Entrada</option>
@@ -106,106 +181,217 @@
 
                         <!-- Tempo de Preparo -->
                         <div>
-                            <label for="preparation_time" class="block text-sm font-medium text-gray-700 mb-1">Tempo de Preparo (minutos)</label>
-                            <input
-                                type="number"
+                            <label for="preparation_time" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Tempo de Preparo</label>
+                            <select
                                 v-model="form.preparation_time"
                                 id="preparation_time"
-                                min="1"
-                                placeholder="Ex: 45"
-                                class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-                            />
+                                class="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                            >
+                                <option selected disabled value="">Selecione</option>
+                                <option value="15">15 minutos</option>
+                                <option value="30">30 minutos</option>
+                                <option value="45">45 minutos</option>
+                                <option value="60">1 hora</option>
+                                <option value="75">1h 15min</option>
+                                <option value="90">1h 30min</option>
+                                <option value="105">1h 45min</option>
+                                <option value="120">2 horas</option>
+                                <option value="135">2h 15min</option>
+                                <option value="150">2h 30min</option>
+                                <option value="165">2h 45min</option>
+                                <option value="180">3 horas</option>
+                                <option value="195">3h 15min</option>
+                                <option value="210">3h 30min</option>
+                                <option value="225">3h 45min</option>
+                                <option value="240">4 horas</option>
+                                <option value="255">4h 15min</option>
+                                <option value="270">4h 30min</option>
+                                <option value="285">4h 45min</option>
+                                <option value="300">5 horas</option>
+                            </select>
                             <p v-if="form.errors.preparation_time" class="text-red-500 text-xs mt-1">{{ form.errors.preparation_time }}</p>
                         </div>
 
                         <!-- Grau de Dificuldade -->
                         <div>
-                            <label for="difficulty_level" class="block text-sm font-medium text-gray-700 mb-1">Grau de Dificuldade</label>
+                            <label for="difficulty_level" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Grau de Dificuldade</label>
                             <select
                                 v-model="form.difficulty_level"
                                 id="difficulty_level"
-                                class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                                class="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                             >
                                 <option selected disabled value="">Selecione</option>
+                                <option value="muito_facil">Muito fácil</option>
                                 <option value="facil">Fácil</option>
-                                <option value="medio">Médio</option>
-                                <option value="dificil">Difícil</option>
+                                <option value="elaborada">Elaborada</option>
+                                <option value="muito_elaborada">Muito elaborada</option>
                             </select>
                             <p v-if="form.errors.difficulty_level" class="text-red-500 text-xs mt-1">{{ form.errors.difficulty_level }}</p>
                         </div>
 
                         <!-- Rendimento -->
                         <div>
-                            <label for="yield" class="block text-sm font-medium text-gray-700 mb-1">Rendimento</label>
+                            <label for="yield" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Rendimento</label>
                             <select
                                 v-model="form.yield"
                                 id="yield"
-                                class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                                class="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                             >
                                 <option selected disabled value="">Selecione</option>
-                                <option value="1">1 porção</option>
-                                <option value="2">2 porções</option>
-                                <option value="4">4 porções</option>
-                                <option value="6">6 porções</option>
-                                <option value="8">8 porções</option>
-                                <option value="10">10 porções</option>
+                                <option value="1-2">1 a 2 porções</option>
+                                <option value="2-4">2 a 4 porções</option>
+                                <option value="4-6">4 a 6 porções</option>
+                                <option value="6-8">6 a 8 porções</option>
+                                <option value="8-10">8 a 10 porções</option>
+                                <option value="10-12">10 a 12 porções</option>
+                                <option value="12-14">12 a 14 porções</option>
+                                <option value="14-16">14 a 16 porções</option>
+                                <option value="16-18">16 a 18 porções</option>
+                                <option value="18-20">18 a 20 porções</option>
                             </select>
                             <p v-if="form.errors.yield" class="text-red-500 text-xs mt-1">{{ form.errors.yield }}</p>
                         </div>
 
                         <!-- Canal -->
                         <div>
-                            <label for="channel" class="block text-sm font-medium text-gray-700 mb-1">Canal</label>
+                            <label for="channel" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Canal</label>
                             <select
                                 v-model="form.channel"
                                 id="channel"
-                                class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                                multiple
+                                class="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 min-h-[42px]"
                             >
-                                <option selected disabled value="">Selecione</option>
                                 <option value="padaria">Padaria</option>
                                 <option value="lanchonete">Lanchonete</option>
-                                <option value="buffet">Buffet</option>
-                                <option value="ala-carte">A la Carte</option>
-                                <option value="industrial">Industrial</option>
+                                <option value="restaurante">Restaurante</option>
+                                <option value="confeitaria">Confeitaria</option>
                             </select>
                             <p v-if="form.errors.channel" class="text-red-500 text-xs mt-1">{{ form.errors.channel }}</p>
+                        </div>
+
+                        <!-- Grupo de Uso -->
+                        <div>
+                            <label for="usage_groups" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Grupo de Uso</label>
+                            <select
+                                v-model="form.usage_groups"
+                                id="usage_groups"
+                                class="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                            >
+                                <option selected disabled value="">Selecione</option>
+                                <option value="bolos">Bolos</option>
+                                <option value="tortas">Tortas</option>
+                                <option value="paves">Pavês</option>
+                                <option value="sorvetes">Sorvetes</option>
+                                <option value="paes">Pães</option>
+                                <option value="docinhos_de_festa">Docinhos de Festa</option>
+                                <option value="bombons">Bombons</option>
+                                <option value="paes_de_mel">Pães de Mel</option>
+                                <option value="massas">Massas</option>
+                                <option value="molhos">Molhos</option>
+                                <option value="carnes">Carnes</option>
+                                <option value="saladas">Saladas</option>
+                                <option value="sopas">Sopas</option>
+                                <option value="cozidos">Cozidos</option>
+                                <option value="sem_acucar">Sem açúcar</option>
+                                <option value="sem_gluten">Sem gluten</option>
+                                <option value="sem_lactose">Sem lactose</option>
+                                <option value="vegetarianas">Vegetarianas</option>
+                                <option value="veganas">Veganas</option>
+                                <option value="sem_alcool">Sem alcool</option>
+                            </select>
+                            <p v-if="form.errors.usage_groups" class="text-red-500 text-xs mt-1">{{ form.errors.usage_groups }}</p>
+                        </div>
+
+                        <!-- Técnica -->
+                        <div>
+                            <label for="preparation_techniques" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Técnica</label>
+                            <select
+                                v-model="form.preparation_techniques"
+                                id="preparation_techniques"
+                                class="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                            >
+                                <option selected disabled value="">Selecione</option>
+                                <option value="fritura_por_imersao">Fritura por imersão</option>
+                                <option value="fritura_rasa">Fritura rasa</option>
+                                <option value="grelhados">Grelhados</option>
+                                <option value="refogados">Refogados</option>
+                                <option value="ensopados_e_molhos">Ensopados e Molhos</option>
+                                <option value="assados">Assados</option>
+                                <option value="cozimento_por_absorcao">Cozimento por absorção</option>
+                                <option value="cozimento_em_agua_quente">Cozimento em água quente</option>
+
+                            </select>
+                            <p v-if="form.errors.preparation_techniques" class="text-red-500 text-xs mt-1">{{ form.errors.preparation_techniques }}</p>
+                        </div>
+
+                        <!-- Ocasião de Consumo -->
+                        <div>
+                            <label for="consumption_occasion" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Ocasião de Consumo</label>
+                            <select
+                                v-model="form.consumption_occasion"
+                                id="consumption_occasion"
+                                class="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                            >
+                                <option selected disabled value="">Selecione</option>
+                                <option value="datas_comemorativas">Datas Comemorativas</option>
+                                <option value="dia_a_dia">Dia a Dia</option>
+                                <option value="para_dias_quentes">Para dias quentes</option>
+                                <option value="para_dias_frios">Para dias frios</option>
+                            </select>
+                            <p v-if="form.errors.consumption_occasion" class="text-red-500 text-xs mt-1">{{ form.errors.consumption_occasion }}</p>
                         </div>
                     </div>
 
                     <!-- Right Column - Larger Text Fields -->
-                    <div class="space-y-4">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         <!-- Descrição da Receita -->
-                        <div>
-                            <label for="recipe_description" class="block text-sm font-medium text-gray-700 mb-1">Descrição da Receita</label>
+                        <div class="lg:col-span-2">
+                            <label for="recipe_description" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Descrição da Receita</label>
                             <textarea
                                 v-model="form.recipe_description"
                                 id="recipe_description"
-                                rows="7"
-                                class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-vertical"
+                                 rows="10"
+                                class="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-vertical"
+                                placeholder="Descreva a receita em detalhe"
                             ></textarea>
                             <p v-if="form.errors.recipe_description" class="text-red-500 text-xs mt-1">{{ form.errors.recipe_description }}</p>
                         </div>
 
+                        <!-- Prompt da Receita -->
+                        <div class="lg:col-span-2">
+                            <label for="recipe_prompt" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Prompt da Receita</label>
+                            <textarea
+                                v-model="form.recipe_prompt"
+                                id="recipe_prompt"
+                                rows="11"
+                                placeholder="Instruções/briefing sobre a receita para geração de conteúdo por IA..."
+                                class="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-vertical"
+                            ></textarea>
+                            <p v-if="form.errors.recipe_prompt" class="text-red-500 text-xs mt-1">{{ form.errors.recipe_prompt }}</p>
+                        </div>
+
                         <!-- Descrição dos Ingredientes -->
                         <div>
-                            <label for="ingredients_description" class="block text-sm font-medium text-gray-700 mb-1">Descrição dos Ingredientes</label>
+                            <label for="ingredients_description" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Descrição dos Ingredientes</label>
                             <textarea
                                 v-model="form.ingredients_description"
                                 id="ingredients_description"
-                                rows="7"
-                                class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-vertical"
+                                rows="11"
+                                class="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-vertical"
+                                placeholder="Descreva os ingredientes em detalhe"
                             ></textarea>
                             <p v-if="form.errors.ingredients_description" class="text-red-500 text-xs mt-1">{{ form.errors.ingredients_description }}</p>
                         </div>
 
                         <!-- Modo de Preparo -->
                         <div>
-                            <label for="preparation_method" class="block text-sm font-medium text-gray-700 mb-1">Modo de Preparo</label>
+                            <label for="preparation_method" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Modo de Preparo</label>
                             <textarea
                                 v-model="form.preparation_method"
                                 id="preparation_method"
-                                rows="7"
-                                class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-vertical"
+                                rows="11"
+                                class="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-vertical"
+                                placeholder="Descreva o modo de preparo em detalhe"
                             ></textarea>
                             <p v-if="form.errors.preparation_method" class="text-red-500 text-xs mt-1">{{ form.errors.preparation_method }}</p>
                         </div>
@@ -213,8 +399,8 @@
                 </div>
 
                 <!-- Connections Section -->
-                <div class="mt-8 pt-6 border-t border-gray-200">
-                    <h3 class="text-lg font-semibold text-gray-900 mb-4">🔗 Conexões e Associações</h3>
+                <div class="mt-8 pt-6">
+                    <h3 class="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-4">🔗 Conexões e Associações</h3>
                     
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         <!-- Product Associations -->
@@ -226,7 +412,7 @@
                             >
                                 <select
                                     v-model="product.product_id"
-                                    class="flex-1 border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                                    class="flex-1 border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                                 >
                                     <option value="">Selecione um produto...</option>
                                     <option v-for="availableProduct in props.products" :key="availableProduct.id" :value="availableProduct.id">
@@ -238,7 +424,7 @@
                                     <div class="flex items-center gap-3">
                                         <select
                                             v-model="product.ingredient_type"
-                                            class="w-32 border border-gray-300 rounded-md px-2 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                                            class="w-32 border border-gray-300 dark:border-gray-600 rounded-md px-2 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                                         >
                                             <option value="main">Principal</option>
                                             <option value="supporting">Secundário</option>
@@ -249,9 +435,9 @@
                                                 v-model="product.top_dish"
                                                 :true-value="true"
                                                 :false-value="false"
-                                                class="w-4 h-4 text-yellow-600 bg-gray-100 border-gray-300 rounded focus:ring-yellow-500 focus:ring-2"
+                                                class="w-4 h-4 text-yellow-600 bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-600 rounded focus:ring-yellow-500 focus:ring-2"
                                             />
-                                            <span class="text-gray-700">Top Dish</span>
+                                            <span class="text-slate-700 dark:text-slate-300">Top Dish</span>
                                         </label>
                                     </div>
                                 </template>
@@ -260,6 +446,7 @@
                                     <button 
                                         type="button"
                                         @click="removeProduct(index)"
+                                        class="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 text-sm font-medium px-3 py-2 rounded-md hover:bg-red-50 dark:hover:bg-red-900 transition-colors"
                                     >
                                         Remover
                                     </button>
@@ -284,7 +471,7 @@
                             >
                                 <select
                                     v-model="content.content_id"
-                                    class="flex-1 border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                    class="flex-1 border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                 >
                                     <option value="">Selecione um conteúdo...</option>
                                     <option v-for="availableContent in props.contents" :key="availableContent.id" :value="availableContent.id">
@@ -299,9 +486,9 @@
                                             v-model="content.top_dish"
                                             :true-value="true"
                                             :false-value="false"
-                                            class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+                                            class="w-4 h-4 text-orange-600 dark:text-orange-400 bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-600 rounded focus:ring-orange-500 focus:ring-2"
                                         />
-                                        <span class="text-gray-700">Top Dish</span>
+                                        <span class="text-slate-700 dark:text-slate-300">Top Dish</span>
                                     </label>
                                 </template>
                                 
@@ -309,6 +496,7 @@
                                     <button 
                                         type="button"
                                         @click="removeContent(index)"
+                                        class="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 text-sm font-medium px-3 py-2 rounded-md hover:bg-red-50 dark:hover:bg-red-900 transition-colors"
                                     >
                                         Remover
                                     </button>
@@ -318,7 +506,7 @@
                             <button 
                                 type="button"
                                 @click="addContent"
-                                class="text-blue-600 hover:text-blue-800 text-sm font-medium px-3 py-2 border border-blue-300 rounded-md hover:bg-blue-50 transition-colors"
+                                class="text-orange-600 dark:text-orange-400 hover:text-orange-800 dark:hover:text-orange-300 text-sm font-medium px-3 py-2 border border-orange-300 dark:border-orange-600 rounded-md hover:bg-orange-50 dark:hover:bg-orange-900 transition-colors"
                             >
                                 + Adicionar Conteúdo
                             </button>
@@ -326,7 +514,7 @@
                     </div>
 
                     <!-- Ingredient Associations -->
-                    <ConnectionCard title="Ingredientes" icon="🥕" type="ingredient" color="green">
+                    <ConnectionCard title="Ingredientes" icon="🥕" type="ingredient" color="green" class="mt-8">
                         <ConnectionItem
                             v-for="(ingredient, index) in selectedIngredients"
                             :key="index"
@@ -341,19 +529,19 @@
                                     @blur="hideIngredientDropdown(index)"
                                     type="text"
                                     placeholder="Digite o nome do ingrediente..."
-                                    class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                                    class="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
                                 />
                                 
                                 <!-- Dropdown Results -->
                                 <div 
                                     v-if="ingredient.show_dropdown && ingredient.search_results.length > 0"
-                                    class="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-48 overflow-y-auto"
+                                    class="absolute z-10 w-full mt-1 bg-white dark:bg-card border border-gray-300 dark:border-gray-600 dark:border-gray-600 rounded-md shadow-lg max-h-48 overflow-y-auto"
                                 >
                                     <div 
                                         v-for="result in ingredient.search_results" 
                                         :key="result.id"
                                         @mousedown="selectIngredient(index, result)"
-                                        class="px-3 py-2 hover:bg-gray-100 cursor-pointer text-sm"
+                                        class="px-3 py-2 hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700 cursor-pointer text-sm"
                                     >
                                         {{ result.name }}
                                     </div>
@@ -366,9 +554,9 @@
                                         type="checkbox"
                                         :checked="ingredient.primary_ingredient"
                                         @change="updateIngredientPrimary(index, $event.target.checked)"
-                                        class="w-4 h-4 text-green-600 bg-gray-100 border-gray-300 rounded focus:ring-green-500 focus:ring-2"
+                                        class="w-4 h-4 text-green-600 bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-600 rounded focus:ring-green-500 focus:ring-2"
                                     />
-                                    <span class="text-gray-700">Principal</span>
+                                    <span class="text-slate-700 dark:text-slate-300">Principal</span>
                                 </label>
                             </template>
                             
@@ -376,6 +564,8 @@
                                 <button 
                                     type="button"
                                     @click="removeIngredient(index)"
+                                    class="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 text-sm font-medium px-3 py-2 rounded-md hover:bg-red-50 dark:hover:bg-red-900 transition-colors"
+
                                 >
                                     Remover
                                 </button>
@@ -393,11 +583,11 @@
                 </div>
 
                 <!-- Action Buttons -->
-                <div class="flex gap-3 mt-8 pt-6 border-t border-gray-200">
+                <div class="flex gap-3 mt-8 pt-6">
                     <button
                         type="button"
                         @click="confirmResetForm"
-                        class="px-6 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"
+                        class="px-6 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 bg-white dark:bg-secondary border border-gray-300 dark:border-gray-600 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-accent focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"
                     >
                         {{ form.id ? 'Cancelar' : 'Limpar' }}
                     </button>
@@ -420,28 +610,42 @@
             </FormCard>
 
             <!-- Saved Recipes Section -->
-            <ListCard title="Receitas Salvas" icon="📋" empty-message="Nenhuma receita cadastrada" empty-icon="🍳" class="mt-8">
+            <ListCard
+                title="Receitas Salvas"
+                icon="📋"
+                empty-message="Nenhuma receita cadastrada"
+                empty-icon="🍳"
+                class="mt-8"
+                searchable
+                :search="localSearch"
+                :per-page="localPerPage"
+                search-placeholder="Buscar por nome ou descrição da receita..."
+                @update:search="value => localSearch = value"
+                @update:perPage="value => localPerPage = value"
+                @submit="router.get('/recipes', { search: localSearch || undefined, per_page: localPerPage || undefined }, { preserveState: true, preserveScroll: true, replace: true })"
+                @clear="() => { localSearch=''; localPerPage=10; router.get('/recipes', {}, { preserveState: true, preserveScroll: true, replace: true }) }"
+            >
                 <ListItem
-                    v-for="recipe in props.recipes"
+                    v-for="recipe in (props.recipes?.data || [])"
                     :key="recipe.id"
                     :title="recipe.recipe_name || 'Sem título'"
                     :description="recipe.recipe_description || 'Sem descrição'"
                 >
                     <template #associations>
                         <!-- Products -->
-                        <div v-if="recipe.products?.length" class="flex items-center gap-2 text-sm text-gray-600">
+                        <div v-if="recipe.products?.length" class="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
                             <span class="font-medium">🛒 Produtos:</span>
                             <span>{{ recipe.products.length }} vinculado(s)</span>
                         </div>
                         
                         <!-- Contents -->
-                        <div v-if="recipe.contents?.length" class="flex items-center gap-2 text-sm text-gray-600">
+                        <div v-if="recipe.contents?.length" class="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
                             <span class="font-medium">📄 Conteúdos:</span>
                             <span>{{ recipe.contents.length }} vinculado(s)</span>
                         </div>
                         
                         <!-- Ingredients -->
-                        <div v-if="recipe.ingredients?.length" class="flex items-center gap-2 text-sm text-gray-600">
+                        <div v-if="recipe.ingredients?.length" class="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
                             <span class="font-medium">🥕 Ingredientes:</span>
                             <span>{{ recipe.ingredients.length }} vinculado(s)</span>
                         </div>
@@ -463,6 +667,23 @@
                     </template>
                 </ListItem>
             </ListCard>
+
+            <!-- Pagination -->
+            <div v-if="props.recipes?.links?.length" class="mt-4 flex flex-wrap items-center gap-2">
+                <button
+                    v-for="(link, idx) in props.recipes.links"
+                    :key="idx"
+                    :disabled="!link.url"
+                    @click.prevent="router.get(link.url, {}, { preserveState: true, preserveScroll: true, replace: true })"
+                    class="px-3 py-1 text-sm rounded border"
+                    :class="[
+                        'border-gray-300 dark:border-gray-600',
+                        link.active ? 'bg-orange-600 text-white border-orange-600' : 'bg-white dark:bg-secondary hover:bg-gray-50 dark:hover:bg-accent',
+                        !link.url ? 'opacity-50 cursor-not-allowed' : ''
+                    ]"
+                    v-html="link.label"
+                />
+            </div>
         </div>
     </AppLayout>
 </template>
@@ -490,10 +711,13 @@ const breadcrumbs = [
 ]
 
 const props = defineProps({
-    recipes: Array,
+    recipes: Object,
     products: Array,
     contents: Array,
-    ingredients: Array
+    ingredients: Array,
+    cuisines: Array,
+    allergens: Array,
+    filters: Object
 })
 
 // Toast notification system
@@ -502,6 +726,18 @@ let toastIdCounter = 0
 
 // Reactive ingredients state
 const selectedIngredients = ref([])
+
+// Reactive cuisine state (multi)
+// List search/pagination state (from server filters)
+const localSearch = ref((props.filters && props.filters.search) ? props.filters.search : '')
+const localPerPage = ref(Number((props.filters && props.filters.per_page) ? props.filters.per_page : 10))
+const cuisineSearchTerm = ref('')
+const cuisineSearchResults = ref([])
+const cuisineShowDropdown = ref(false)
+// Reactive allergens state (multi)
+const allergenSearchTerm = ref('')
+const allergenSearchResults = ref([])
+const allergenShowDropdown = ref(false)
 
 function showToast(message, type = 'info', duration = 5000) {
     const toast = {
@@ -635,6 +871,134 @@ function updateIngredientPrimary(index, value) {
     }
 }
 
+// Cuisine management functions
+function showCuisineDropdown() {
+    cuisineShowDropdown.value = true
+}
+
+function hideCuisineDropdown() {
+    setTimeout(() => {
+        cuisineShowDropdown.value = false
+    }, 200)
+}
+
+async function searchCuisines() {
+    const query = cuisineSearchTerm.value.trim()
+    
+    if (query.length < 2) {
+        cuisineSearchResults.value = []
+        return
+    }
+    
+    try {
+        const response = await fetch(`/recipes/search-cuisines?query=${encodeURIComponent(query)}&limit=5`)
+        const data = await response.json()
+        cuisineSearchResults.value = data
+    } catch (error) {
+        console.error('Error searching cuisines:', error)
+        // Fallback to local search
+        const existingCuisines = props.cuisines ? props.cuisines.filter(cuisine => 
+            cuisine.name.toLowerCase().includes(query.toLowerCase())
+        ) : []
+        cuisineSearchResults.value = existingCuisines.slice(0, 5)
+    }
+}
+
+function addCuisine(selectedCuisine) {
+    const exists = form.selected_cuisines.some(c => (c.cuisine_id && c.cuisine_id === selectedCuisine.id) || (c.name && c.name.toLowerCase() === selectedCuisine.name.toLowerCase()))
+    if (!exists) {
+        form.selected_cuisines.push({ cuisine_id: selectedCuisine.id, name: selectedCuisine.name })
+    }
+    cuisineSearchTerm.value = ''
+    cuisineShowDropdown.value = false
+    cuisineSearchResults.value = []
+}
+
+function addCuisineFromInput() {
+    const name = cuisineSearchTerm.value.trim()
+    if (!name) return
+    const exists = form.selected_cuisines.some(c => c.name && c.name.toLowerCase() === name.toLowerCase())
+    if (!exists) {
+        form.selected_cuisines.push({ cuisine_id: null, name })
+    }
+    cuisineSearchTerm.value = ''
+    // keep dropdown logic to reopen on next input
+    cuisineShowDropdown.value = false
+    cuisineSearchResults.value = []
+}
+
+function removeCuisine(index) {
+    form.selected_cuisines.splice(index, 1)
+}
+
+function updateCuisineSearchTerm(value) {
+    cuisineSearchTerm.value = value
+    const query = value.trim()
+    if (query.length >= 2) {
+        cuisineShowDropdown.value = true
+        searchCuisines()
+    } else {
+        cuisineSearchResults.value = []
+        cuisineShowDropdown.value = false
+    }
+}
+
+// Allergen management
+function showAllergenDropdown() {
+    allergenShowDropdown.value = true
+}
+
+function hideAllergenDropdown() {
+    setTimeout(() => {
+        allergenShowDropdown.value = false
+    }, 200)
+}
+
+async function searchAllergens() {
+    const query = allergenSearchTerm.value.trim()
+    if (query.length < 2) {
+        allergenSearchResults.value = []
+        return
+    }
+    try {
+        const response = await fetch(`/recipes/search-allergens?query=${encodeURIComponent(query)}&limit=5`)
+        const data = await response.json()
+        allergenSearchResults.value = data
+    } catch (error) {
+        console.error('Error searching allergens:', error)
+        const existingAllergens = props.allergens ? props.allergens.filter(a => 
+            a.name.toLowerCase().includes(query.toLowerCase())
+        ) : []
+        allergenSearchResults.value = existingAllergens.slice(0, 5)
+    }
+}
+
+function addAllergen(selectedAllergen) {
+    const exists = form.selected_allergens.some(a => a.allergen_id && a.allergen_id === selectedAllergen.id)
+    if (!exists) {
+        form.selected_allergens.push({ allergen_id: selectedAllergen.id, name: selectedAllergen.name })
+    }
+    allergenSearchTerm.value = ''
+    allergenShowDropdown.value = false
+    allergenSearchResults.value = []
+}
+
+function removeAllergen(index) {
+    form.selected_allergens.splice(index, 1)
+}
+
+function updateAllergenSearchTerm(value) {
+    allergenSearchTerm.value = value
+    const query = value.trim()
+    if (query.length >= 2) {
+        allergenShowDropdown.value = true
+        searchAllergens()
+    } else {
+        allergenSearchResults.value = []
+        allergenShowDropdown.value = false
+    }
+}
+
 function showValidationErrors(errors) {
     // Show first error as a toast
     const firstError = Object.values(errors)[0]
@@ -666,6 +1030,9 @@ function confirmResetForm() {
         form.selected_products = []
         form.selected_contents = []
         selectedIngredients.value = []
+        cuisineSearchTerm.value = ''
+        cuisineSearchResults.value = []
+        cuisineShowDropdown.value = false
         form.id = null
         showToast('Edição cancelada', 'info')
     } else {
@@ -675,6 +1042,14 @@ function confirmResetForm() {
             form.selected_products = []
             form.selected_contents = []
             selectedIngredients.value = []
+            form.selected_cuisines = []
+            form.selected_allergens = []
+            cuisineSearchTerm.value = ''
+            cuisineSearchResults.value = []
+            cuisineShowDropdown.value = false
+            allergenSearchTerm.value = ''
+            allergenSearchResults.value = []
+            allergenShowDropdown.value = false
             showToast('Formulário limpo', 'info')
         }
     }
@@ -683,28 +1058,31 @@ function confirmResetForm() {
 const form = useForm({
     id: null,
     recipe_code: null,
-    recipe_name: null,
-    cuisine: '',
+    recipe_name: '',
+    // cuisines are selected via selected_cuisines
     recipe_type: '',
     service_order: '',
-    preparation_time: null,
+    preparation_time: '',
     difficulty_level: '',
     yield: '',
-    channel: '',
+    channel: [],
     recipe_description: null,
+    recipe_prompt: null,
     ingredients_description: null,
     preparation_method: null,
-    main_ingredients: [],
-    supporting_ingredients: [],
-    usage_groups: [],
-    preparation_techniques: [],
-    consumption_occasion: [],
+    usage_groups: '',
+    preparation_techniques: '',
+    consumption_occasion: '',
     // Product associations
     selected_products: [],
     // Content associations
     selected_contents: [],
     // Ingredient associations
-    selected_ingredients: []
+    selected_ingredients: [],
+    // Cuisine associations
+    selected_cuisines: [],
+    // Allergen associations
+    selected_allergens: []
 })
 
 const resetForm = () => {
@@ -712,6 +1090,14 @@ const resetForm = () => {
     form.selected_products = []
     form.selected_contents = []
     selectedIngredients.value = []
+    form.selected_cuisines = []
+    form.selected_allergens = []
+    cuisineSearchTerm.value = ''
+    cuisineSearchResults.value = []
+    cuisineShowDropdown.value = false
+    allergenSearchTerm.value = ''
+    allergenSearchResults.value = []
+    allergenShowDropdown.value = false
     form.id = null
     showToast('Formulário limpo para nova receita', 'info')
 }
@@ -719,22 +1105,25 @@ const resetForm = () => {
 function editRecipe(recipe) {
     form.id = recipe.id
     form.recipe_code = recipe.recipe_code
-    form.recipe_name = recipe.recipe_name
-    form.cuisine = recipe.cuisine
-    form.recipe_type = recipe.recipe_type
-    form.service_order = recipe.service_order
-    form.preparation_time = recipe.preparation_time
-    form.difficulty_level = recipe.difficulty_level
-    form.yield = recipe.yield
-    form.channel = recipe.channel
-    form.recipe_description = recipe.recipe_description
-    form.ingredients_description = recipe.ingredients_description
-    form.preparation_method = recipe.preparation_method
-    form.main_ingredients = recipe.main_ingredients || []
-    form.supporting_ingredients = recipe.supporting_ingredients || []
-    form.usage_groups = recipe.usage_groups || []
-    form.preparation_techniques = recipe.preparation_techniques || []
-    form.consumption_occasion = recipe.consumption_occasion || []
+    form.recipe_name = recipe.recipe_name || ''
+    // Load cuisines relation into chips
+    form.selected_cuisines = recipe.cuisines ? recipe.cuisines.map(c => ({ cuisine_id: c.id, name: c.name })) : []
+    cuisineSearchTerm.value = ''
+    form.recipe_type = recipe.recipe_type || ''
+    form.service_order = recipe.service_order || ''
+    form.preparation_time = recipe.preparation_time || ''
+    form.difficulty_level = recipe.difficulty_level || ''
+    form.yield = recipe.yield || ''
+    form.channel = Array.isArray(recipe.channel)
+        ? recipe.channel
+        : (recipe.channel ? String(recipe.channel).split(',').map(s => s.trim()).filter(Boolean) : [])
+    form.recipe_description = recipe.recipe_description || ''
+    form.recipe_prompt = recipe.recipe_prompt || ''
+    form.ingredients_description = recipe.ingredients_description || ''
+    form.preparation_method = recipe.preparation_method || ''
+    form.usage_groups = recipe.usage_groups || ''
+    form.preparation_techniques = recipe.preparation_techniques || ''
+    form.consumption_occasion = recipe.consumption_occasion || ''
     
     // Load associated products
     form.selected_products = recipe.products ? recipe.products.map(product => ({
@@ -758,6 +1147,12 @@ function editRecipe(recipe) {
         show_dropdown: false,
         primary_ingredient: ingredient.pivot.primary_ingredient
     })) : []
+
+    // Load associated allergens
+    form.selected_allergens = recipe.allergens ? recipe.allergens.map(a => ({
+        allergen_id: a.id,
+        name: a.name,
+    })) : []
 }
 
 function deleteRecipe(recipe) {
@@ -777,8 +1172,9 @@ function deleteRecipe(recipe) {
 }
 
 const submit = () => {
-    // Add selected ingredients to form data before submission
+    // Add selected associations to form data before submission
     form.selected_ingredients = selectedIngredients.value
+    // Allergens are directly in form.selected_allergens
     
     form.post("/recipes", {
         onSuccess: () => {
@@ -791,6 +1187,20 @@ const submit = () => {
             form.selected_products = []
             form.selected_contents = []
             selectedIngredients.value = []
+            form.selected_cuisines = []
+            form.selected_allergens = []
+            form.reset()
+            form.selected_products = []
+            form.selected_contents = []
+            selectedIngredients.value = []
+            form.selected_cuisines = []
+            form.selected_allergens = []
+            cuisineSearchTerm.value = ''
+            cuisineSearchResults.value = []
+            cuisineShowDropdown.value = false
+            allergenSearchTerm.value = ''
+            allergenSearchResults.value = []
+            allergenShowDropdown.value = false
             
             // Clear form ID to indicate new recipe creation
             form.id = null

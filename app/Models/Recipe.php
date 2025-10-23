@@ -19,7 +19,6 @@ class Recipe extends Model
         'embedding',
         'recipe_code',
         'recipe_name', 
-        'cuisine',
         'recipe_type',
         'service_order',
         'preparation_time',
@@ -27,22 +26,33 @@ class Recipe extends Model
         'yield',
         'channel',
         'recipe_description',
+        'recipe_prompt',
         'ingredients_description',
         'preparation_method',
-        'main_ingredients',
-        'supporting_ingredients',
         'usage_groups',
         'preparation_techniques',
         'consumption_occasion',
     ];
 
-    protected $casts = [
-        'main_ingredients' => 'array',
-        'supporting_ingredients' => 'array',
-        'usage_groups' => 'array',
-        'preparation_techniques' => 'array',
-        'consumption_occasion' => 'array',
-    ];
+    /**
+     * Get a comma-separated list of ingredient names for this recipe.
+     */
+    public function ingredientNamesList(): string
+    {
+        return $this->ingredients
+            ? $this->ingredients->pluck('name')->filter()->implode(', ')
+            : '';
+    }
+
+    /**
+     * Get a comma-separated list of cuisine names for this recipe.
+     */
+    public function cuisineNamesList(): string
+    {
+        return $this->cuisines
+            ? $this->cuisines->pluck('name')->filter()->implode(', ')
+            : '';
+    }
 
     public function getEmbeddingVector(): ?Vector
     {
@@ -122,5 +132,21 @@ class Recipe extends Model
     public function supportingIngredients(): BelongsToMany
     {
         return $this->ingredients()->wherePivot('primary_ingredient', false);
+    }
+
+    /**
+     * The cuisines that belong to this recipe.
+     */
+    public function cuisines(): BelongsToMany
+    {
+        return $this->belongsToMany(Cuisine::class)->withTimestamps();
+    }
+
+    /**
+     * The allergens associated with this recipe.
+     */
+    public function allergens(): BelongsToMany
+    {
+        return $this->belongsToMany(Allergen::class)->withTimestamps();
     }
 }

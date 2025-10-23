@@ -6,6 +6,8 @@ use App\Models\Recipe;
 use App\Models\Product;
 use App\Models\Content;
 use App\Models\Ingredient;
+use App\Models\Allergen;
+use App\Models\Cuisine;
 use App\Services\PrismService;
 use App\Services\EmbeddingService;
 use App\Services\AIToolService;
@@ -19,18 +21,36 @@ class RecipeController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $recipes = Recipe::with(['products', 'contents', 'ingredients'])->latest()->get();
+        $perPage = (int) $request->input('per_page', 10);
+        $search = trim((string) $request->input('search', ''));
+
+        $recipes = Recipe::with(['products', 'contents', 'ingredients', 'cuisines', 'allergens'])
+            ->when($search !== '', function ($query) use ($search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('recipe_name', 'ilike', "%{$search}%")
+                      ->orWhere('recipe_description', 'ilike', "%{$search}%");
+                });
+            })
+            ->latest()
+            ->paginate($perPage)
+            ->withQueryString();
+
         $products = Product::where('status', true)->orderBy('descricao')->get();
         $contents = Content::where('status', true)->orderBy('nome_conteudo')->get();
         $ingredients = Ingredient::orderBy('name')->get();
+        $allergens = Allergen::orderBy('name')->get();
+        $cuisines = Cuisine::active()->orderBy('name')->get();
 
         return Inertia::render('Recipes/Manage', [
             'recipes' => $recipes,
             'products' => $products,
             'contents' => $contents,
-            'ingredients' => $ingredients
+            'ingredients' => $ingredients,
+            'cuisines' => $cuisines,
+            'allergens' => $allergens,
+            'filters' => $request->only(['search', 'per_page'])
         ]);
     }
 
@@ -43,25 +63,24 @@ class RecipeController extends Controller
             // Recipe fields
             'recipe_code' => 'nullable|string|max:255',
             'recipe_name' => 'string|max:255',
-            'cuisine' => 'nullable|string|max:255',
             'recipe_type' => 'string|max:255',
             'service_order' => 'nullable|string|max:255',
             'preparation_time' => 'nullable|integer|min:1',
-            'difficulty_level' => 'nullable|string|in:facil,medio,dificil,expert',
+            'difficulty_level' => 'nullable|string|in:muito_facil,facil,elaborada,muito_elaborada',
             'yield' => 'nullable|string|max:255',
-            'channel' => 'nullable|string|max:255',
+            'channel' => 'nullable',
+            'channel.*' => 'string|in:padaria,lanchonete,restaurante,confeitaria',
             
             // Content fields
             'recipe_description' => 'string',
-            'ingredients_description' => 'string',
+            'ingredients_description' => 'nullable|string',
+            'recipe_prompt' => 'nullable|string',
             'preparation_method' => 'string',
             
-            // Array fields (stored as JSON)
-            'main_ingredients' => 'required|array',
-            'supporting_ingredients' => 'nullable|array',
-            'usage_groups' => 'nullable|array',
-            'preparation_techniques' => 'nullable|array',
-            'consumption_occasion' => 'nullable|array',
+            // String fields
+            'usage_groups' => 'nullable|string|max:255',
+            'preparation_techniques' => 'nullable|string|max:255',
+            'consumption_occasion' => 'nullable|string|max:255',
             
             // Product associations
             'selected_products' => 'nullable|array',
@@ -78,11 +97,31 @@ class RecipeController extends Controller
             'selected_ingredients.*.ingredient_id' => 'nullable|exists:ingredients,id',
             'selected_ingredients.*.ingredient_name' => 'nullable|string|max:255',
             'selected_ingredients.*.primary_ingredient' => 'nullable|boolean',
+
+            // Cuisine associations
+            'selected_cuisines' => 'nullable|array',
+            'selected_cuisines.*.cuisine_id' => 'nullable|exists:cuisines,id',
+            'selected_cuisines.*.name' => 'nullable|string|max:255',
+
+            // Allergen associations (IDs only; no free-text creation)
+            'selected_allergens' => 'nullable|array',
+            'selected_allergens.*.allergen_id' => 'required_with:selected_allergens|exists:allergens,id',
         ]);
+
+        // Normalize channel: accept array and store as CSV string
+        if (isset($data['channel'])) {
+            if (is_array($data['channel'])) {
+                $data['channel'] = implode(',', array_values(array_filter(array_map('strval', $data['channel']))));
+            } elseif ($data['channel'] === null) {
+                $data['channel'] = null;
+            } else {
+                $data['channel'] = (string) $data['channel'];
+            }
+        }
 
         $recipe = Recipe::updateOrCreate(
             ['id' => $request->id],
-            collect($data)->except(['selected_products', 'selected_contents', 'selected_ingredients'])->toArray()
+            collect($data)->except(['selected_products', 'selected_contents', 'selected_ingredients', 'selected_cuisines', 'selected_allergens'])->toArray()
         );
 
         // Sync products if provided
@@ -143,6 +182,37 @@ class RecipeController extends Controller
             $recipe->ingredients()->sync($ingredientData);
         }
 
+        // Sync cuisines if provided
+        if ($request->has('selected_cuisines') && is_array($request->selected_cuisines)) {
+            $cuisineIds = [];
+            foreach ($request->selected_cuisines as $cuisineInfo) {
+                $cuisineId = $cuisineInfo['cuisine_id'] ?? null;
+                $name = $cuisineInfo['name'] ?? null;
+                if (!$cuisineId && $name) {
+                    $cuisine = Cuisine::firstOrCreate(['name' => trim($name)]);
+                    $cuisineId = $cuisine->id;
+                }
+                if ($cuisineId) {
+                    $cuisineIds[] = $cuisineId;
+                }
+            }
+            $recipe->cuisines()->sync($cuisineIds);
+        }
+
+        // Sync allergens if provided (IDs only)
+        if ($request->has('selected_allergens') && is_array($request->selected_allergens)) {
+            $allergenIds = collect($request->selected_allergens)
+                ->pluck('allergen_id')
+                ->filter()
+                ->unique()
+                ->values()
+                ->all();
+            $recipe->allergens()->sync($allergenIds);
+        }
+
+        $embeddingService = new EmbeddingService(new PrismService());
+        $embeddingService->generateEmbedding($recipe);
+
         return null;
     }
 
@@ -173,6 +243,49 @@ class RecipeController extends Controller
             ->get(['id', 'name']);
 
         return response()->json($ingredients);
+    }
+
+    /**
+     * Search for cuisines by name
+     */
+    public function searchCuisines(Request $request)
+    {
+        $request->validate([
+            'query' => 'required|string|min:1',
+            'limit' => 'nullable|integer|min:1|max:20'
+        ]);
+
+        $query = $request->query('query');
+        $limit = $request->query('limit', 10);
+
+        $cuisines = Cuisine::active()
+            ->where('name', 'ilike', "%{$query}%")
+            ->orderBy('name')
+            ->limit($limit)
+            ->get(['id', 'name']);
+
+        return response()->json($cuisines);
+    }
+
+    /**
+     * Search for allergens by name
+     */
+    public function searchAllergens(Request $request)
+    {
+        $request->validate([
+            'query' => 'required|string|min:1',
+            'limit' => 'nullable|integer|min:1|max:20'
+        ]);
+
+        $query = $request->query('query');
+        $limit = $request->query('limit', 10);
+
+        $allergens = Allergen::where('name', 'ilike', "%{$query}%")
+            ->orderBy('name')
+            ->limit($limit)
+            ->get(['id', 'name']);
+
+        return response()->json($allergens);
     }
 
     public function search(Request $request)
@@ -216,7 +329,7 @@ class RecipeController extends Controller
                     ->nearestNeighbors('embedding', $embedding, Distance::Cosine)
                     ->take($limit)
                     ->where('status', true)
-                    ->with(['groupProduct', 'detail'])
+                    ->with(['groupProduct'])
                     ->get()
                     ->map(function ($product) {
                         return collect($product)->except('embedding')->toArray();
@@ -248,8 +361,9 @@ class RecipeController extends Controller
         $request->validate([
             'text' => 'required|string|min:1',
             'context' => 'nullable',
-            // 'use_tools' => 'nullable|boolean'
+            'use_tools' => 'nullable|boolean'
         ]);
+
         $prism = new PrismService();
 
         $text = $prism->buildMessages([
@@ -260,59 +374,18 @@ class RecipeController extends Controller
         ]);
 
         $context = $this->cleanResultFromEmbeddings($request->context);
-        // $useTools = $request->use_tools ?? false;
+        $useTools = $request->use_tools ?? false;
 
         try {
-            // $tools = [];
+            $tools = [];
 
             // Add tools if requested
-            // if ($useTools) {
-            //     $aiToolService = new AIToolService($prism, new EmbeddingService($prism));
-            //     $tools = $aiToolService->getTools();
-            // }
+            if ($useTools) {
+                $aiToolService = new AIToolService($prism, new EmbeddingService($prism));
+                $tools = $aiToolService->getTools();
+            }
 
-            $response = $prism->getResponse($text, $context);
-
-            // // Handle tool calls if present
-            // if (isset($response['tool_calls']) && !empty($response['tool_calls'])) {
-            //     $aiToolService = new AIToolService($prism, new EmbeddingService($prism));
-            //     $toolResults = [];
-
-            //     foreach ($response['tool_calls'] as $toolCall) {
-            //         $functionName = $toolCall['function']['name'] ?? '';
-            //         $parameters = $toolCall['function']['arguments'] ?? [];
-                    
-            //         if (is_string($parameters)) {
-            //             $parameters = json_decode($parameters, true) ?? [];
-            //         }
-
-            //         $result = $aiToolService->executeTool($functionName, $parameters);
-                    
-            //         // Clean result to remove any embedding data
-            //         $cleanResult = $this->cleanResultFromEmbeddings($result);
-                    
-            //         $toolResults[] = [
-            //             'tool_call_id' => $toolCall['id'] ?? uniqid(),
-            //             'function_name' => $functionName,
-            //             'result' => $cleanResult
-            //         ];
-            //     }
-
-            //     // Send tool results back to AI for final response
-            //     $finalResponse = $prism->getResponse(
-            //         "Com base nos resultados das ferramentas, forneça uma resposta completa ao usuário.",
-            //         [
-            //             'original_query' => $text,
-            //             'tool_results' => $toolResults,
-            //             'context' => $context
-            //         ]
-            //     );
-
-            //     return response()->json([
-            //         'response' => $finalResponse['response'] ?? $finalResponse,
-            //         'tool_calls' => $toolResults
-            //     ], 200);
-            // }
+            $response = $prism->getResponse($text, $context, $tools);
 
             if(isset($response['status']) && $response['status']){
                     return response()->json([

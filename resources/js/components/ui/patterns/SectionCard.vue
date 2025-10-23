@@ -17,23 +17,23 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 const sectionVariants = {
-  default: 'bg-white',
-  gray: 'bg-gray-50',
+  default: 'bg-white dark:bg-card',
+  gray: 'bg-gray-50 dark:bg-slate-800',
   colored: ''
 }
 
 const colorVariants = {
-  orange: 'bg-orange-50 border-orange-200',
-  blue: 'bg-blue-50 border-blue-200',
-  green: 'bg-green-50 border-green-200',
-  purple: 'bg-purple-50 border-purple-200'
+  orange: 'bg-orange-50 dark:bg-slate-800 border-orange-200 dark:border-gray-700',
+  blue: 'bg-orange-50 dark:bg-slate-800 border-orange-200 dark:border-gray-700',
+  green: 'bg-orange-50 dark:bg-slate-800 border-orange-200 dark:border-gray-700',
+  purple: 'bg-orange-50 dark:bg-slate-800 border-orange-200 dark:border-gray-700'
 }
 
 const headerColorVariants = {
-  orange: 'bg-orange-100 text-orange-900',
-  blue: 'bg-blue-100 text-blue-900',
-  green: 'bg-green-100 text-green-900',
-  purple: 'bg-purple-100 text-purple-900'
+  orange: 'bg-orange-100 dark:bg-slate-800 text-orange-900 dark:text-slate-100',
+  blue: 'bg-orange-100 dark:bg-slate-800 text-orange-900 dark:text-slate-100',
+  green: 'bg-orange-100 dark:bg-slate-800 text-orange-900 dark:text-slate-100',
+  purple: 'bg-orange-100 dark:bg-slate-800 text-orange-900 dark:text-slate-100'
 }
 </script>
 
@@ -69,10 +69,10 @@ const headerColorVariants = {
       <div v-else class="flex items-center gap-3">
         <span v-if="icon" class="text-xl">{{ icon }}</span>
         <div>
-          <h3 v-if="title" class="text-base font-semibold text-gray-900">
+          <h3 v-if="title" class="text-base font-semibold text-slate-900 dark:text-slate-100">
             {{ title }}
           </h3>
-          <p v-if="subtitle" class="text-sm text-gray-600 mt-1">
+          <p v-if="subtitle" class="text-sm text-slate-600 dark:text-slate-400 mt-1">
             {{ subtitle }}
           </p>
         </div>

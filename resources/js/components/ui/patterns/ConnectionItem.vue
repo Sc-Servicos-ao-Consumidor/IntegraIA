@@ -16,39 +16,39 @@ const props = withDefaults(defineProps<Props>(), {
 
 const colorVariants = {
   orange: {
-    icon: 'bg-orange-100',
-    iconText: 'text-orange-600',
-    button: 'text-orange-600 hover:text-orange-800',
-    border: 'border-orange-300',
-    hover: 'hover:bg-orange-50'
+    icon: 'bg-orange-100 dark:bg-slate-800',
+    iconText: 'text-orange-600 dark:text-slate-400',
+    button: 'text-orange-600 dark:text-slate-400 hover:text-orange-800 dark:hover:text-slate-300',
+    border: 'border-orange-300 dark:border-gray-600',
+    hover: 'hover:bg-orange-50 dark:hover:bg-slate-800'
   },
   blue: {
-    icon: 'bg-blue-100',
-    iconText: 'text-blue-600',
-    button: 'text-blue-600 hover:text-blue-800',
-    border: 'border-blue-300',
-    hover: 'hover:bg-blue-50'
+    icon: 'bg-orange-100 dark:bg-slate-800',
+    iconText: 'text-orange-600 dark:text-slate-400',
+    button: 'text-orange-600 dark:text-slate-400 hover:text-orange-800 dark:hover:text-slate-300',
+    border: 'border-orange-300 dark:border-gray-600',
+    hover: 'hover:bg-orange-50 dark:hover:bg-slate-800'
   },
   green: {
-    icon: 'bg-green-100',
-    iconText: 'text-green-600',
-    button: 'text-green-600 hover:text-green-800',
-    border: 'border-green-300',
-    hover: 'hover:bg-green-50'
+    icon: 'bg-orange-100 dark:bg-slate-800',
+    iconText: 'text-orange-600 dark:text-slate-400',
+    button: 'text-orange-600 dark:text-slate-400 hover:text-orange-800 dark:hover:text-slate-300',
+    border: 'border-orange-300 dark:border-gray-600',
+    hover: 'hover:bg-orange-50 dark:hover:bg-slate-800'
   },
   purple: {
-    icon: 'bg-purple-100',
-    iconText: 'text-purple-600',
-    button: 'text-purple-600 hover:text-purple-800',
-    border: 'border-purple-300',
-    hover: 'hover:bg-purple-50'
+    icon: 'bg-orange-100 dark:bg-slate-800',
+    iconText: 'text-orange-600 dark:text-slate-400',
+    button: 'text-orange-600 dark:text-slate-400 hover:text-orange-800 dark:hover:text-slate-300',
+    border: 'border-orange-300 dark:border-gray-600',
+    hover: 'hover:bg-orange-50 dark:hover:bg-slate-800'
   },
   yellow: {
-    icon: 'bg-yellow-100',
-    iconText: 'text-yellow-600',
-    button: 'text-yellow-600 hover:text-yellow-800',
-    border: 'border-yellow-300',
-    hover: 'hover:bg-yellow-50'
+    icon: 'bg-orange-100 dark:bg-slate-800',
+    iconText: 'text-orange-600 dark:text-slate-400',
+    button: 'text-orange-600 dark:text-slate-400 hover:text-orange-800 dark:hover:text-slate-300',
+    border: 'border-orange-300 dark:border-gray-600',
+    hover: 'hover:bg-orange-50 dark:hover:bg-slate-800'
   }
 }
 
@@ -59,7 +59,7 @@ const colors = colorVariants[props.color]
   <div
     :class="
       cn(
-        'flex items-center gap-3 p-3 border border-gray-200 rounded bg-white',
+        'flex items-center gap-4 p-4 border border-gray-200 dark:border-gray-600 rounded-lg bg-white dark:bg-card shadow-sm',
         colors.hover,
         'transition-colors',
         props.class
@@ -70,7 +70,7 @@ const colors = colorVariants[props.color]
     <div 
       :class="
         cn(
-          'w-8 h-8 rounded flex items-center justify-center',
+          'w-10 h-10 rounded-lg flex items-center justify-center',
           colors.icon
         )
       "
@@ -101,9 +101,9 @@ const colors = colorVariants[props.color]
     <button 
       v-if="removable && $slots.remove"
       type="button"
-      :class="
+        :class="
         cn(
-          'text-red-600 hover:text-red-800 text-sm font-medium px-2 py-1 rounded hover:bg-red-50 transition-colors',
+          'text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 text-sm font-medium px-3 py-2 rounded-md hover:bg-red-50 dark:hover:bg-red-900 transition-colors',
           colors.button
         )
       "

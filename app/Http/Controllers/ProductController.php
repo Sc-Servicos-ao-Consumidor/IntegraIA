@@ -6,6 +6,8 @@ use App\Models\Product;
 use App\Models\GroupProduct;
 use App\Models\Recipe;
 use App\Models\Content;
+use App\Services\EmbeddingService;
+use App\Services\PrismService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
@@ -17,8 +19,11 @@ class ProductController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
+        $perPage = (int) $request->input('per_page', 10);
+        $search = trim((string) $request->input('search', ''));
+
         $products = Product::with([
             'groupProduct', 
             'images' => function($query) {
@@ -27,7 +32,18 @@ class ProductController extends Controller
             'packagings',
             'recipes:id,recipe_name as descricao',
             'contents:id,nome_conteudo as descricao'
-        ])->latest()->get();
+        ])
+        ->when($search !== '', function ($query) use ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('descricao', 'ilike', "%{$search}%")
+                  ->orWhere('codigo_padrao', 'ilike', "%{$search}%")
+                  ->orWhere('sku', 'ilike', "%{$search}%")
+                  ->orWhere('marca', 'ilike', "%{$search}%");
+            });
+        })
+        ->latest()
+        ->paginate($perPage)
+        ->withQueryString();
         
         $groupProducts = GroupProduct::all();
         $recipes = Recipe::select('id', 'recipe_name as descricao')->get();
@@ -37,7 +53,8 @@ class ProductController extends Controller
             'products' => $products,
             'groupProducts' => $groupProducts,
             'recipes' => $recipes,
-            'contents' => $contents
+            'contents' => $contents,
+            'filters' => $request->only(['search', 'per_page'])
         ]);
     }
 
@@ -55,13 +72,13 @@ class ProductController extends Controller
             'sku' => 'nullable|string|max:255',
             'group_product_id' => 'required|exists:group_products,id',
             'marca' => 'nullable|string|max:255',
-            'escolha_embalagem' => 'nullable|string|max:255',
             'prompt_uso_informacoes_produto' => 'nullable|string',
             'especificacao_produto' => 'nullable|string',
             'perfil_sabor' => 'nullable|string',
             'descricao_tabela_nutricional' => 'nullable|string',
             'descricao_lista_ingredientes' => 'nullable|string',
             'descricao_modos_preparo' => 'nullable|string',
+            'dicas_utilizacao' => 'nullable|string',
             'descricao_rendimentos' => 'nullable|string',
             'ean' => 'nullable|string|max:255',
             'status' => 'boolean',
@@ -211,6 +228,10 @@ class ProductController extends Controller
             }
 
             DB::commit();
+
+            $embeddingService = new EmbeddingService(new PrismService());
+            $embeddingService->generateEmbedding($product);
+
             return redirect()->route('products.index')->with('success', 'Produto salvo com sucesso!');
 
         } catch (\Exception $e) {

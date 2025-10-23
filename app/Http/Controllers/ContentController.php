@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Content;
 use App\Models\Product;
 use App\Models\Recipe;
+use App\Services\EmbeddingService;
+use App\Services\PrismService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -13,16 +15,30 @@ class ContentController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $contents = Content::with(['recipes', 'products'])->latest()->get();
-        $recipes = Recipe::where('recipe_name', '!=', null)->orderBy('recipe_name')->get();
+        $perPage = (int) $request->input('per_page', 10);
+        $search = trim((string) $request->input('search', ''));
+
+        $contents = Content::with(['recipes', 'products'])
+            ->when($search !== '', function ($query) use ($search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('nome_conteudo', 'ilike', "%{$search}%")
+                      ->orWhere('descricao_conteudo', 'ilike', "%{$search}%");
+                });
+            })
+            ->latest()
+            ->paginate($perPage)
+            ->withQueryString();
+
+        $recipes = Recipe::whereNotNull('recipe_name')->orderBy('recipe_name')->get();
         $products = Product::where('status', true)->orderBy('descricao')->get();
 
         return Inertia::render('Contents/Manage', [
             'contents' => $contents,
             'recipes' => $recipes,
-            'products' => $products
+            'products' => $products,
+            'filters' => $request->only(['search', 'per_page'])
         ]);
     }
 
@@ -34,27 +50,17 @@ class ContentController extends Controller
         $data = $request->validate([
             'nome_conteudo' => 'required|string|max:255',
             'content_code' => 'nullable|string|max:255|unique:contents,content_code,' . $request->id,
-            'descricao_tabela_nutricional' => 'nullable|string',
-            'descricao_lista_ingredientes' => 'nullable|string',
-            'descricao_modos_preparo' => 'nullable|string',
-            'descricao_rendimentos' => 'nullable|string',
-            'imagem_tabela_nutricional' => 'nullable|url',
-            'imagem_lista_ingredientes' => 'nullable|url',
-            'imagem_modos_preparo' => 'nullable|url',
-            'imagem_rendimentos' => 'nullable|url',
-            'imagens_nutricionais_cadastradas' => 'nullable|array',
-            'imagens_ingredientes_cadastradas' => 'nullable|array',
-            'imagens_preparo_cadastradas' => 'nullable|array',
-            'imagens_rendimentos_cadastradas' => 'nullable|array',
             'tipo_conteudo' => 'required|string|max:255',
             'pilares' => 'nullable|string|max:255',
-            'canal' => 'nullable|string|max:255',
+            'canal' => 'nullable',
+            'canal.*' => 'string|in:padaria,lanchonete,restaurante,confeitaria',
             'links_conteudo' => 'nullable|array',
             'cozinheiro' => 'required|boolean',
             'comprador' => 'required|boolean',
             'administrador' => 'required|boolean',
             'status' => 'nullable|boolean',
             'descricao_conteudo' => 'required|string',
+            'content_prompt' => 'nullable|string',
             // Recipe associations
             'selected_recipes' => 'nullable|array',
             'selected_recipes.*.recipe_id' => 'required_with:selected_recipes|exists:recipes,id',
@@ -65,6 +71,17 @@ class ContentController extends Controller
             'selected_products.*.featured' => 'nullable|in:sim,nao',
             'selected_products.*.notes' => 'nullable|string',
         ]);
+
+        // Normalize canal: accept array and store as CSV string
+        if (isset($data['canal'])) {
+            if (is_array($data['canal'])) {
+                $data['canal'] = implode(',', array_values(array_filter(array_map('strval', $data['canal']))));
+            } elseif ($data['canal'] === null) {
+                $data['canal'] = null;
+            } else {
+                $data['canal'] = (string) $data['canal'];
+            }
+        }
 
         $content = Content::updateOrCreate(
             ['id' => $request->id],
@@ -95,6 +112,9 @@ class ContentController extends Controller
             }
             $content->products()->sync($productData);
         }
+
+        $embeddingService = new EmbeddingService(new PrismService());
+        $embeddingService->generateEmbedding($content);
 
         return null;
     }

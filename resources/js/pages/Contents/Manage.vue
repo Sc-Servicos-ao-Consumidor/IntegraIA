@@ -25,7 +25,7 @@
                 </div>
                 <button
                     @click="removeToast(toast.id)"
-                    class="ml-2 text-white hover:text-gray-200 focus:outline-none"
+                    class="ml-2 text-white hover:text-slate-200 focus:outline-none"
                 >
                     ×
                 </button>
@@ -42,23 +42,24 @@
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
                     <!-- Nome do Conteúdo -->
                     <div>
-                        <label for="nome_conteudo" class="block text-sm font-medium text-gray-700 mb-1">Nome do Conteúdo</label>
+                        <label for="nome_conteudo" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Nome do Conteúdo</label>
                         <input
                             v-model="form.nome_conteudo"
                             id="nome_conteudo"
                             type="text"
-                            class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                            class="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                            placeholder="Digite o nome do conteúdo"
                         />
                         <p v-if="form.errors.nome_conteudo" class="text-red-500 text-xs mt-1">{{ form.errors.nome_conteudo }}</p>
                     </div>
 
                     <!-- Tipo de Conteúdo -->
                     <div>
-                        <label for="tipo_conteudo" class="block text-sm font-medium text-gray-700 mb-1">Tipo de Conteúdo</label>
+                        <label for="tipo_conteudo" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Tipo de Conteúdo</label>
                         <select
                             v-model="form.tipo_conteudo"
                             id="tipo_conteudo"
-                            class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                            class="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                         >
                             <option selected disabled value="">Selecione</option>
                             <option value="ebook">E-book</option>
@@ -71,11 +72,11 @@
 
                     <!-- Pilares -->
                     <div>
-                        <label for="pilares" class="block text-sm font-medium text-gray-700 mb-1">Pilares</label>
+                        <label for="pilares" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Pilares</label>
                         <select
                             v-model="form.pilares"
                             id="pilares"
-                            class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                            class="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                         >
                             <option selected disabled value="">Selecione</option>
                             <option value="treinamento">Treinamento</option>
@@ -87,11 +88,11 @@
 
                     <!-- Cozinheiro -->
                     <div>
-                        <label for="cozinheiro" class="block text-sm font-medium text-gray-700 mb-1">Cozinheiro</label>
+                        <label for="cozinheiro" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Cozinheiro</label>
                         <select
                             v-model="form.cozinheiro"
                             id="cozinheiro"
-                            class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                            class="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                         >
                             <option selected disabled value="">Selecione</option>
                             <option :value="true">Sim</option>
@@ -101,11 +102,11 @@
 
                     <!-- Comprador -->
                     <div>
-                        <label for="comprador" class="block text-sm font-medium text-gray-700 mb-1">Comprador</label>
+                        <label for="comprador" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Comprador</label>
                         <select
                             v-model="form.comprador"
                             id="comprador"
-                            class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                            class="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                         >
                             <option selected disabled value="">Selecione</option>
                             <option :value="true">Sim</option>
@@ -115,11 +116,11 @@
 
                     <!-- Administrador -->
                     <div>
-                        <label for="administrador" class="block text-sm font-medium text-gray-700 mb-1">Administrador</label>
+                        <label for="administrador" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Administrador</label>
                         <select
                             v-model="form.administrador"
                             id="administrador"
-                            class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                            class="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                         >
                             <option selected disabled value="">Selecione</option>
                             <option :value="true">Sim</option>
@@ -129,38 +130,37 @@
 
                     <!-- Canal -->
                     <div>
-                        <label for="canal" class="block text-sm font-medium text-gray-700 mb-1">Canal</label>
+                        <label for="canal" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Canal</label>
                         <select
                             v-model="form.canal"
                             id="canal"
-                            class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                            multiple
+                            class="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 min-h-[42px]"
                         >
-                            <option selected disabled value="">Selecione</option>
                             <option value="padaria">Padaria</option>
                             <option value="lanchonete">Lanchonete</option>
-                            <option value="buffet">Buffet</option>
-                            <option value="ala-carte">A la Carte</option>
-                            <option value="industrial">Industrial</option>
+                            <option value="restaurante">Restaurante</option>
+                            <option value="confeitaria">Confeitaria</option>
                         </select>
                     </div>
                 </div>
 
                 <!-- Links do Conteúdo -->
                 <div class="mb-8">
-                    <h3 class="text-lg font-medium text-gray-900 mb-4">Links do Conteúdo</h3>
+                    <h3 class="text-lg font-medium text-slate-900 dark:text-slate-100 mb-4">Links do Conteúdo</h3>
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
                         <div v-for="(link, index) in form.links_conteudo" :key="index" class="flex gap-3">
                             <input
                                 v-model="link.nome"
                                 type="text"
                                 placeholder="Descrição do Link"
-                                class="flex-1 border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                                class="flex-1 border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                             />
                             <input
                                 v-model="link.url"
                                 type="url"
                                 placeholder="Link"
-                                class="flex-1 border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                                class="flex-1 border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                             />
                             <button 
                                 type="button"
@@ -182,18 +182,32 @@
 
                 <!-- Descrição do Conteúdo -->
                 <div class="mt-8">
-                    <label for="descricao_conteudo" class="block text-sm font-medium text-gray-700 mb-1">Descrição do Conteúdo</label>
+                    <label for="descricao_conteudo" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Descrição do Conteúdo</label>
                     <textarea
                         v-model="form.descricao_conteudo"
                         id="descricao_conteudo"
                         rows="4"
-                        class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-vertical"
+                        class="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-vertical"
+                        placeholder="Descreva o conteúdo em detalhe"
                     ></textarea>
                 </div>
 
+                <!-- Prompt do Conteúdo -->
+                <div class="mt-4">
+                    <label for="content_prompt" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Prompt do Conteúdo</label>
+                    <textarea
+                        v-model="form.content_prompt"
+                        id="content_prompt"
+                        rows="4"
+                        placeholder="Instruções/briefing sobre o conteúdo para geração de conteúdo por IA..."
+                        class="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-vertical"
+                    ></textarea>
+                    <p v-if="form.errors.content_prompt" class="text-red-500 text-xs mt-1">{{ form.errors.content_prompt }}</p>
+                </div>
+
                 <!-- Connections Section -->
-                <div class="mt-8 pt-8 border-t border-gray-200">
-                    <h3 class="text-lg font-semibold text-gray-900 mb-4">🔗 Conexões e Associações</h3>
+                <div class="mt-8 pt-8">
+                    <h3 class="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-4">🔗 Conexões e Associações</h3>
                     
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         <!-- Recipe Associations -->
@@ -205,7 +219,7 @@
                             >
                                 <select
                                     v-model="recipe.recipe_id"
-                                    class="flex-1 border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                                    class="flex-1 border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                                 >
                                     <option disabled selected value="">Selecione uma receita...</option>
                                     <option v-for="availableRecipe in props.recipes" :key="availableRecipe.id" :value="availableRecipe.id">
@@ -220,9 +234,9 @@
                                             v-model="recipe.top_dish"
                                             :true-value="true"
                                             :false-value="false"
-                                            class="w-4 h-4 text-orange-600 bg-gray-100 border-gray-300 rounded focus:ring-orange-500 focus:ring-2"
+                                            class="w-4 h-4 text-orange-600 bg-gray-100 border-gray-300 dark:border-gray-600 rounded focus:ring-orange-500 focus:ring-2"
                                         />
-                                        <span class="text-gray-700">Top Dish</span>
+                                        <span class="text-slate-700 dark:text-slate-300">Top Dish</span>
                                     </label>
                                 </template>
                                 
@@ -230,6 +244,7 @@
                                     <button 
                                         type="button"
                                         @click="removeRecipe(index)"
+                                        class="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 text-sm font-medium px-3 py-2 rounded-md hover:bg-red-50 dark:hover:bg-red-900 transition-colors"
                                     >
                                         Remover
                                     </button>
@@ -254,7 +269,7 @@
                             >
                                 <select
                                     v-model="product.product_id"
-                                    class="flex-1 border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                    class="flex-1 border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                                 >
                                     <option disabled selected value="">Selecione um produto...</option>
                                     <option v-for="availableProduct in props.products" :key="availableProduct.id" :value="availableProduct.id">
@@ -269,9 +284,9 @@
                                             v-model="product.featured"
                                             :true-value="'sim'"
                                             :false-value="'nao'"
-                                            class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+                                            class="w-4 h-4 text-orange-600 dark:text-orange-400 bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-600 dark:border-gray-600 rounded focus:ring-orange-500 focus:ring-2"
                                         />
-                                        <span class="text-gray-700">Principal</span>
+                                        <span class="text-slate-700 dark:text-slate-300">Principal</span>
                                     </label>
                                 </template>
                                 
@@ -279,6 +294,7 @@
                                     <button 
                                         type="button"
                                         @click="removeProduct(index)"
+                                        class="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 text-sm font-medium px-3 py-2 rounded-md hover:bg-red-50 dark:hover:bg-red-900 transition-colors"
                                     >
                                         Remover
                                     </button>
@@ -288,7 +304,7 @@
                             <button 
                                 type="button"
                                 @click="addProduct"
-                                class="text-blue-600 hover:text-blue-800 text-sm font-medium px-3 py-2 border border-blue-300 rounded-md hover:bg-blue-50 transition-colors"
+                                class="text-orange-600 dark:text-orange-400 hover:text-orange-800 dark:hover:text-orange-300 text-sm font-medium px-3 py-2 border border-orange-300 dark:border-orange-600 rounded-md hover:bg-orange-50 dark:hover:bg-orange-900 transition-colors"
                             >
                                 + Adicionar Produto
                             </button>
@@ -298,11 +314,11 @@
 
 
                 <!-- Action Buttons -->
-                <div class="flex gap-3 mt-8 pt-6 border-t border-gray-200">
+                <div class="flex gap-3 mt-8 pt-6">
                     <button
                         type="button"
                         @click="confirmResetForm"
-                        class="px-6 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"
+                        class="px-6 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 dark:text-gray-300 bg-white dark:bg-secondary border border-gray-300 dark:border-gray-600 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-accent focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"
                     >
                         {{ form.id ? 'Cancelar' : 'Limpar' }}
                     </button>
@@ -325,9 +341,23 @@
             </FormCard>
 
             <!-- Saved Contents Section -->
-            <ListCard title="Conteúdos Salvos" icon="📋" empty-message="Nenhum conteúdo cadastrado" empty-icon="📄" class="mt-8">
+            <ListCard
+                title="Conteúdos Salvos"
+                icon="📋"
+                empty-message="Nenhum conteúdo cadastrado"
+                empty-icon="📄"
+                class="mt-8"
+                searchable
+                :search="localSearch"
+                :per-page="localPerPage"
+                search-placeholder="Buscar por nome ou descrição do conteúdo..."
+                @update:search="value => localSearch = value"
+                @update:perPage="value => localPerPage = value"
+                @submit="router.get('/contents', { search: localSearch || undefined, per_page: localPerPage || undefined }, { preserveState: true, preserveScroll: true, replace: true })"
+                @clear="() => { localSearch=''; localPerPage=10; router.get('/contents', {}, { preserveState: true, preserveScroll: true, replace: true }) }"
+            >
                 <ListItem
-                    v-for="content in props.contents"
+                    v-for="content in (props.contents?.data || [])"
                     :key="content.id"
                     :title="content.nome_conteudo || 'Sem título'"
                     :description="content.descricao_conteudo || 'Sem descrição'"
@@ -348,6 +378,23 @@
                     </template>
                 </ListItem>
             </ListCard>
+
+            <!-- Pagination -->
+            <div v-if="props.contents?.links?.length" class="mt-4 flex flex-wrap items-center gap-2">
+                <button
+                    v-for="(link, idx) in props.contents.links"
+                    :key="idx"
+                    :disabled="!link.url"
+                    @click.prevent="router.get(link.url, {}, { preserveState: true, preserveScroll: true, replace: true })"
+                    class="px-3 py-1 text-sm rounded border"
+                    :class="[
+                        'border-gray-300 dark:border-gray-600',
+                        link.active ? 'bg-orange-600 text-white border-orange-600' : 'bg-white dark:bg-secondary hover:bg-gray-50 dark:hover:bg-accent',
+                        !link.url ? 'opacity-50 cursor-not-allowed' : ''
+                    ]"
+                    v-html="link.label"
+                />
+            </div>
         </div>
     </AppLayout>
 </template>
@@ -373,12 +420,16 @@ const breadcrumbs = [
 ]
 
 const props = defineProps({
-    contents: Array,
+    contents: Object,
     recipes: Array,
-    products: Array
+    products: Array,
+    filters: Object
 })
 
 // Toast notification system
+// List search/pagination state
+const localSearch = ref((props.filters && props.filters.search) ? props.filters.search : '')
+const localPerPage = ref(Number((props.filters && props.filters.per_page) ? props.filters.per_page : 10))
 const toasts = ref([])
 let toastIdCounter = 0
 
@@ -484,13 +535,14 @@ const form = useForm({
     imagens_rendimentos_cadastradas: [],
     tipo_conteudo: '',
     pilares: '',
-    canal: '',
+    canal: [],
     links_conteudo: [{ nome: '', url: '' }],
     cozinheiro: '',
     comprador: '',
     administrador: '',
     status: true,
     descricao_conteudo: null,
+    content_prompt: null,
     selected_recipes: [],
     selected_products: []
 })
@@ -573,13 +625,16 @@ function editContent(content) {
     form.imagens_rendimentos_cadastradas = content.imagens_rendimentos_cadastradas || []
     form.tipo_conteudo = content.tipo_conteudo
     form.pilares = content.pilares
-    form.canal = content.canal
+    form.canal = Array.isArray(content.canal)
+        ? content.canal
+        : (content.canal ? String(content.canal).split(',').map(s => s.trim()).filter(Boolean) : [])
     form.links_conteudo = content.links_conteudo || [{ nome: '', url: '' }]
     form.cozinheiro = content.cozinheiro
     form.comprador = content.comprador
     form.administrador = content.administrador
     form.status = content.status
     form.descricao_conteudo = content.descricao_conteudo
+    form.content_prompt = content.content_prompt
     
     // Load associated recipes
     form.selected_recipes = content.recipes ? content.recipes.map(recipe => ({

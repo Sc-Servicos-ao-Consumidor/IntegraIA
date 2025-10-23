@@ -24,7 +24,7 @@ class EmbeddingService
     {
         try {
             $embeddingText = $this->getEmbeddingText($model);
-            
+
             if (!$embeddingText) {
                 Log::warning("No embedding text generated for model", [
                     'model_type' => get_class($model),
@@ -95,20 +95,20 @@ class EmbeddingService
     {
         $parts = array_filter([
             $recipe->recipe_name,
+            $recipe->recipe_type,
+            $recipe->service_order,
+            $recipe->preparation_time,
+            $recipe->difficulty_level,
+            $recipe->yield,
+            $recipe->channel,
             $recipe->recipe_description,
             $recipe->ingredients_description,
             $recipe->preparation_method,
-            $recipe->cuisine,
-            $recipe->recipe_type,
-            $recipe->channel,
-            $recipe->difficulty_level,
-            $recipe->yield,
-            $recipe->service_order,
-            implode(', ', $recipe->main_ingredients ?? []),
-            implode(', ', $recipe->supporting_ingredients ?? []),
-            implode(', ', $recipe->usage_groups ?? []),
-            implode(', ', $recipe->preparation_techniques ?? []),
-            implode(', ', $recipe->consumption_occasion ?? []),
+            $recipe->ingredientNamesList(),
+            $recipe->usage_groups,
+            $recipe->preparation_techniques,
+            $recipe->consumption_occasion,
+            $recipe->cuisineNamesList(),
         ]);
 
         return implode("\n", $parts);
@@ -120,26 +120,21 @@ class EmbeddingService
     protected function getProductEmbeddingText(Product $product): string
     {
         $parts = array_filter([
-            $product->descricao,
-            $product->marca,
-            $product->codigo_padrao,
             $product->sku,
+            $product->marca,
+            $product->descricao,
+            $product->descricao_breve,
+            $product->dicas_utilizacao,
+            $product->especificacao_produto,
+            $product->perfil_sabor,
+            $product->descricao_tabela_nutricional,
+            $product->descricao_lista_ingredientes,
+            $product->descricao_modos_preparo,
+            $product->descricao_rendimentos,
+            $product->informacao_adicional,     
+            $product->ean,
+            $product->status,
         ]);
-
-        // Include group product information if available
-        if ($product->groupProduct) {
-            $parts[] = $product->groupProduct->nome ?? '';
-            $parts[] = $product->groupProduct->descricao ?? '';
-        }
-
-        // Include product details if available
-        if ($product->detail) {
-            $parts[] = $product->detail->descricao_produto ?? '';
-            $parts[] = $product->detail->ingredientes ?? '';
-            $parts[] = $product->detail->modo_preparo ?? '';
-            $parts[] = $product->detail->informacoes_nutricionais ?? '';
-            $parts[] = $product->detail->informacoes_uso ?? '';
-        }
 
         return implode("\n", $parts);
     }
@@ -151,10 +146,7 @@ class EmbeddingService
     {
         $parts = array_filter([
             $content->nome_conteudo,
-            $content->descricao_tabela_nutricional,
-            $content->descricao_lista_ingredientes,
-            $content->descricao_modos_preparo,
-            $content->descricao_rendimentos,
+
             $content->tipo_conteudo,
             $content->pilares,
             $content->canal,

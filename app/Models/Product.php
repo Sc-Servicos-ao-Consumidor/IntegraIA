@@ -23,30 +23,19 @@ class Product extends Model
         'codigo_padrao',
         'sku',
         'group_product_id',
-        'marca', // Added back - this field exists in the original products table
-        'escolha_embalagem', // Added from migration
-        'prompt_uso_informacoes_produto', // Added from migration
-        'especificacao_produto', // Added from migration
-        'perfil_sabor', // Added from migration
-        'descricao_tabela_nutricional', // Added from migration
-        'descricao_lista_ingredientes', // Added from migration
-        'descricao_modos_preparo', // Added from migration
-        'descricao_rendimentos', // Added from migration
+        'marca',
+        'prompt_uso_informacoes_produto', 
+        'especificacao_produto', 
+        'perfil_sabor', 
+        'descricao_tabela_nutricional', 
+        'descricao_lista_ingredientes', 
+        'descricao_modos_preparo', 
+        'descricao_rendimentos', 
         'descricao',
         'descricao_breve',
         'informacao_adicional',
         'ean',
-        'quantidade_caixa',
-        'embalagem_tipo',
-        'embalagem_descricao',
-        'localizacao',
-        'nome_responsavel',
-        'telefone',
-        'whatsapp',
-        'site',
-        'peso_liquido',
-        'peso_bruto',
-        'validade',
+        'dicas_utilizacao',
         'status',
         'produto_familia_id',
         'produto_grupo_id',
@@ -57,9 +46,6 @@ class Product extends Model
 
     protected $casts = [
         'status' => 'boolean',
-        'peso_liquido' => 'decimal:2',
-        'peso_bruto' => 'decimal:2',
-        'validade' => 'date',
     ];
 
     /**

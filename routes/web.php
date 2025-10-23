@@ -8,19 +8,21 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::get('/', function () {
-    return Inertia::render('Welcome');
+    return redirect()->route('login');
 })->name('home');
 
 Route::get('dashboard', function () {
-    return redirect()->route('recipes.semantic-search');
+    return redirect()->route('semantic-search');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/recipes/search', [RecipeController::class, 'search']);
     Route::get('/recipes/search-ingredients', [RecipeController::class, 'searchIngredients']);
-    Route::get('/recipes/semantic-search', function () {
+    Route::get('/recipes/search-cuisines', [RecipeController::class, 'searchCuisines']);
+    Route::get('/recipes/search-allergens', [RecipeController::class, 'searchAllergens']);
+    Route::get('/semantic-search', function () {
         return Inertia::render('Recipes/SemanticSearch');
-    })->name('recipes.semantic-search');
+    })->name('semantic-search');
     Route::resource('recipes', RecipeController::class);
     Route::post('/recipes/assistant', [RecipeController::class, 'assistant']);
     

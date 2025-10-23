@@ -25,21 +25,21 @@ const cardVariants = {
   <div
     :class="
       cn(
-        'bg-white rounded-lg shadow-sm border border-gray-200 min-h-[600px]',
+        'bg-white dark:bg-card rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 min-h-[600px]',
         cardVariants[variant],
         props.class
       )
     "
   >
     <!-- Header Section -->
-    <div v-if="title || subtitle || icon" class="mb-8 pb-6 border-b border-gray-200">
+    <div v-if="title || subtitle || icon" class="mb-8 pb-6 border-b border-gray-200 dark:border-gray-700">
       <div class="flex items-center gap-3">
-        <span v-if="icon" class="text-2xl">{{ icon }}</span>
+        <span v-if="icon" class="text-3xl">{{ icon }}</span>
         <div>
-          <h2 v-if="title" class="text-lg font-semibold text-gray-900">
+          <h2 v-if="title" class="text-xl font-bold text-slate-900 dark:text-slate-100">
             {{ title }}
           </h2>
-          <p v-if="subtitle" class="text-sm text-gray-600 mt-1">
+          <p v-if="subtitle" class="text-sm text-slate-600 dark:text-slate-400 mt-1">
             {{ subtitle }}
           </p>
         </div>
