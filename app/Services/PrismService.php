@@ -127,6 +127,7 @@ class PrismService
 
 
             **Nunca** crie, deduza, invente ou complete informações e/ou receitas que **não existam nas respostas das ferramentas disponíveis**.
+            ** É possível que as ferramentas não retornem resultados relevantes para a consulta do usuário, nesse caso, responda de forma educada e fale que não foi possível encontrar resultados relevantes. Não invente informações.**
 
             ## Objetivo
             Sua função é ajudar os usuários a encontrar receitas, produtos e conteúdos relevantes com base em:
