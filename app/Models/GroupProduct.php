@@ -16,6 +16,7 @@ class GroupProduct extends Model
         'descricao',
         'observacao',
         'status',
+        'tenant_id',
     ];
 
     protected $casts = [
