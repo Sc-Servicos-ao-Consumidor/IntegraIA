@@ -161,7 +161,9 @@ class AIToolService
         $messages = $this->prismService->buildMessages([
             [
                 'type' => 'user',
-                'content' => 'Verifique se as receitas encontradas são relevantes para uma consulta de IA e retorne apenas as mais relevantes. Se não houver receitas relevantes, retorne uma mensagem de que não foi possível encontrar receitas relevantes. Retorne as receitas em formato JSON.'
+                'content' => 'Verifique se as receitas encontradas são relevantes para uma consulta de IA e retorne apenas as mais relevantes. Se não houver receitas relevantes, retorne uma mensagem de que não foi possível encontrar receitas relevantes. 
+                Sempre que possível, inclua detalhes como ingredientes, instruções ou descrições obtidas pela ferramenta `get_recipe_details`.
+                Retorne as receitas em formato JSON.'
             ]
         ]);
 
@@ -210,7 +212,9 @@ class AIToolService
         $messages = $this->prismService->buildMessages([
             [
                 'type' => 'user',
-                'content' => 'Verifique se os produtos encontrados são relevantes para uma consulta de IA e retorne apenas os mais relevantes. Se não houver produtos relevantes, retorne uma mensagem de que não foi possível encontrar produtos relevantes. Retorne os produtos em formato JSON.'
+                'content' => 'Verifique se os produtos encontrados são relevantes para uma consulta de IA e retorne apenas os mais relevantes. Se não houver produtos relevantes, retorne uma mensagem de que não foi possível encontrar produtos relevantes. 
+                Sempre que possível, inclua detalhes como ingredientes, instruções ou descrições obtidas pela ferramenta `get_product_details`.
+                Retorne os produtos em formato JSON.'
             ]
         ]);
 
@@ -256,7 +260,9 @@ class AIToolService
         $messages = $this->prismService->buildMessages([
             [
                 'type' => 'user',
-                'content' => 'Verifique se os conteúdos encontrados são relevantes para uma consulta de IA e retorne apenas os mais relevantes. Se não houver conteúdos relevantes, retorne uma mensagem de que não foi possível encontrar conteúdos relevantes. Retorne os conteúdos em formato JSON.'
+                'content' => 'Verifique se os conteúdos encontrados são relevantes para uma consulta de IA e retorne apenas os mais relevantes. Se não houver conteúdos relevantes, retorne uma mensagem de que não foi possível encontrar conteúdos relevantes. 
+                Sempre que possível, inclua detalhes como ingredientes, instruções ou descrições obtidas pela ferramenta `get_content_details`.
+                Retorne os conteúdos em formato JSON.'
             ]
         ]);
 
