@@ -202,6 +202,7 @@ class ProductSeeder extends Seeder
             // Create product packaging
             $packaging = $data['packaging'];
             $packaging['product_id'] = $product->id;
+            $packaging['tenant_id'] = $tenantId;
             ProductPackaging::create($packaging);
             
             // Create product images

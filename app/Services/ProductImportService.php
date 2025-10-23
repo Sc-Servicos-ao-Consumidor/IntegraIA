@@ -94,6 +94,7 @@ class ProductImportService
         }
 
         $productData = [
+            'tenant_id' => session('tenant_id'),
             'ulid' => $item['ulid'] ?? Str::ulid(),
             'slug' => $item['slug'] ?? Str::slug($item['descricao'] ?? ''),
             'codigo_padrao' => $item['codigo_padrao'] ?? null,
@@ -133,6 +134,7 @@ class ProductImportService
         $packagings = $item['produto_embalagens'] ?? [];
         foreach ($packagings as $pack) {
             $packData = [
+                'tenant_id' => session('tenant_id'),
                 'product_id' => $product->id,
                 'ulid' => $pack['ulid'] ?? null,
                 'codigo_padrao' => $pack['codigo_padrao'] ?? null,
