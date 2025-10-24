@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\User;
+use App\Models\Tenant;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -13,9 +14,7 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
-
-        User::factory()->create([
+        $user = User::factory()->create([
             'name' => 'Test User',
             'email' => 'test@example.com',
             'password' => '123123123'
@@ -30,5 +29,11 @@ class DatabaseSeeder extends Seeder
             ContentSeeder::class,
             CuisineSeeder::class,
         ]);
+
+        // Attach default tenant to the default user
+        $tenantId = Tenant::where('slug', 'unilever')->value('id');
+        if ($tenantId) {
+            $user->tenants()->syncWithoutDetaching([$tenantId]);
+        }
     }
 }
