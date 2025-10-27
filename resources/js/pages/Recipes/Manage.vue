@@ -376,7 +376,7 @@
                             <textarea
                                 v-model="form.ingredients_description"
                                 id="ingredients_description"
-                                rows="11"
+                                rows="17"
                                 class="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-vertical"
                                 placeholder="Descreva os ingredientes em detalhe"
                             ></textarea>
@@ -389,7 +389,7 @@
                             <textarea
                                 v-model="form.preparation_method"
                                 id="preparation_method"
-                                rows="11"
+                                rows="17"
                                 class="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 resize-vertical"
                                 placeholder="Descreva o modo de preparo em detalhe"
                             ></textarea>
