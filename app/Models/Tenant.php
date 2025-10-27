@@ -14,6 +14,7 @@ class Tenant extends Model
         'slug',
         'domain',
         'status',
+        'base_prompt',
     ];
 }
 
