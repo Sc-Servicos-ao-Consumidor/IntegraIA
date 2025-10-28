@@ -28,6 +28,7 @@ return new class extends Migration
      */
     public function down(): void
     {
+        if (Schema::hasTable('user_tenants') && Schema::hasColumn('user_tenants', 'tenant_id')) {
         Schema::table('user_tenants', function (Blueprint $table) {
             $table->dropForeign(['tenant_id']);
             $table->dropColumn('tenant_id');
