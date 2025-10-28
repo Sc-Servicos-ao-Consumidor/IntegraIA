@@ -13,13 +13,16 @@ return new class extends Migration
     {
         if (Schema::hasTable('user_tenants')) {
             // drop the column tenant
-            Schema::table('user_tenants', function (Blueprint $table) {
-                $table->dropColumn('tenant');
-            });
-
-            Schema::table('user_tenants', function (Blueprint $table) {
-                $table->foreignId('tenant_id')->constrained('tenants')->cascadeOnDelete()->cascadeOnUpdate();
-            });
+            if (Schema::hasColumn('user_tenants', 'tenant')) {
+                Schema::table('user_tenants', function (Blueprint $table) {
+                    $table->dropColumn('tenant');
+                });
+            }
+            if (!Schema::hasColumn('user_tenants', 'tenant_id')) {
+                Schema::table('user_tenants', function (Blueprint $table) {
+                    $table->foreignId('tenant_id')->constrained('tenants')->cascadeOnDelete()->cascadeOnUpdate();
+                });
+            }
         }
     }
 
