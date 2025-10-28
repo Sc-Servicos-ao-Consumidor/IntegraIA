@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('product_packagings', function (Blueprint $table) {
-            $table->foreignId('tenant_id')->after('id')->constrained('tenants')->cascadeOnDelete()->cascadeOnUpdate();
+        Schema::table('tenants', function (Blueprint $table) {
+            $table->string('logo_url')->nullable()->after('domain');
         });
     }
 
@@ -21,9 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('product_packagings', function (Blueprint $table) {
-            $table->dropForeign(['tenant_id']);
-            $table->dropColumn('tenant_id');
+        Schema::table('tenants', function (Blueprint $table) {
+            $table->dropColumn('logo_url');
         });
     }
 };
