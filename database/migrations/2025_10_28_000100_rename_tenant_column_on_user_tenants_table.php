@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (Schema::hasTable('user_tenants') && Schema::hasColumn('user_tenants', 'tenant')) {
+        if (Schema::hasTable('user_tenants')) {
             // drop the column tenant
             Schema::table('user_tenants', function (Blueprint $table) {
                 $table->dropColumn('tenant');
