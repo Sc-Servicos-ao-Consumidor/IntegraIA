@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('group_products', function (Blueprint $table) {
-            $table->foreignId('tenant_id')->constrained('tenants')->after('status');
+        Schema::table('group_products', function (Blueprint $table) {   
+            $table->foreignId('tenant_id')->after('status')->nullable()->constrained('tenants')->cascadeOnDelete()->cascadeOnUpdate();
         });
     }
 
