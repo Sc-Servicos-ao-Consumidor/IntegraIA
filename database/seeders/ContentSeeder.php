@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Tenant;
 use App\Models\Content;
 use App\Models\Product;
 use App\Models\Recipe;
@@ -95,8 +96,11 @@ class ContentSeeder extends Seeder
 
     private function getContentData()
     {
+        $tenantId = Tenant::where('slug', 'unilever')->value('id');
+
         return [
             [
+                'tenant_id' => $tenantId,
                 'nome_conteudo' => 'Guia Completo de Massas Artesanais',
                 'content_code' => 'CONT001',
                 'descricao_tabela_nutricional' => 'Informações nutricionais detalhadas das massas artesanais, incluindo valores calóricos, carboidratos, proteínas e fibras.',
@@ -116,6 +120,7 @@ class ContentSeeder extends Seeder
                 'descricao_conteudo' => 'Conteúdo educativo sobre preparação de massas artesanais para padarias.',
             ],
             [
+                'tenant_id' => $tenantId,
                 'nome_conteudo' => 'Sobremesas Veganas Premium',
                 'content_code' => 'CONT002',
                 'descricao_tabela_nutricional' => 'Análise nutricional de sobremesas veganas premium, destacando benefícios dos ingredientes plant-based.',
@@ -135,6 +140,7 @@ class ContentSeeder extends Seeder
                 'descricao_conteudo' => 'Material especializado em sobremesas veganas premium.',
             ],
             [
+                'tenant_id' => $tenantId,
                 'nome_conteudo' => 'Gestão de Custos em Buffets',
                 'content_code' => 'CONT003',
                 'descricao_tabela_nutricional' => 'Análise de custo-benefício nutricional por porção.',
@@ -154,6 +160,7 @@ class ContentSeeder extends Seeder
                 'descricao_conteudo' => 'Treinamento focado em gestão financeira para buffets.',
             ],
             [
+                'tenant_id' => $tenantId,
                 'nome_conteudo' => 'Cardápio do Futuro: Tendências 2025',
                 'content_code' => 'CONT004',
                 'descricao_tabela_nutricional' => 'Perfil nutricional das tendências alimentares: proteínas alternativas, superalimentos.',
@@ -173,6 +180,7 @@ class ContentSeeder extends Seeder
                 'descricao_conteudo' => 'Estudo prospectivo sobre tendências culinárias do futuro.',
             ],
             [
+                'tenant_id' => $tenantId,
                 'nome_conteudo' => 'Atendimento de Excelência em SAC',
                 'content_code' => 'CONT005',
                 'descricao_tabela_nutricional' => 'Não aplicável para conteúdo de atendimento.',

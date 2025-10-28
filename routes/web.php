@@ -5,6 +5,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ContentController;
 use App\Http\Controllers\GroupProductController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\TenantController;
 use Inertia\Inertia;
 
 Route::get('/', function () {
@@ -34,6 +35,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     
     // Contents management
     Route::resource('contents', ContentController::class);
+
+    // Tenant switching
+    Route::post('/tenant/switch', [TenantController::class, 'switch'])->name('tenant.switch');
 });
 
 require __DIR__.'/settings.php';

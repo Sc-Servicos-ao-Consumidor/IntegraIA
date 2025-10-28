@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Tenant;
 use App\Models\Product;
 use App\Models\Recipe;
 use Illuminate\Database\Seeder;
@@ -10,6 +11,7 @@ class RecipeSeeder extends Seeder
 {
     public function run(): void
     {
+        $tenantId = Tenant::where('slug', 'unilever')->value('id');
         // Get products for relationships
         $baseTomateKnorr = Product::where('descricao', 'Base de Tomate Knorr Professional')->first();
         $caldoCarneKnorr = Product::where('descricao', 'Caldo de Carne Knorr Professional')->first();
@@ -21,6 +23,7 @@ class RecipeSeeder extends Seeder
         $recipes = [
             // Molho à Bolonhesa com Base de Tomate Knorr
             [
+                'tenant_id' => $tenantId,
                 'recipe_code' => 'REC-001',
                 'recipe_name' => 'Molho à Bolonhesa com Base de Tomate Knorr',
                 'recipe_type' => 'Molho',
@@ -39,6 +42,7 @@ class RecipeSeeder extends Seeder
 
             // Ragú de Carne com Base de Tomate Knorr
             [
+                'tenant_id' => $tenantId,
                 'recipe_code' => 'REC-002',
                 'recipe_name' => 'Ragú de Carne com Base de Tomate Knorr',
                 'recipe_type' => 'Molho',
@@ -57,6 +61,7 @@ class RecipeSeeder extends Seeder
 
             // Molho de Pizza com Base de Tomate Knorr
             [
+                'tenant_id' => $tenantId,
                 'recipe_code' => 'REC-003',
                 'recipe_name' => 'Molho de Pizza com Base de Tomate Knorr',
                 'recipe_type' => 'Molho',

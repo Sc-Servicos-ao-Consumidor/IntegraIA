@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use App\Services\ProductImportService;
+use App\Models\Tenant;
 
 class ImportProducts extends Command
 {
@@ -21,13 +22,17 @@ class ImportProducts extends Command
 
         $headers = [];
         $token = $this->option('token') ?? config('services.products_api.token');
-        if ($token) {
-            $headers['Authorization'] = 'Bearer ' . $token;
-            $headers['tenant'] = 'c8003d67-1444-4f85-b687-3dc3150fc113';
+
+        foreach (Tenant::active() as $tenant) {
+
+            if ($token) {
+                $headers['Authorization'] = 'Bearer ' . $token;
+                    $headers['tenant'] = $tenant->id;
+            }
+            $this->info('Starting product import for tenant: ' . $tenant->name);
+            $service->importAll($url, $headers);
         }
 
-        $this->info('Starting product import...');
-        $service->importAll($url, $headers);
         $this->info('Product import completed.');
         return self::SUCCESS;
     }

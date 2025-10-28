@@ -158,16 +158,7 @@ class AIToolService
                 ];
             });
 
-        $messages = $this->prismService->buildMessages([
-            [
-                'type' => 'user',
-                'content' => 'Verifique se as receitas encontradas são relevantes para uma consulta de IA e retorne apenas as mais relevantes. Se não houver receitas relevantes, retorne uma mensagem de que não foi possível encontrar receitas relevantes. Retorne as receitas em formato JSON.'
-            ]
-        ]);
-
-        $response = $this->prismService->getResponse($messages, $recipes, [], 'Você é um assistente da IA Unilever. Seu objetivo é ajudar a encontrar receitas relevantes para uma consulta de IA. Pergunta original do usuário: ' . $query);
-
-        return $response['response'];
+        return $recipes->toJson();
     }
 
     /**
@@ -207,16 +198,7 @@ class AIToolService
                 ];
             });
 
-        $messages = $this->prismService->buildMessages([
-            [
-                'type' => 'user',
-                'content' => 'Verifique se os produtos encontrados são relevantes para uma consulta de IA e retorne apenas os mais relevantes. Se não houver produtos relevantes, retorne uma mensagem de que não foi possível encontrar produtos relevantes. Retorne os produtos em formato JSON.'
-            ]
-        ]);
-
-        $response = $this->prismService->getResponse($messages, $products, [], 'Você é um assistente da IA Unilever. Seu objetivo é ajudar a encontrar produtos relevantes para uma consulta de IA. Pergunta original do usuário: ' . $query);
-
-        return $response['response'];
+        return $products->toJson();
     }
 
     /**
@@ -253,15 +235,7 @@ class AIToolService
                 ];
             });
 
-        $messages = $this->prismService->buildMessages([
-            [
-                'type' => 'user',
-                'content' => 'Verifique se os conteúdos encontrados são relevantes para uma consulta de IA e retorne apenas os mais relevantes. Se não houver conteúdos relevantes, retorne uma mensagem de que não foi possível encontrar conteúdos relevantes. Retorne os conteúdos em formato JSON.'
-            ]
-        ]);
-
-        $response = $this->prismService->getResponse($messages, $contents, [], 'Você é um assistente da IA Unilever. Seu objetivo é ajudar a encontrar conteúdos relevantes para uma consulta de IA. Pergunta original do usuário: ' . $query);
-        return $response['response'];
+        return $contents->toJson();
 
     }
 

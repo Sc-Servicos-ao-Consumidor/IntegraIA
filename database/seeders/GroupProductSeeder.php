@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\GroupProduct;
+use App\Models\Tenant;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
 
@@ -10,8 +11,10 @@ class GroupProductSeeder extends Seeder
 {
     public function run(): void
     {
+        $tenantId = Tenant::where('slug', 'unilever')->value('id');
         $groupProducts = [
             [
+                'tenant_id' => $tenantId,
                 'ulid' => (string) Str::ulid(),
                 'codigo_padrao' => 'KNR-001',
                 'descricao' => 'Knorr Professional - Bases e Molhos',
@@ -19,6 +22,7 @@ class GroupProductSeeder extends Seeder
                 'status' => true,
             ],
             [
+                'tenant_id' => $tenantId,
                 'ulid' => (string) Str::ulid(),
                 'codigo_padrao' => 'KNR-002',
                 'descricao' => 'Knorr Professional - Caldos e Temperos',
@@ -26,6 +30,7 @@ class GroupProductSeeder extends Seeder
                 'status' => true,
             ],
             [
+                'tenant_id' => $tenantId,
                 'ulid' => (string) Str::ulid(),
                 'codigo_padrao' => 'KNR-003',
                 'descricao' => 'Knorr Professional - Sopas e Cremes',
@@ -33,6 +38,7 @@ class GroupProductSeeder extends Seeder
                 'status' => true,
             ],
             [
+                'tenant_id' => $tenantId,
                 'ulid' => (string) Str::ulid(),
                 'codigo_padrao' => 'ING-001',
                 'descricao' => 'Ingredientes Básicos - Carnes',
@@ -40,6 +46,7 @@ class GroupProductSeeder extends Seeder
                 'status' => true,
             ],
             [
+                'tenant_id' => $tenantId,
                 'ulid' => (string) Str::ulid(),
                 'codigo_padrao' => 'ING-002',
                 'descricao' => 'Ingredientes Básicos - Vegetais e Ervas',
@@ -47,6 +54,7 @@ class GroupProductSeeder extends Seeder
                 'status' => true,
             ],
             [
+                'tenant_id' => $tenantId,
                 'ulid' => (string) Str::ulid(),
                 'codigo_padrao' => 'ING-003',
                 'descricao' => 'Ingredientes Básicos - Grãos e Cereais',

@@ -11,18 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (!Schema::hasTable('user_tenants')) {
-            Schema::create('user_tenants', function (Blueprint $table) {
-                $table->id();
-                $table->foreignId('user_id')->constrained('users')->cascadeOnDelete()->cascadeOnUpdate();
-                $table->foreignId('tenant_id')->constrained('tenants')->cascadeOnDelete()->cascadeOnUpdate();
-                $table->timestamps();
+        Schema::create('user_tenants', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('user_id')->constrained('users')->cascadeOnDelete()->cascadeOnUpdate();
+            $table->foreignId('tenant_id')->constrained('tenants')->cascadeOnDelete()->cascadeOnUpdate();
+            $table->timestamps();
 
-                $table->unique(['user_id', 'tenant_id']);
-                $table->index(['user_id']);
-                $table->index(['tenant_id']);
-            });
-        }
+            $table->unique(['user_id', 'tenant_id']);
+            $table->index(['user_id']);
+            $table->index(['tenant_id']);
+        });
     }
 
     /**

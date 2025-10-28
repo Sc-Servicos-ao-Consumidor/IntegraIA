@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\GroupProduct;
+use App\Models\Tenant;
 use App\Models\Product;
 use App\Models\ProductImage;
 use App\Models\ProductPackaging;
@@ -13,6 +14,8 @@ class ProductSeeder extends Seeder
 {
     public function run(): void
     {
+        $tenantId = Tenant::where('slug', 'unilever')->value('id');
+
         // Get group products for relationships
         $basesGroup = GroupProduct::where('descricao', 'Knorr Professional - Bases e Molhos')->first();
         $caldosGroup = GroupProduct::where('descricao', 'Knorr Professional - Caldos e Temperos')->first();
@@ -23,6 +26,7 @@ class ProductSeeder extends Seeder
             // Knorr Professional Products
             [
                 'product' => [
+                    'tenant_id' => $tenantId,
                     'ulid' => (string) Str::ulid(),
                     'slug' => 'base-tomate-knorr-750g',
                     'codigo_padrao' => 'KNR-BT-750',
@@ -70,6 +74,7 @@ class ProductSeeder extends Seeder
             ],
             [
                 'product' => [
+                    'tenant_id' => $tenantId,
                     'ulid' => (string) Str::ulid(),
                     'slug' => 'caldo-carne-knorr-1kg',
                     'codigo_padrao' => 'KNR-CC-1000',
@@ -110,6 +115,7 @@ class ProductSeeder extends Seeder
             ],
             [
                 'product' => [
+                    'tenant_id' => $tenantId,
                     'ulid' => (string) Str::ulid(),
                     'slug' => 'carne-moida-bovina',
                     'codigo_padrao' => 'ING-CM-001',
@@ -149,6 +155,7 @@ class ProductSeeder extends Seeder
             ],
             [
                 'product' => [
+                    'tenant_id' => $tenantId,
                     'ulid' => (string) Str::ulid(),
                     'slug' => 'oregano-desidratado',
                     'codigo_padrao' => 'ING-OR-001',
@@ -195,6 +202,7 @@ class ProductSeeder extends Seeder
             // Create product packaging
             $packaging = $data['packaging'];
             $packaging['product_id'] = $product->id;
+            $packaging['tenant_id'] = $tenantId;
             ProductPackaging::create($packaging);
             
             // Create product images
