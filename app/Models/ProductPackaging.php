@@ -5,15 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use App\Models\Concerns\BelongsToTenant;
 
 class ProductPackaging extends Model
 {
     use HasFactory;
-    use BelongsToTenant;
 
     protected $fillable = [
-        'tenant_id',
         'product_id',
         'ulid',
         'codigo_padrao',
@@ -42,11 +39,6 @@ class ProductPackaging extends Model
     public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class);
-    }
-
-    public function tenant(): BelongsTo
-    {
-        return $this->belongsTo(Tenant::class);
     }
 }
 
