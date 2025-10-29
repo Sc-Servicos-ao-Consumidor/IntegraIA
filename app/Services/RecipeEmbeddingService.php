@@ -27,7 +27,7 @@ class RecipeEmbeddingService
 
         try{
             $response = Prism::embeddings()
-                ->using(Provider::OpenAI, 'text-embedding-3-small')
+                ->using(Provider::OpenAI, 'text-embedding-3-large')
                 ->fromInput($embeddingInput)
                 ->asEmbeddings();
 

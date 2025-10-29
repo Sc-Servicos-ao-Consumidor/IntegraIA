@@ -44,7 +44,7 @@ class PrismService
     {
         try {
             $response = Prism::embeddings()
-                ->using($this->getProvider(), config('services.prism_api.embedding_model', 'text-embedding-3-small'))
+                ->using($this->getProvider(), config('services.prism_api.embedding_model', 'text-embedding-3-large'))
                 ->fromInput($query)
                 ->asEmbeddings();
 

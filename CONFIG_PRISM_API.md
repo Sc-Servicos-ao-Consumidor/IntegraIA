@@ -13,7 +13,7 @@ PRISM_API_TOKEN=your-api-token-here
 
 # AI Model Configuration
 PRISM_EMBEDDING_PROVIDER=openai
-PRISM_EMBEDDING_MODEL=text-embedding-3-small
+PRISM_EMBEDDING_MODEL=text-embedding-3-large
 PRISM_CHAT_PROVIDER=openai
 PRISM_CHAT_MODEL=gpt-5-nano
 ```

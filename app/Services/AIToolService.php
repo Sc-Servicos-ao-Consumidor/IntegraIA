@@ -159,6 +159,7 @@ class AIToolService
             });
 
         return $recipes->toJson();
+
     }
 
     /**
@@ -199,6 +200,7 @@ class AIToolService
             });
 
         return $products->toJson();
+
     }
 
     /**
@@ -236,7 +238,6 @@ class AIToolService
             });
 
         return $contents->toJson();
-
     }
 
     /**
