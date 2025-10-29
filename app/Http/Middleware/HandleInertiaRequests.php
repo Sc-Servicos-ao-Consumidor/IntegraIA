@@ -39,12 +39,24 @@ class HandleInertiaRequests extends Middleware
     {
         [$message, $author] = str(Inspiring::quotes()->random())->explode('-');
 
+        $user = $request->user();
+        $tenantId = (int) ($request->session()->get('tenant_id') ?? 0);
+        $tenants = [];
+        if ($user) {
+            // Avoid eager loading heavy relations; fetch minimal fields
+            $tenants = $user->tenants()->select('tenants.id', 'tenants.name', 'tenants.logo_url')->get();
+        }
+
         return [
             ...parent::share($request),
             'name' => config('app.name'),
             'quote' => ['message' => trim($message), 'author' => trim($author)],
             'auth' => [
-                'user' => $request->user(),
+                'user' => $user,
+                'tenant' => [
+                    'current_id' => $tenantId ?: null,
+                    'list' => $tenants,
+                ],
             ],
             'ziggy' => [
                 ...(new Ziggy)->toArray(),

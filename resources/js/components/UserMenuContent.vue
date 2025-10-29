@@ -4,10 +4,13 @@ import { DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSep
 import type { User } from '@/types';
 import { Link, router } from '@inertiajs/vue3';
 import { LogOut, Settings } from 'lucide-vue-next';
+ 
 
 interface Props {
     user: User;
 }
+
+ 
 
 const handleLogout = () => {
     router.flushAll();

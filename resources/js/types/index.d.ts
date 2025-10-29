@@ -3,6 +3,10 @@ import type { Config } from 'ziggy-js';
 
 export interface Auth {
     user: User;
+    tenant?: {
+        current_id: number | null;
+        list: Array<{ id: number; name: string; logo_url?: string | null }>;
+    };
 }
 
 export interface BreadcrumbItem {

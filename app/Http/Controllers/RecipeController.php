@@ -11,6 +11,7 @@ use App\Models\Cuisine;
 use App\Services\PrismService;
 use App\Services\EmbeddingService;
 use App\Services\AIToolService;
+use App\Models\Tenant;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Schema;
@@ -392,7 +393,15 @@ class RecipeController extends Controller
                 $tools = $aiToolService->getTools();
             }
 
-            $response = $prism->getResponse($text, $context, $tools);
+            $tenantId = (int) ($request->session()->get('tenant_id'));
+            $tenantBasePrompt = null;
+
+            if ($tenantId) {
+                $tenant = Tenant::find($tenantId);
+                $tenantBasePrompt = $tenant->base_prompt;
+            }
+
+            $response = $prism->getResponse($text, $context, $tools, $tenantBasePrompt);
 
             if(isset($response['status']) && $response['status']){
                     return response()->json([
@@ -423,7 +432,7 @@ class RecipeController extends Controller
                 if ($key === 'embedding') {
                     continue;
                 }
-                
+
                 // Recursively clean nested arrays/objects
                 if (is_array($value)) {
                     $cleaned[$key] = $this->cleanResultFromEmbeddings($value);
