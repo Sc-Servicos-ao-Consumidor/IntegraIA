@@ -44,7 +44,7 @@ class HandleInertiaRequests extends Middleware
         $tenants = [];
         if ($user) {
             // Avoid eager loading heavy relations; fetch minimal fields
-            $tenants = $user->tenants()->select('tenants.id', 'tenants.name')->get();
+            $tenants = $user->tenants()->select('tenants.id', 'tenants.name', 'tenants.logo_url')->get();
         }
 
         return [

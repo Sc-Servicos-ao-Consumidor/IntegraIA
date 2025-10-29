@@ -2,22 +2,15 @@
 import UserInfo from '@/components/UserInfo.vue';
 import { DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
 import type { User } from '@/types';
-import { Link, router, usePage } from '@inertiajs/vue3';
+import { Link, router } from '@inertiajs/vue3';
 import { LogOut, Settings } from 'lucide-vue-next';
-import { computed } from 'vue';
+ 
 
 interface Props {
     user: User;
 }
 
-const page = usePage();
-const tenants = computed(() => page.props.auth?.tenant?.list ?? []);
-const currentTenantId = computed(() => page.props.auth?.tenant?.current_id ?? null);
-
-const switchTenant = (tenantId: number) => {
-    if (!tenantId || tenantId === currentTenantId.value) return;
-    router.post(route('tenant.switch'), { tenant_id: tenantId }, { preserveScroll: true });
-};
+ 
 
 const handleLogout = () => {
     router.flushAll();
@@ -33,20 +26,6 @@ defineProps<Props>();
         </div>
     </DropdownMenuLabel>
     <DropdownMenuSeparator />
-    <DropdownMenuGroup v-if="tenants.length > 0">
-        <DropdownMenuLabel>Tenants</DropdownMenuLabel>
-        <DropdownMenuItem
-            v-for="t in tenants"
-            :key="t.id"
-            as-child
-        >
-            <button class="flex w-full items-center justify-between" @click="switchTenant(t.id)">
-                <span>{{ t.name }}</span>
-                <span v-if="currentTenantId === t.id" class="ml-2 text-xs text-muted-foreground">(Ativo)</span>
-            </button>
-        </DropdownMenuItem>
-    </DropdownMenuGroup>
-    <DropdownMenuSeparator v-if="tenants.length > 0" />
     <DropdownMenuGroup>
         <DropdownMenuItem :as-child="true">
             <Link class="block w-full" :href="route('profile.edit')" prefetch as="button">

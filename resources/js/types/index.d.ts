@@ -5,7 +5,7 @@ export interface Auth {
     user: User;
     tenant?: {
         current_id: number | null;
-        list: Array<{ id: number; name: string }>;
+        list: Array<{ id: number; name: string; logo_url?: string | null }>;
     };
 }
 
