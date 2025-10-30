@@ -8,6 +8,7 @@ use App\Models\Recipe;
 use App\Models\Content;
 use App\Services\EmbeddingService;
 use App\Services\PrismService;
+use App\Services\ProductChunkService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
@@ -231,6 +232,10 @@ class ProductController extends Controller
 
             $embeddingService = new EmbeddingService(new PrismService());
             $embeddingService->generateEmbedding($product);
+
+            // Generate product chunks
+            $productChunkService = new ProductChunkService(new PrismService());
+            $productChunkService->generateChunks($product);
 
             return redirect()->route('products.index')->with('success', 'Produto salvo com sucesso!');
 

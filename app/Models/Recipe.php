@@ -6,6 +6,7 @@ use App\Models\Concerns\BelongsToTenant;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Pgvector\Laravel\HasNeighbors;
 use Pgvector\Laravel\Vector;
 
@@ -150,5 +151,13 @@ class Recipe extends Model
     public function allergens(): BelongsToMany
     {
         return $this->belongsToMany(Allergen::class)->withTimestamps();
+    }
+
+    /**
+     * The semantic chunks for this recipe.
+     */
+    public function chunks(): HasMany
+    {
+        return $this->hasMany(RecipeChunk::class);
     }
 }

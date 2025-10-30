@@ -7,6 +7,7 @@ use App\Models\Product;
 use App\Models\Recipe;
 use App\Services\EmbeddingService;
 use App\Services\PrismService;
+use App\Services\ContentChunkService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -115,6 +116,10 @@ class ContentController extends Controller
 
         $embeddingService = new EmbeddingService(new PrismService());
         $embeddingService->generateEmbedding($content);
+
+        // Generate content chunks
+        $contentChunkService = new ContentChunkService(new PrismService());
+        $contentChunkService->generateChunks($content);
 
         return null;
     }

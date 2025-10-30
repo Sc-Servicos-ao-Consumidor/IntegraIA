@@ -3,11 +3,15 @@
 namespace App\Services;
 
 use App\Models\Recipe;
+use App\Models\RecipeChunk;
 use App\Models\Product;
+use App\Models\ProductChunk;
 use App\Models\Content;
+use App\Models\ContentChunk;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Pgvector\Laravel\Distance;
+use Pgvector\Laravel\Vector;
 use Prism\Prism\Facades\Tool;
 
 class AIToolService
@@ -31,7 +35,7 @@ class AIToolService
         $tools[] = Tool::as('search_recipes')
             ->for('Buscar receitas com base em uma consulta de texto usando busca semântica')
             ->withStringParameter('query', 'Texto da consulta para buscar receitas')
-            ->withNumberParameter('limit', 'Número máximo de receitas a retornar (padrão: 5)', false)
+            ->withNumberParameter('limit', 'Número máximo de receitas a retornar (padrão: 10)', false)
             ->using(function (string $query, int $limit) {
                 return $this->searchRecipes($query, $limit);
             });
@@ -39,7 +43,7 @@ class AIToolService
         $tools[] = Tool::as('search_products')
             ->for('Buscar produtos com base em uma consulta de texto usando busca semântica')
             ->withStringParameter('query', 'Texto da consulta para buscar produtos')
-            ->withNumberParameter('limit', 'Número máximo de produtos a retornar (padrão: 5)', false)
+            ->withNumberParameter('limit', 'Número máximo de produtos a retornar (padrão: 10)', false)
             ->using(function (string $query, int $limit) {
                 return $this->searchProducts($query, $limit);
             });
@@ -47,7 +51,7 @@ class AIToolService
         $tools[] = Tool::as('search_content')
             ->for('Buscar conteúdo com base em uma consulta de texto usando busca semântica')
             ->withStringParameter('query', 'Texto da consulta para buscar conteúdo')
-            ->withNumberParameter('limit', 'Número máximo de conteúdos a retornar (padrão: 5)', false)
+            ->withNumberParameter('limit', 'Número máximo de conteúdos a retornar (padrão: 10)', false)
             ->using(function (string $query, int $limit) {
                 return $this->searchContent($query, $limit);
             });
@@ -71,7 +75,7 @@ class AIToolService
             ->withNumberParameter('contentId', 'ID do conteúdo')
             ->using(function (int $contentId) {
                 return $this->getContentDetails($contentId);
-            });
+            });        
 
         $tools[] = Tool::as('find_recipes_with_product_id')
             ->for('Encontrar receitas que usam um produto específico')
@@ -122,7 +126,7 @@ class AIToolService
     /**
      * Search recipes using semantic search
      */
-    protected function searchRecipes(string $query, int $limit): string
+    protected function searchRecipes(string $query, int $limit = 10): string
     {
         $response = $this->prismService->getEmbedding($query);
         $embedding = $this->prismService->extractEmbeddingFromResponse($response);
@@ -131,12 +135,40 @@ class AIToolService
             return 'Falha ao gerar embedding para a consulta';
         }
 
+        $embeddingVector = new Vector($embedding);
+
+        // Find most similar chunks, not recipes
+        $topChunks = RecipeChunk::query()
+            ->select(['id', 'recipe_id', 'chunk_type', 'position', 'content'])
+            ->selectRaw('embedding <=> ? as distance', [$embeddingVector])
+            ->orderBy('distance')
+            ->take(max($limit * 5, 20))
+            ->get();
+
+        // Aggregate by recipe_id (best chunk per recipe)
+        $bestByRecipe = [];
+        foreach ($topChunks as $chunk) {
+            $rid = $chunk->recipe_id;
+            if (!isset($bestByRecipe[$rid])) {
+                $bestByRecipe[$rid] = [
+                    'chunk' => $chunk,
+                    'distance' => (float) $chunk->distance,
+                ];
+            }
+            if (count($bestByRecipe) >= $limit) {
+                break;
+            }
+        }
+
+        $orderedRecipeIds = array_keys($bestByRecipe);
+
         $recipes = Recipe::query()
-            ->nearestNeighbors('embedding', $embedding, Distance::Cosine)
-            ->take($limit)
-            ->with(['products', 'contents'])
+            ->with(['products', 'contents', 'cuisines', 'allergens'])
+            ->whereIn('id', $orderedRecipeIds)
             ->get()
-            ->map(function ($recipe) {
+            ->sortBy(fn ($r) => array_search($r->id, $orderedRecipeIds))
+            ->map(function ($recipe) use ($bestByRecipe) {
+                $match = $bestByRecipe[$recipe->id]['chunk'] ?? null;
                 return [
                     'id' => $recipe->id,
                     'recipe_name' => $recipe->recipe_name,
@@ -155,6 +187,8 @@ class AIToolService
                     'cuisines' => $recipe->cuisines,
                     'allergens' => $recipe->allergens,
                     'aditional_prompt' => $recipe->recipe_prompt,
+                    'match_chunk_type' => $match?->chunk_type,
+                    'match_chunk_content' => $match?->content,
                 ];
             });
 
@@ -165,7 +199,7 @@ class AIToolService
     /**
      * Search products using semantic search
      */
-    protected function searchProducts(string $query, int $limit): string
+    protected function searchProducts(string $query, int $limit = 10): string
     {
         $response = $this->prismService->getEmbedding($query);
         $embedding = $this->prismService->extractEmbeddingFromResponse($response);
@@ -174,13 +208,39 @@ class AIToolService
             return 'Falha ao gerar embedding para a consulta';
         }
 
+        $embeddingVector = new Vector($embedding);
+
+        $topChunks = ProductChunk::query()
+            ->select(['id', 'product_id', 'chunk_type', 'position', 'content'])
+            ->selectRaw('embedding <=> ? as distance', [$embeddingVector])
+            ->orderBy('distance')
+            ->take(max($limit * 5, 20))
+            ->get();
+
+        $bestByProduct = [];
+        foreach ($topChunks as $chunk) {
+            $pid = $chunk->product_id;
+            if (!isset($bestByProduct[$pid])) {
+                $bestByProduct[$pid] = [
+                    'chunk' => $chunk,
+                    'distance' => (float) $chunk->distance,
+                ];
+            }
+            if (count($bestByProduct) >= $limit) {
+                break;
+            }
+        }
+
+        $orderedProductIds = array_keys($bestByProduct);
+
         $products = Product::query()
-            ->nearestNeighbors('embedding', $embedding, Distance::Cosine)
-            ->take($limit)
             ->with(['groupProduct'])
             ->where('status', true)
+            ->whereIn('id', $orderedProductIds)
             ->get()
-            ->map(function ($product) {
+            ->sortBy(fn ($p) => array_search($p->id, $orderedProductIds))
+            ->map(function ($product) use ($bestByProduct) {
+                $match = $bestByProduct[$product->id]['chunk'] ?? null;
                 return [
                     'id' => $product->id,
                     'nome_produto' => $product->descricao,
@@ -196,6 +256,8 @@ class AIToolService
                     'descricao_rendimentos' => $product->descricao_rendimentos,
                     'informacao_adicional' => $product->informacao_adicional,
                     'aditional_prompt' => $product->prompt_uso_informacoes_produto,
+                    'match_chunk_type' => $match?->chunk_type,
+                    'match_chunk_content' => $match?->content,
                 ];
             });
 
@@ -206,7 +268,7 @@ class AIToolService
     /**
      * Search content using semantic search
      */
-    protected function searchContent(string $query, int $limit): string
+    protected function searchContent(string $query, int $limit = 10): string
     {
         $response = $this->prismService->getEmbedding($query);
         $embedding = $this->prismService->extractEmbeddingFromResponse($response);
@@ -215,12 +277,38 @@ class AIToolService
             return 'Falha ao gerar embedding para a consulta';
         }
 
+        $embeddingVector = new Vector($embedding);
+
+        $topChunks = ContentChunk::query()
+            ->select(['id', 'content_id', 'chunk_type', 'position', 'content'])
+            ->selectRaw('embedding <=> ? as distance', [$embeddingVector])
+            ->orderBy('distance')
+            ->take(max($limit * 5, 20))
+            ->get();
+
+        $bestByContent = [];
+        foreach ($topChunks as $chunk) {
+            $cid = $chunk->content_id;
+            if (!isset($bestByContent[$cid])) {
+                $bestByContent[$cid] = [
+                    'chunk' => $chunk,
+                    'distance' => (float) $chunk->distance,
+                ];
+            }
+            if (count($bestByContent) >= $limit) {
+                break;
+            }
+        }
+
+        $orderedContentIds = array_keys($bestByContent);
+
         $contents = Content::query()
-            ->nearestNeighbors('embedding', $embedding, Distance::Cosine)
-            ->take($limit)
             ->where('status', true)
+            ->whereIn('id', $orderedContentIds)
             ->get()
-            ->map(function ($content) {
+            ->sortBy(fn ($c) => array_search($c->id, $orderedContentIds))
+            ->map(function ($content) use ($bestByContent) {
+                $match = $bestByContent[$content->id]['chunk'] ?? null;
                 return [
                     'id' => $content->id,
                     'nome_conteudo' => $content->nome_conteudo,
@@ -234,6 +322,8 @@ class AIToolService
                     'administrador' => $content->administrador,
                     'descricao_conteudo' => $content->descricao_conteudo,
                     'aditional_prompt' => $content->content_prompt,
+                    'match_chunk_type' => $match?->chunk_type,
+                    'match_chunk_content' => $match?->content,
                 ];
             });
 

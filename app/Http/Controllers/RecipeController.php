@@ -10,6 +10,7 @@ use App\Models\Allergen;
 use App\Models\Cuisine;
 use App\Services\PrismService;
 use App\Services\EmbeddingService;
+use App\Services\RecipeChunkService;
 use App\Services\AIToolService;
 use App\Models\Tenant;
 use Exception;
@@ -220,6 +221,10 @@ class RecipeController extends Controller
 
         $embeddingService = new EmbeddingService(new PrismService());
         $embeddingService->generateEmbedding($recipe);
+
+        // Generate chunked embeddings for improved search
+        $chunkService = new RecipeChunkService(new PrismService());
+        $chunkService->generateChunks($recipe);
 
         return null;
     }
