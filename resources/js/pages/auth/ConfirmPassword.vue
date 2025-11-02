@@ -9,7 +9,8 @@ import { LoaderCircle } from 'lucide-vue-next';
 import { ref, nextTick } from 'vue';
 
 // Toast notification system
-const toasts = ref([]);
+type Toast = { id: number; message: string; type: 'success' | 'error' | 'warning' | 'info'; visible: boolean };
+const toasts = ref<Toast[]>([]);
 let toastIdCounter = 0;
 
 function showToast(message: string, type: 'success' | 'error' | 'warning' | 'info' = 'info', duration = 5000) {
@@ -22,9 +23,17 @@ function showToast(message: string, type: 'success' | 'error' | 'warning' | 'inf
     
     toasts.value.push(toast);
     
-    // Show toast with animation
+    // Show toast with animation (ensure DOM has rendered first)
+    const newToastIndex = toasts.value.length - 1;
     nextTick(() => {
-        toast.visible = true;
+        const schedule = typeof requestAnimationFrame === 'function'
+            ? requestAnimationFrame
+            : (fn: (t: number) => void) => setTimeout(() => fn(Date.now()), 16);
+        schedule(() => {
+            if (toasts.value[newToastIndex]) {
+                toasts.value[newToastIndex].visible = true;
+            }
+        });
     });
     
     // Auto-remove toast after duration

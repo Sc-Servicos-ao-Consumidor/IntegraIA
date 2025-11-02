@@ -749,9 +749,17 @@ function showToast(message, type = 'info', duration = 5000) {
     
     toasts.value.push(toast)
     
-    // Show toast with animation
+    // Show toast with animation (ensure DOM has rendered first)
+    const newToastIndex = toasts.value.length - 1
     nextTick(() => {
-        toast.visible = true
+        const schedule = typeof requestAnimationFrame === 'function'
+            ? requestAnimationFrame
+            : (fn) => setTimeout(fn, 16)
+        schedule(() => {
+            if (toasts.value[newToastIndex]) {
+                toasts.value[newToastIndex].visible = true
+            }
+        })
     })
     
     // Auto-remove toast after duration
