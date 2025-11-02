@@ -26,6 +26,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     })->name('semantic-search');
     Route::resource('recipes', RecipeController::class);
     Route::post('/recipes/assistant', [RecipeController::class, 'assistant']);
+    Route::post('/recipes/assistant/feedback', [RecipeController::class, 'assistantFeedback']);
     
     // Products management
     Route::resource('products', ProductController::class);
