@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\UpdateAssistantFeedback;
 use App\Models\Recipe;
 use App\Models\Product;
 use App\Models\Content;
@@ -9,12 +10,13 @@ use App\Models\Ingredient;
 use App\Models\Allergen;
 use App\Models\Cuisine;
 use App\Services\PrismService;
+use App\Models\AIAssistantFeedback;
 use App\Services\EmbeddingService;
 use App\Services\AIToolService;
 use App\Models\Tenant;
 use Exception;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Bus;
 use Inertia\Inertia;
 use Pgvector\Laravel\Distance;
 class RecipeController extends Controller
@@ -218,8 +220,11 @@ class RecipeController extends Controller
             $recipe->allergens()->sync($allergenIds);
         }
 
-        $embeddingService = new EmbeddingService(new PrismService());
-        $embeddingService->generateEmbedding($recipe);
+        // Queue embedding and chunk generation to avoid blocking request
+        Bus::chain([
+            new \App\Jobs\GenerateRecipeEmbedding($recipe->id),
+            new \App\Jobs\GenerateRecipeChunks($recipe->id),
+        ])->dispatch();
 
         return null;
     }
@@ -403,13 +408,31 @@ class RecipeController extends Controller
 
             $response = $prism->getResponse($text, $context, $tools, $tenantBasePrompt);
 
-            if(isset($response['status']) && $response['status']){
-                    return response()->json([
-                    'response' => $response['response'] ?? $response
-                ], 200);
-            }else{
+            // Normalize response text
+            $assistantText = $response['response'] ?? (is_string($response) ? $response : null);
+
+            // Persist interaction
+            $interaction = AIAssistantFeedback::create([
+                'session_id' => $request->session()->getId(),
+                'query' => $request->text,
+                'response' => $assistantText,
+                'meta' => [
+                    'use_tools' => (bool) ($request->use_tools ?? false),
+                    'tenant_id' => $tenantId ?? null,
+                ],
+            ]);
+
+            $ok = isset($response['status']) ? (bool)$response['status'] : ($assistantText !== null);
+
+            if ($ok) {
                 return response()->json([
-                    'response' => $response['response'] ?? 'Erro ao processar a solicitação'
+                    'response' => $assistantText ?? 'Sem resposta',
+                    'interaction_id' => $interaction->id,
+                ], 200);
+            } else {
+                return response()->json([
+                    'response' => $assistantText ?? 'Erro ao processar a solicitação',
+                    'interaction_id' => $interaction->id,
                 ], 500);
             }
 
@@ -418,6 +441,33 @@ class RecipeController extends Controller
                 'response' => 'Assistant failed: ' . $e->getMessage()
             ], 500);
         }
+    }
+
+    public function assistantFeedback(Request $request)
+    {
+        $request->validate([
+            'interaction_id' => 'nullable|integer|exists:ai_assistant_feedback,id',
+            'query' => 'nullable|string',
+            'response' => 'nullable|string',
+            'rating' => 'nullable|string|in:up,down',
+            'expected_response' => 'nullable|string',
+        ]);
+
+        $sessionId = $request->session()->getId();
+
+        // Queue feedback update so it doesn't interfere with AI calls
+        UpdateAssistantFeedback::dispatch(
+            $request->input('interaction_id'),
+            $sessionId,
+            $request->input('query'),
+            $request->input('response'),
+            $request->input('rating'),
+            $request->input('expected_response')
+        );
+
+        return response()->json([
+            'status' => 'queued',
+        ]);
     }
 
     /**

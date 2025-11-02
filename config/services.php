@@ -43,7 +43,7 @@ return [
         'url' => env('PRISM_API_URL', 'https://openapi.test/api/ai'),
         'token' => env('PRISM_API_TOKEN'),
         'embedding_provider' => env('PRISM_EMBEDDING_PROVIDER', 'openai'),
-        'embedding_model' => env('PRISM_EMBEDDING_MODEL', 'text-embedding-3-small'),
+        'embedding_model' => env('PRISM_EMBEDDING_MODEL', 'text-embedding-3-large'),
         'chat_provider' => env('PRISM_CHAT_PROVIDER', 'openai'),
         'chat_model' => env('PRISM_CHAT_MODEL', 'gpt-4o-mini'),
     ],

@@ -157,6 +157,67 @@
                             <div v-if="markdownError" class="text-orange-800 dark:text-orange-200 whitespace-pre-wrap">{{ assistantResponse }}</div>
                             <div v-else v-html="renderedMarkdown" class="text-orange-800 dark:text-orange-200"></div>
                         </div>
+
+                        <!-- Feedback Section -->
+                        <div class="mt-6 border-t border-blue-200 dark:border-blue-800 pt-4">
+                            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-sm text-orange-900 dark:text-orange-100 font-medium">Este resultado foi útil?</span>
+                                    <button
+                                        class="px-3 py-1.5 rounded-lg border text-sm transition-colors cursor-pointer"
+                                        :class="[
+                                            feedbackRating === 'up'
+                                                ? 'bg-green-100 dark:bg-green-900/30 border-green-300 dark:border-green-700 text-green-800 dark:text-green-200'
+                                                : 'bg-white dark:bg-slate-800 border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300'
+                                        ]"
+                                        :disabled="feedbackSubmitted || feedbackSubmitting"
+                                        @click="setFeedbackRating('up')"
+                                    >
+                                        👍 Bom
+                                    </button>
+                                    <button
+                                        class="px-3 py-1.5 rounded-lg border text-sm transition-colors cursor-pointer"
+                                        :class="[
+                                            feedbackRating === 'down'
+                                                ? 'bg-red-100 dark:bg-red-900/30 border-red-300 dark:border-red-700 text-red-800 dark:text-red-200'
+                                                : 'bg-white dark:bg-slate-800 border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300'
+                                        ]"
+                                        :disabled="feedbackSubmitted || feedbackSubmitting"
+                                        @click="setFeedbackRating('down')"
+                                    >
+                                        👎 Ruim
+                                    </button>
+                                </div>
+
+                                <div class="flex-1">
+                                    <label class="block text-xs text-slate-700 dark:text-slate-300 mb-1">Se não foi ideal, qual seria a resposta correta?</label>
+                                    <textarea
+                                        v-model="feedbackText"
+                                        :disabled="feedbackSubmitted || feedbackSubmitting"
+                                        rows="2"
+                                        placeholder="Escreva a resposta correta ou sugestões de melhoria..."
+                                        class="w-full border border-gray-300 dark:border-gray-700 rounded-lg px-3 py-2 text-sm bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                                    ></textarea>
+                                </div>
+
+                                <div class="flex items-center gap-2 self-start md:self-auto">
+                                    <button
+                                        @click="submitFeedback"
+                                        :disabled="feedbackSubmitted || feedbackSubmitting || (!feedbackRating && !feedbackText.trim())"
+                                        class="bg-orange-600 hover:bg-orange-700 disabled:bg-orange-300 dark:disabled:bg-orange-800 text-white font-medium px-4 py-2 rounded-lg text-sm transition-colors shadow-sm hover:shadow-md disabled:cursor-not-allowed cursor-pointer"
+                                    >
+                                        <span v-if="feedbackSubmitting" class="flex items-center gap-2">
+                                            <svg class="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                            </svg>
+                                            Enviando...
+                                        </span>
+                                        <span v-else>{{ feedbackSubmitted ? 'Feedback enviado' : 'Enviar feedback' }}</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -440,8 +501,15 @@ const loading = ref(false)
 const hasSearched = ref(false)
 const showAIAssistant = ref(true)
 const assistantResponse = ref(null)
+const assistantInteractionId = ref(null)
 const markdownError = ref(false)
 const showRawMarkdown = ref(false)
+
+// Feedback state
+const feedbackRating = ref(null) // 'up' | 'down'
+const feedbackText = ref('')
+const feedbackSubmitting = ref(false)
+const feedbackSubmitted = ref(false)
 
 // Function to detect if content contains markdown
 function containsMarkdown(text) {
@@ -502,10 +570,18 @@ function showToast(message, type = 'info', duration = 5000) {
     }
     
     toasts.value.push(toast)
-    
-    // Show toast with animation
+
+    // Show toast with animation (ensure DOM has rendered first)
+    const newToastIndex = toasts.value.length - 1
     nextTick(() => {
-        toast.visible = true
+        const schedule = typeof requestAnimationFrame === 'function'
+            ? requestAnimationFrame
+            : (fn) => setTimeout(fn, 16)
+        schedule(() => {
+            if (toasts.value[newToastIndex]) {
+                toasts.value[newToastIndex].visible = true
+            }
+        })
     })
     
     // Auto-remove toast after duration
@@ -530,8 +606,13 @@ const search = async () => {
     loading.value = true
     hasSearched.value = true
     assistantResponse.value = null
+    assistantInteractionId.value = null
     markdownError.value = false
     showRawMarkdown.value = false
+    feedbackRating.value = null
+    feedbackText.value = ''
+    feedbackSubmitting.value = false
+    feedbackSubmitted.value = false
     
     try {
         // Perform semantic search
@@ -553,6 +634,7 @@ const search = async () => {
                     use_tools: true
                 })
                 assistantResponse.value = assistantRes.data.response
+                assistantInteractionId.value = assistantRes.data.interaction_id || null
             } catch (assistantError) {
                 console.error('Assistant error:', assistantError)
                 showToast('Erro ao obter resposta do assistente IA', 'warning')
@@ -613,6 +695,39 @@ function editContent(content) {
 function viewContent(content) {
     // Navigate to content view page (implement when available)
     showToast('Funcionalidade de visualização em desenvolvimento', 'info')
+}
+
+function setFeedbackRating(value) {
+    if (feedbackSubmitted.value || feedbackSubmitting.value) return
+    feedbackRating.value = value
+}
+
+async function submitFeedback() {
+    if (feedbackSubmitted.value || feedbackSubmitting.value) return
+    if (!feedbackRating.value && !feedbackText.value.trim()) {
+        showToast('Selecione 👍 ou 👎 ou escreva uma sugestão.', 'warning')
+        return
+    }
+
+    feedbackSubmitting.value = true
+    try {
+        await axios.post('/recipes/assistant/feedback', {
+            query: query.value,
+            response: assistantResponse.value,
+            rating: feedbackRating.value,
+            expected_response: feedbackText.value,
+            interaction_id: assistantInteractionId.value
+        })
+        feedbackSubmitted.value = true
+        showToast('Obrigado pelo feedback!', 'success')
+    } catch (error) {
+        console.error('Feedback error:', error)
+        // Consider feedback still captured client-side to avoid user retry fatigue
+        feedbackSubmitted.value = true
+        showToast('Feedback registrado localmente.', 'info')
+    } finally {
+        feedbackSubmitting.value = false
+    }
 }
 </script>
 

@@ -183,4 +183,12 @@ class Product extends Model
     {
         return $this->contents()->wherePivot('featured', 'sim');
     }
+
+    /**
+     * Semantic chunks for this product.
+     */
+    public function chunks(): HasMany
+    {
+        return $this->hasMany(ProductChunk::class);
+    }
 }
