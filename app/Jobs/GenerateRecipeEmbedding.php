@@ -33,5 +33,3 @@ class GenerateRecipeEmbedding implements ShouldQueue
         $embeddingService->generateEmbedding($recipe);
     }
 }
-
-

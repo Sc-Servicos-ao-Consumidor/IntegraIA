@@ -2,8 +2,7 @@
 
 namespace App\Services;
 
-use Illuminate\Support\Facades\Http;
-use Prism\Prism\Prism;
+use Prism\Prism\Facades\Prism;
 use Prism\Prism\Enums\Provider;
 use Prism\Prism\Exceptions\PrismException;
 use Illuminate\Support\Facades\Log;
@@ -19,7 +18,7 @@ class PrismService
     public function __construct()
     {
         $this->providerName = config('services.prism_api.chat_provider', 'openai');
-        $this->modelName = config('services.prism_api.chat_model', 'gpt-o4-mini');
+        $this->modelName = config('services.prism_api.chat_model', 'gpt-5-mini');
     }
 
     public function buildMessages(array $conversation): array

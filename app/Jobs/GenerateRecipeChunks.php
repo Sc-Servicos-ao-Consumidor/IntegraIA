@@ -33,5 +33,3 @@ class GenerateRecipeChunks implements ShouldQueue
         $chunkService->generateChunks($recipe);
     }
 }
-
-
