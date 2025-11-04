@@ -173,7 +173,7 @@
                                         :disabled="feedbackSubmitted || feedbackSubmitting"
                                         @click="setFeedbackRating('up')"
                                     >
-                                        👍 Bom
+                                        👍 Sim
                                     </button>
                                     <button
                                         class="px-3 py-1.5 rounded-lg border text-sm transition-colors cursor-pointer"
@@ -185,7 +185,7 @@
                                         :disabled="feedbackSubmitted || feedbackSubmitting"
                                         @click="setFeedbackRating('down')"
                                     >
-                                        👎 Ruim
+                                        👎 Não
                                     </button>
                                 </div>
 
