@@ -641,7 +641,7 @@ const search = async () => {
             }
         }
 
-        showToast(`Busca concluída! Encontrados ${getTotalResults()} resultados`, 'success')
+        showToast(`Busca concluída!`, 'success')
 
     } catch (error) {
         console.error('Search error:', error)
