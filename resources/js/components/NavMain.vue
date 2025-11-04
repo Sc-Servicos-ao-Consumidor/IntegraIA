@@ -16,7 +16,7 @@ const isActive = (href: string) => currentPath.value === href || currentPath.val
 
 <template>
     <SidebarGroup class="px-2 py-0">
-        <SidebarGroupLabel>SmartChef IA</SidebarGroupLabel>
+        <SidebarGroupLabel>SmartChef AI</SidebarGroupLabel>
         <SidebarMenu>
             <SidebarMenuItem v-for="item in items" :key="item.title">
                 <SidebarMenuButton as-child :is-active="isActive(item.href)" :tooltip="item.title">
