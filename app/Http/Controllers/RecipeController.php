@@ -463,7 +463,7 @@ class RecipeController extends Controller
             $request->input('response'),
             $request->input('rating'),
             $request->input('expected_response')
-        )->onQueue('default');
+        )->onQueue('store_intent_ai');
 
         return response()->json([
             'status' => 'queued',
