@@ -6,6 +6,7 @@ use App\Http\Controllers\ContentController;
 use App\Http\Controllers\GroupProductController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\TenantController;
+use App\Http\Controllers\AIController;
 use Inertia\Inertia;
 
 Route::get('/', function () {
@@ -17,7 +18,7 @@ Route::get('dashboard', function () {
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('/recipes/search', [RecipeController::class, 'search']);
+    Route::get('/recipes/search', [AIController::class, 'search']);
     Route::get('/recipes/search-ingredients', [RecipeController::class, 'searchIngredients']);
     Route::get('/recipes/search-cuisines', [RecipeController::class, 'searchCuisines']);
     Route::get('/recipes/search-allergens', [RecipeController::class, 'searchAllergens']);
@@ -25,8 +26,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return Inertia::render('Recipes/SemanticSearch');
     })->name('semantic-search');
     Route::resource('recipes', RecipeController::class);
-    Route::post('/recipes/assistant', [RecipeController::class, 'assistant']);
-    Route::post('/recipes/assistant/feedback', [RecipeController::class, 'assistantFeedback']);
+    Route::post('/recipes/assistant', [AIController::class, 'assistant']);
+    Route::post('/recipes/assistant/feedback', [AIController::class, 'assistantFeedback']);
     
     // Products management
     Route::resource('products', ProductController::class);
