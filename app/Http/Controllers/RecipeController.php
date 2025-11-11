@@ -2,18 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Jobs\UpdateAssistantFeedback;
 use App\Models\Recipe;
 use App\Models\Product;
 use App\Models\Content;
 use App\Models\Ingredient;
 use App\Models\Allergen;
 use App\Models\Cuisine;
-use App\Services\PrismService;
-use App\Models\AIAssistantFeedback;
-use App\Services\EmbeddingService;
-use App\Services\AIToolService;
-use App\Models\Tenant;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Bus;
