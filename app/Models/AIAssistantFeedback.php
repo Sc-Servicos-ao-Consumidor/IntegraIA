@@ -4,14 +4,17 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class AIAssistantFeedback extends Model
 {
     use HasFactory;
 
-    protected $table = 'ai_assistant_feedback';
+    protected $table = 'assistant_logs';
 
     protected $fillable = [
+        'tenant_id',
+        'assistant_id',
         'session_id',
         'query',
         'response',
@@ -23,4 +26,14 @@ class AIAssistantFeedback extends Model
     protected $casts = [
         'meta' => 'array',
     ];
+
+    public function tenant(): BelongsTo
+    {
+        return $this->belongsTo(Tenant::class);
+    }
+
+    public function assistant(): BelongsTo
+    {
+        return $this->belongsTo(AIAssistant::class, 'assistant_id');
+    }
 }
