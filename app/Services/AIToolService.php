@@ -9,8 +9,6 @@ use App\Models\ProductChunk;
 use App\Models\Content;
 use App\Models\ContentChunk;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Log;
-use Pgvector\Laravel\Distance;
 use Pgvector\Laravel\Vector;
 use Prism\Prism\Facades\Tool;
 
@@ -28,97 +26,126 @@ class AIToolService
     /**
      * Get available tools for AI assistant
      */
-    public function getTools(): array
+    public function getTools(?array $allowedNames = null): array
     {
         $tools = [];
+        $hasFilter = is_array($allowedNames) && count($allowedNames) > 0;
 
-        $tools[] = Tool::as('search_recipes')
-            ->for('Buscar receitas com base em uma consulta de texto usando busca semântica')
-            ->withStringParameter('query', 'Texto da consulta para buscar receitas')
-            ->withNumberParameter('limit', 'Número máximo de receitas a retornar (padrão: 10)', false)
-            ->using(function (string $query, int $limit) {
-                return $this->searchRecipes($query, $limit);
-            });
+        $isAllowed = function (string $name) use ($hasFilter, $allowedNames): bool {
+            return $hasFilter && in_array($name, $allowedNames, true);
+        };
 
-        $tools[] = Tool::as('search_products')
-            ->for('Buscar produtos com base em uma consulta de texto usando busca semântica')
-            ->withStringParameter('query', 'Texto da consulta para buscar produtos')
-            ->withNumberParameter('limit', 'Número máximo de produtos a retornar (padrão: 10)', false)
-            ->using(function (string $query, int $limit) {
-                return $this->searchProducts($query, $limit);
-            });
+        if ($isAllowed('search_recipes')) {
+            $tools[] = Tool::as('search_recipes')
+                ->for('Buscar receitas com base em uma consulta de texto usando busca semântica')
+                ->withStringParameter('query', 'Texto da consulta para buscar receitas')
+                ->withNumberParameter('limit', 'Número máximo de receitas a retornar (padrão: 10)', false)
+                ->using(function (string $query, int $limit) {
+                    return $this->searchRecipes($query, $limit);
+                });
+        }
 
-        $tools[] = Tool::as('search_content')
-            ->for('Buscar conteúdo com base em uma consulta de texto usando busca semântica')
-            ->withStringParameter('query', 'Texto da consulta para buscar conteúdo')
-            ->withNumberParameter('limit', 'Número máximo de conteúdos a retornar (padrão: 10)', false)
-            ->using(function (string $query, int $limit) {
-                return $this->searchContent($query, $limit);
-            });
+        if ($isAllowed('search_products')) {
+            $tools[] = Tool::as('search_products')
+                ->for('Buscar produtos com base em uma consulta de texto usando busca semântica')
+                ->withStringParameter('query', 'Texto da consulta para buscar produtos')
+                ->withNumberParameter('limit', 'Número máximo de produtos a retornar (padrão: 10)', false)
+                ->using(function (string $query, int $limit) {
+                    return $this->searchProducts($query, $limit);
+                });
+        }
 
-        $tools[] = Tool::as('get_recipe_details')
-            ->for('Obter detalhes completos de uma receita específica')
-            ->withNumberParameter('recipeId', 'ID da receita')
-            ->using(function (int $recipeId) {
-                return $this->getRecipeDetails($recipeId);
-            });
+        if ($isAllowed('search_content')) {
+            $tools[] = Tool::as('search_content')
+                ->for('Buscar conteúdo com base em uma consulta de texto usando busca semântica')
+                ->withStringParameter('query', 'Texto da consulta para buscar conteúdo')
+                ->withNumberParameter('limit', 'Número máximo de conteúdos a retornar (padrão: 10)', false)
+                ->using(function (string $query, int $limit) {
+                    return $this->searchContent($query, $limit);
+                });
+        }
 
-        $tools[] = Tool::as('get_product_details')
-            ->for('Obter detalhes completos de um produto específico')
-            ->withNumberParameter('productId', 'ID do produto')
-            ->using(function (int $productId) {
-                return $this->getProductDetails($productId);
-            });
-        
-        $tools[] = Tool::as('get_content_details')
-            ->for('Obter detalhes completos de um conteúdo específico')
-            ->withNumberParameter('contentId', 'ID do conteúdo')
-            ->using(function (int $contentId) {
-                return $this->getContentDetails($contentId);
-            });        
+        if ($isAllowed('get_recipe_details')) {
+            $tools[] = Tool::as('get_recipe_details')
+                ->for('Obter detalhes completos de uma receita específica')
+                ->withNumberParameter('recipeId', 'ID da receita')
+                ->using(function (int $recipeId) {
+                    return $this->getRecipeDetails($recipeId);
+                });
+        }
 
-        $tools[] = Tool::as('find_recipes_with_product_id')
-            ->for('Encontrar receitas que usam um produto específico')
-            ->withNumberParameter('productId', 'ID do produto')
-            ->withStringParameter('ingredientType', 'Tipo de ingrediente (main, supporting, ou null para ambos)', false)
-            ->using(function (int $productId, string $ingredientType) {
-                return $this->findRecipesWithProductId($productId, $ingredientType);
-            });
+        if ($isAllowed('get_product_details')) {
+            $tools[] = Tool::as('get_product_details')
+                ->for('Obter detalhes completos de um produto específico')
+                ->withNumberParameter('productId', 'ID do produto')
+                ->using(function (int $productId) {
+                    return $this->getProductDetails($productId);
+                });
+        }
 
-        $tools[] = Tool::as('find_content_with_product_id')
-            ->for('Encontrar conteúdo que usa um produto específico')
-            ->withNumberParameter('productId', 'ID do produto')
-            ->using(function (int $productId) {
-                return $this->findContentWithProductId($productId);
-            });
+        if ($isAllowed('get_content_details')) {
+            $tools[] = Tool::as('get_content_details')
+                ->for('Obter detalhes completos de um conteúdo específico')
+                ->withNumberParameter('contentId', 'ID do conteúdo')
+                ->using(function (int $contentId) {
+                    return $this->getContentDetails($contentId);
+                });
+        }        
 
-        $tools[] = Tool::as('find_product_with_recipe_id')
-            ->for('Encontrar produtos que usam uma receita específica')
-            ->withNumberParameter('recipeId', 'ID da receita')
-            ->using(function (int $recipeId) {
-                return $this->findProductsWithRecipeId($recipeId);
-            });
+        if ($isAllowed('find_recipes_with_product_id')) {
+            $tools[] = Tool::as('find_recipes_with_product_id')
+                ->for('Encontrar receitas que usam um produto específico')
+                ->withNumberParameter('productId', 'ID do produto')
+                ->withStringParameter('ingredientType', 'Tipo de ingrediente (main, supporting, ou null para ambos)', false)
+                ->using(function (int $productId, string $ingredientType) {
+                    return $this->findRecipesWithProductId($productId, $ingredientType);
+                });
+        }
 
-        $tools[] = Tool::as('find_content_with_recipe_id')
-            ->for('Encontrar conteúdo que usa uma receita específica')
-            ->withNumberParameter('recipeId', 'ID da receita')
-            ->using(function (int $recipeId) {
-                return $this->findContentWithRecipeId($recipeId);
-            });
+        if ($isAllowed('find_content_with_product_id')) {
+            $tools[] = Tool::as('find_content_with_product_id')
+                ->for('Encontrar conteúdo que usa um produto específico')
+                ->withNumberParameter('productId', 'ID do produto')
+                ->using(function (int $productId) {
+                    return $this->findContentWithProductId($productId);
+                });
+        }
 
-        $tools[] = Tool::as('find_product_with_content_id')
-            ->for('Encontrar produtos que usam um conteúdo específico')
-            ->withNumberParameter('contentId', 'ID do conteúdo')
-            ->using(function (int $contentId) {
-                return $this->findProductsWithContentId($contentId);
-            });
+        if ($isAllowed('find_product_with_recipe_id')) {
+            $tools[] = Tool::as('find_product_with_recipe_id')
+                ->for('Encontrar produtos que usam uma receita específica')
+                ->withNumberParameter('recipeId', 'ID da receita')
+                ->using(function (int $recipeId) {
+                    return $this->findProductsWithRecipeId($recipeId);
+                });
+        }
 
-        $tools[] = Tool::as('find_recipes_with_content_id')
-            ->for('Encontrar receitas que usam um conteúdo específico')
-            ->withNumberParameter('contentId', 'ID do conteúdo')
-            ->using(function (int $contentId) {
-                return $this->findRecipesWithContentId($contentId);
-            });
+        if ($isAllowed('find_content_with_recipe_id')) {
+            $tools[] = Tool::as('find_content_with_recipe_id')
+                ->for('Encontrar conteúdo que usa uma receita específica')
+                ->withNumberParameter('recipeId', 'ID da receita')
+                ->using(function (int $recipeId) {
+                    return $this->findContentWithRecipeId($recipeId);
+                });
+        }
+
+        if ($isAllowed('find_product_with_content_id')) {
+            $tools[] = Tool::as('find_product_with_content_id')
+                ->for('Encontrar produtos que usam um conteúdo específico')
+                ->withNumberParameter('contentId', 'ID do conteúdo')
+                ->using(function (int $contentId) {
+                    return $this->findProductsWithContentId($contentId);
+                });
+        }
+
+        if ($isAllowed('find_recipes_with_content_id')) {
+            $tools[] = Tool::as('find_recipes_with_content_id')
+                ->for('Encontrar receitas que usam um conteúdo específico')
+                ->withNumberParameter('contentId', 'ID do conteúdo')
+                ->using(function (int $contentId) {
+                    return $this->findRecipesWithContentId($contentId);
+                });
+        }
 
         return $tools;
     }

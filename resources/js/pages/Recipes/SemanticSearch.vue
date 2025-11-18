@@ -630,7 +630,7 @@ const search = async () => {
             try {
                 const assistantRes = await axios.post('/recipes/assistant', {
                     text: query.value,
-                    context: '',
+                    tenant_id: tenant.id,
                     use_tools: true
                 })
                 assistantResponse.value = assistantRes.data.response

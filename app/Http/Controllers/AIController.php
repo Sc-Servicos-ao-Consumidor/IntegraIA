@@ -2,18 +2,18 @@
 
 namespace App\Http\Controllers;
 
-use App\Jobs\UpdateAssistantFeedback;
+use App\Jobs\UpdateAssistantLog;
+use App\Models\Assistant;
 use App\Models\Recipe;
 use App\Models\Product;
 use App\Models\Content;
 use App\Models\Tenant;
-use App\Models\AIAssistantFeedback;
+use App\Models\AssistantLog;
 use App\Services\EmbeddingService;
 use App\Services\AIToolService;
 use App\Services\PrismService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Str;
 use Pgvector\Laravel\Distance;
 
 class AIController extends Controller
@@ -93,6 +93,7 @@ class AIController extends Controller
             'context' => 'nullable',
             'use_tools' => 'nullable|boolean',
             'tenant_id' => 'integer|exists:tenants,id',
+            'assistant_slug' => 'string|exists:assistants,slug',
         ]);
 
         if ($validator->fails()) {
@@ -100,6 +101,22 @@ class AIController extends Controller
                 'message' => 'Validation error.',
                 'errors' => $validator->errors(),
             ], 422);
+        }
+
+        $assistant = Assistant::where('slug', $request->assistant_slug)
+            ->where('tenant_id', $request->tenant_id)
+            ->first();
+
+        // Fallback to the tenant's default assistant if none was found
+        $assistant ??= Assistant::firstWhere([
+            'tenant_id' => $request->tenant_id,
+            'is_default' => true,
+        ]);
+
+        if (!$assistant) {
+            return response()->json([
+                'message' => 'Assistant not found.',
+            ], 404);
         }
 
         $prism = new PrismService();
@@ -119,7 +136,10 @@ class AIController extends Controller
 
             if ($useTools) {
                 $aiToolService = new AIToolService($prism, new EmbeddingService($prism));
-                $tools = $aiToolService->getTools();
+
+                $assistantTools = is_array($assistant->tools) ? array_values($assistant->tools) : [];
+
+                $tools = $aiToolService->getTools(count($assistantTools) > 0 ? $assistantTools : []);
             }
 
             $tenantId = (int) ($request->input('tenant_id'));
@@ -130,17 +150,24 @@ class AIController extends Controller
                 $tenantBasePrompt = $tenant->base_prompt;
             }
 
-            $response = $prism->getResponse($text, $context, $tools, $tenantBasePrompt);
+            // Build base prompt prioritizing the Assistant's system_prompt, then tenant base prompt
+            $assistantPrompt = $assistant->system_prompt ?? null;
+            $basePrompt = trim(($assistantPrompt ? $assistantPrompt . "\n\n" : '') . ($tenantBasePrompt ?? '')) ?: null;
+
+            $response = $prism->getResponse($text, $context, $tools, $basePrompt);
 
             $assistantText = $response['response'] ?? (is_string($response) ? $response : null);
 
-            $interaction = AIAssistantFeedback::create([
+            $interaction = AssistantLog::create([
+                'tenant_id' => $tenantId ?: null,
+                'assistant_id' => $assistant->id,
                 'session_id' => $request->hasSession() ? $request->session()->getId() : null,
                 'query' => $request->text,
                 'response' => $assistantText,
                 'meta' => [
                     'use_tools' => (bool) $useTools,
                     'tenant_id' => $tenantId ?? null,
+                    'assistant_slug' => $assistant->slug,
                 ],
             ]);
 
@@ -168,7 +195,7 @@ class AIController extends Controller
     public function assistantFeedback(Request $request)
     {
         $request->validate([
-            'interaction_id' => 'nullable|integer|exists:ai_assistant_feedback,id',
+            'interaction_id' => 'nullable|integer|exists:assistant_logs,id',
             'query' => 'nullable|string',
             'response' => 'nullable|string',
             'rating' => 'nullable|string|in:up,down',
@@ -177,7 +204,7 @@ class AIController extends Controller
 
         $sessionId = $request->hasSession() ? $request->session()->getId() : null;
 
-        UpdateAssistantFeedback::dispatch(
+        UpdateAssistantLog::dispatch(
             $request->input('interaction_id'),
             $sessionId,
             $request->input('query'),
@@ -211,5 +238,3 @@ class AIController extends Controller
         return $data;
     }
 }
-
-

@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class AIAssistant extends Model
+class Assistant extends Model
 {
     use HasFactory;
 
@@ -35,9 +35,9 @@ class AIAssistant extends Model
         return $this->belongsTo(Tenant::class);
     }
 
-    public function feedback(): HasMany
+    public function logs(): HasMany
     {
-        return $this->hasMany(AIAssistantFeedback::class, 'assistant_id');
+        return $this->hasMany(AssistantLog::class, 'assistant_id');
     }
 }
 

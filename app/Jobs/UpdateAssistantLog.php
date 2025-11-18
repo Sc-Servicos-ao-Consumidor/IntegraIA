@@ -2,14 +2,14 @@
 
 namespace App\Jobs;
 
-use App\Models\AIAssistantFeedback;
+use App\Models\AssistantLog;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 
-class UpdateAssistantFeedback implements ShouldQueue
+class UpdateAssistantLog implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
@@ -47,19 +47,19 @@ class UpdateAssistantFeedback implements ShouldQueue
         $interaction = null;
 
         if ($this->interactionId) {
-            $interaction = AIAssistantFeedback::where('id', $this->interactionId)
+            $interaction = AssistantLog::where('id', $this->interactionId)
                 ->where('session_id', $this->sessionId)
                 ->first();
         }
 
         if (!$interaction) {
-            $interaction = AIAssistantFeedback::where('session_id', $this->sessionId)
+            $interaction = AssistantLog::where('session_id', $this->sessionId)
                 ->latest('id')
                 ->first();
         }
 
         if (!$interaction) {
-            $interaction = AIAssistantFeedback::create([
+            $interaction = AssistantLog::create([
                 'session_id' => $this->sessionId,
                 'query' => (string) ($this->query ?? ''),
                 'response' => (string) ($this->response ?? ''),

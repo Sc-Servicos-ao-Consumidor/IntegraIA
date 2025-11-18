@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class AIAssistantFeedback extends Model
+class AssistantLog extends Model
 {
     use HasFactory;
 
@@ -34,6 +34,6 @@ class AIAssistantFeedback extends Model
 
     public function assistant(): BelongsTo
     {
-        return $this->belongsTo(AIAssistant::class, 'assistant_id');
+        return $this->belongsTo(Assistant::class, 'assistant_id');
     }
 }
