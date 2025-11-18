@@ -477,7 +477,7 @@
 </template>
 
 <script setup>
-import { router, Head } from '@inertiajs/vue3'
+import { router, Head, usePage } from '@inertiajs/vue3'
 import { ref, nextTick, computed } from 'vue'
 import axios from 'axios'
 import { marked } from 'marked'
@@ -494,6 +494,9 @@ marked.setOptions({
     smartLists: true,
     smartypants: true
 })
+
+const page = usePage()
+const tenantId = computed(() => page.props.auth?.tenant?.current_id)
 
 const query = ref('')
 const results = ref({})
@@ -630,7 +633,7 @@ const search = async () => {
             try {
                 const assistantRes = await axios.post('/recipes/assistant', {
                     text: query.value,
-                    tenant_id: tenant.id,
+                    tenant_id: tenantId.value,
                     use_tools: true
                 })
                 assistantResponse.value = assistantRes.data.response

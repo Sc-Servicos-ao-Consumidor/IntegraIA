@@ -93,7 +93,7 @@ class AIController extends Controller
             'context' => 'nullable',
             'use_tools' => 'nullable|boolean',
             'tenant_id' => 'integer|exists:tenants,id',
-            'assistant_slug' => 'string|exists:assistants,slug',
+            'assistant_slug' => 'nullable|string|exists:assistants,slug',
         ]);
 
         if ($validator->fails()) {
@@ -110,7 +110,7 @@ class AIController extends Controller
         // Fallback to the tenant's default assistant if none was found
         $assistant ??= Assistant::firstWhere([
             'tenant_id' => $request->tenant_id,
-            'is_default' => true,
+            'default' => true,
         ]);
 
         if (!$assistant) {
