@@ -19,7 +19,7 @@ class AssistantLog extends Model
         'query',
         'response',
         'rating',
-        'expected_response',
+        'comment',
         'meta',
     ];
 

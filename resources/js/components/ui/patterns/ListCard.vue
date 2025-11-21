@@ -7,6 +7,7 @@ interface Props {
   title?: string
   subtitle?: string
   icon?: string
+  badge?: string
   emptyMessage?: string
   emptyIcon?: string
   searchable?: boolean
@@ -49,8 +50,14 @@ const emit = defineEmits<{
         <div class="flex items-center gap-3">
           <span v-if="icon" class="text-2xl">{{ icon }}</span>
           <div>
-            <h2 v-if="title" class="text-xl font-bold text-slate-900 dark:text-slate-100">
-              {{ title }}
+            <h2 v-if="title" class="text-xl font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
+              <span>{{ title }}</span>
+              <span
+                v-if="props.badge"
+                class="text-xs font-medium rounded px-2 py-0.5 border bg-orange-100 text-orange-800 border-orange-200 dark:bg-orange-900 dark:text-orange-100 dark:border-orange-800"
+              >
+                {{ props.badge }}
+              </span>
             </h2>
             <p v-if="subtitle" class="text-sm text-slate-600 dark:text-slate-400 mt-1">
               {{ subtitle }}

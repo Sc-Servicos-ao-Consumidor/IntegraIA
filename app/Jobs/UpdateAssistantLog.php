@@ -22,8 +22,7 @@ class UpdateAssistantLog implements ShouldQueue
     protected ?string $response;
 
     protected ?string $rating; // 'up' | 'down' | null
-
-    protected ?string $expectedResponse;
+    protected ?string $comment;
 
     /**
      * Create a new job instance.
@@ -34,14 +33,14 @@ class UpdateAssistantLog implements ShouldQueue
         ?string $query,
         ?string $response,
         ?string $rating,
-        ?string $expectedResponse
+        ?string $comment
     ) {
         $this->interactionId = $interactionId;
         $this->sessionId = $sessionId;
         $this->query = $query;
         $this->response = $response;
         $this->rating = $rating;
-        $this->expectedResponse = $expectedResponse;
+        $this->comment = $comment;
     }
 
     /**
@@ -75,8 +74,8 @@ class UpdateAssistantLog implements ShouldQueue
         if ($this->rating !== null) {
             $interaction->rating = $this->rating;
         }
-        if ($this->expectedResponse !== null && $this->expectedResponse !== '') {
-            $interaction->expected_response = $this->expectedResponse;
+        if ($this->comment !== null && $this->comment !== '') {
+            $interaction->comment = $this->comment;
         }
 
         $interaction->save();

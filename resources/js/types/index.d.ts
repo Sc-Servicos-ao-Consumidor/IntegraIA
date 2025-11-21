@@ -19,6 +19,8 @@ export interface NavItem {
     href: string;
     icon?: LucideIcon;
     isActive?: boolean;
+    badge?: string;
+    badgeColor?: 'orange' | 'blue' | 'green' | 'red' | 'purple' | 'gray';
 }
 
 export type AppPageProps<T extends Record<string, unknown> = Record<string, unknown>> = T & {

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AIController;
+use App\Http\Controllers\AssistantLogController;
 use App\Http\Controllers\ContentController;
 use App\Http\Controllers\GroupProductController;
 use App\Http\Controllers\ProductController;
@@ -40,6 +41,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Tenant switching
     Route::post('/tenant/switch', [TenantController::class, 'switch'])->name('tenant.switch');
+
+	// Assistant Logs
+	Route::get('/assistant-logs', [AssistantLogController::class, 'index'])->name('assistant-logs.index');
 });
 
 require __DIR__.'/settings.php';

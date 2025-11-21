@@ -718,7 +718,7 @@ async function submitFeedback() {
             query: query.value,
             response: assistantResponse.value,
             rating: feedbackRating.value,
-            expected_response: feedbackText.value,
+            comment: feedbackText.value,
             interaction_id: assistantInteractionId.value
         })
         feedbackSubmitted.value = true

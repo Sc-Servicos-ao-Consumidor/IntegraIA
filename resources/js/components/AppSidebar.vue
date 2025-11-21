@@ -34,6 +34,13 @@ const mainNavItems: NavItem[] = [
         href: '/contents',
         icon: FileText,
     },
+    {
+        title: 'Histórico de Interações',
+        href: '/assistant-logs',
+        icon: Brain,
+        badge: 'BETA',
+        badgeColor: 'orange',
+    },
 ];
 
 const footerNavItems: NavItem[] = [

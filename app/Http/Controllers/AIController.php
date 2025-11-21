@@ -199,7 +199,7 @@ class AIController extends Controller
             'query' => 'nullable|string',
             'response' => 'nullable|string',
             'rating' => 'nullable|string|in:up,down',
-            'expected_response' => 'nullable|string',
+            'comment' => 'nullable|string',
         ]);
 
         $sessionId = $request->hasSession() ? $request->session()->getId() : null;
@@ -210,7 +210,7 @@ class AIController extends Controller
             $request->input('query'),
             $request->input('response'),
             $request->input('rating'),
-            $request->input('expected_response')
+            $request->input('comment')
         )->onQueue('store_intent_ai');
 
         return response()->json([
