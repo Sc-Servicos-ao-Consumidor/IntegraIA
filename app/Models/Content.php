@@ -12,9 +12,9 @@ use Pgvector\Laravel\Vector;
 
 class Content extends Model
 {
+    use BelongsToTenant;
     use HasFactory;
     use HasNeighbors;
-    use BelongsToTenant;
 
     protected $fillable = [
         'tenant_id',
@@ -30,7 +30,7 @@ class Content extends Model
         'descricao_conteudo',
         'content_prompt',
         'status',
-        'embedding'
+        'embedding',
     ];
 
     protected $casts = [

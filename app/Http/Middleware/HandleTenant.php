@@ -22,7 +22,7 @@ class HandleTenant
             // If no tenant in session or not allowed, set to first allowed
             $currentTenantId = (int) ($request->session()->get('tenant_id') ?? 0);
 
-            if (!$currentTenantId || !in_array($currentTenantId, $allowedTenantIds, true)) {
+            if (! $currentTenantId || ! in_array($currentTenantId, $allowedTenantIds, true)) {
                 $newTenantId = $allowedTenantIds[0] ?? null;
                 if ($newTenantId) {
                     $request->session()->put('tenant_id', $newTenantId);
@@ -36,5 +36,3 @@ class HandleTenant
         return $next($request);
     }
 }
-
-

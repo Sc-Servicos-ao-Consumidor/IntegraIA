@@ -22,5 +22,3 @@ class Allergen extends Model
         return $this->belongsToMany(Recipe::class)->withTimestamps();
     }
 }
-
-

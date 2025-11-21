@@ -2,15 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Recipe;
-use App\Models\Product;
-use App\Models\Content;
-use App\Models\Ingredient;
 use App\Models\Allergen;
+use App\Models\Content;
 use App\Models\Cuisine;
+use App\Models\Ingredient;
+use App\Models\Product;
+use App\Models\Recipe;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Bus;
 use Inertia\Inertia;
+
 class RecipeController extends Controller
 {
     /**
@@ -25,7 +26,7 @@ class RecipeController extends Controller
             ->when($search !== '', function ($query) use ($search) {
                 $query->where(function ($q) use ($search) {
                     $q->where('recipe_name', 'ilike', "%{$search}%")
-                      ->orWhere('recipe_description', 'ilike', "%{$search}%");
+                        ->orWhere('recipe_description', 'ilike', "%{$search}%");
                 });
             })
             ->latest()
@@ -45,7 +46,7 @@ class RecipeController extends Controller
             'ingredients' => $ingredients,
             'cuisines' => $cuisines,
             'allergens' => $allergens,
-            'filters' => $request->only(['search', 'per_page'])
+            'filters' => $request->only(['search', 'per_page']),
         ]);
     }
 
@@ -65,28 +66,28 @@ class RecipeController extends Controller
             'yield' => 'nullable|string|max:255',
             'channel' => 'nullable',
             'channel.*' => 'string|in:padaria,lanchonete,restaurante,confeitaria',
-            
+
             // Content fields
             'recipe_description' => 'string',
             'ingredients_description' => 'nullable|string',
             'recipe_prompt' => 'nullable|string',
             'preparation_method' => 'string',
-            
+
             // String fields
             'usage_groups' => 'nullable|string|max:255',
             'preparation_techniques' => 'nullable|string|max:255',
             'consumption_occasion' => 'nullable|string|max:255',
-            
+
             // Product associations
             'selected_products' => 'nullable|array',
             'selected_products.*.product_id' => 'required_with:selected_products|exists:products,id',
             'selected_products.*.ingredient_type' => 'nullable|in:main,supporting',
             'selected_products.*.top_dish' => 'nullable|boolean',
-            
+
             // Content associations
             'selected_contents' => 'nullable|array',
             'selected_contents.*.content_id' => 'required_with:selected_contents|exists:contents,id',
-            
+
             // Ingredient associations
             'selected_ingredients' => 'nullable|array',
             'selected_ingredients.*.ingredient_id' => 'nullable|exists:ingredients,id',
@@ -127,7 +128,7 @@ class RecipeController extends Controller
                 $productData[$productInfo['product_id']] = [
                     'ingredient_type' => $productInfo['ingredient_type'] ?? 'main',
                     'order' => $index + 1,
-                    'top_dish' => (bool)($productInfo['top_dish'] ?? false),
+                    'top_dish' => (bool) ($productInfo['top_dish'] ?? false),
                 ];
             }
             $recipe->products()->sync($productData);
@@ -139,7 +140,7 @@ class RecipeController extends Controller
             foreach ($request->selected_contents as $index => $contentInfo) {
                 $contentData[$contentInfo['content_id']] = [
                     'order' => $index + 1,
-                    'top_dish' => (bool)($contentInfo['top_dish'] ?? false),
+                    'top_dish' => (bool) ($contentInfo['top_dish'] ?? false),
                 ];
             }
             $recipe->contents()->sync($contentData);
@@ -153,14 +154,14 @@ class RecipeController extends Controller
 
                 // Determine candidate name: ingredient_name or search_term
                 $candidateName = null;
-                if (!empty($ingredientInfo['ingredient_name'])) {
+                if (! empty($ingredientInfo['ingredient_name'])) {
                     $candidateName = $ingredientInfo['ingredient_name'];
-                } elseif (!empty($ingredientInfo['search_term'])) {
+                } elseif (! empty($ingredientInfo['search_term'])) {
                     $candidateName = $ingredientInfo['search_term'];
                 }
 
                 // If no ingredient_id is provided but we have a name, create or find it
-                if (!$ingredientId && $candidateName) {
+                if (! $ingredientId && $candidateName) {
                     $name = trim($candidateName);
                     if ($name !== '') {
                         $ingredient = Ingredient::firstOrCreate(['name' => $name]);
@@ -170,7 +171,7 @@ class RecipeController extends Controller
 
                 if ($ingredientId) {
                     $ingredientData[$ingredientId] = [
-                        'primary_ingredient' => (bool)($ingredientInfo['primary_ingredient'] ?? true),
+                        'primary_ingredient' => (bool) ($ingredientInfo['primary_ingredient'] ?? true),
                     ];
                 }
             }
@@ -184,7 +185,7 @@ class RecipeController extends Controller
             foreach ($request->selected_cuisines as $cuisineInfo) {
                 $cuisineId = $cuisineInfo['cuisine_id'] ?? null;
                 $name = $cuisineInfo['name'] ?? null;
-                if (!$cuisineId && $name) {
+                if (! $cuisineId && $name) {
                     $cuisine = Cuisine::firstOrCreate(['name' => trim($name)]);
                     $cuisineId = $cuisine->id;
                 }
@@ -201,7 +202,7 @@ class RecipeController extends Controller
             foreach ($request->selected_allergens as $allergenInfo) {
                 $allergenId = $allergenInfo['allergen_id'] ?? null;
                 $name = $allergenInfo['name'] ?? null;
-                if (!$allergenId && $name) {
+                if (! $allergenId && $name) {
                     $allergen = Allergen::firstOrCreate(['name' => trim($name)]);
                     $allergenId = $allergen->id;
                 }
@@ -236,7 +237,7 @@ class RecipeController extends Controller
     {
         $request->validate([
             'query' => 'required|string|min:1',
-            'limit' => 'nullable|integer|min:1|max:20'
+            'limit' => 'nullable|integer|min:1|max:20',
         ]);
 
         $query = $request->query('query');
@@ -257,7 +258,7 @@ class RecipeController extends Controller
     {
         $request->validate([
             'query' => 'required|string|min:1',
-            'limit' => 'nullable|integer|min:1|max:20'
+            'limit' => 'nullable|integer|min:1|max:20',
         ]);
 
         $query = $request->query('query');
@@ -279,7 +280,7 @@ class RecipeController extends Controller
     {
         $request->validate([
             'query' => 'required|string|min:1',
-            'limit' => 'nullable|integer|min:1|max:20'
+            'limit' => 'nullable|integer|min:1|max:20',
         ]);
 
         $query = $request->query('query');

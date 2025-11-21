@@ -12,16 +12,17 @@ use Pgvector\Laravel\Vector;
 
 class Recipe extends Model
 {
+    use BelongsToTenant;
+
     /** @use HasFactory<\Database\Factories\RecipeFactory> */
     use HasFactory;
     use HasNeighbors;
-    use BelongsToTenant;
 
     protected $fillable = [
         'tenant_id',
         'embedding',
         'recipe_code',
-        'recipe_name', 
+        'recipe_name',
         'recipe_type',
         'service_order',
         'preparation_time',
@@ -70,12 +71,12 @@ class Recipe extends Model
         return $this->belongsToMany(Product::class)
             ->withPivot([
                 'quantity',
-                'unit', 
+                'unit',
                 'ingredient_type',
                 'preparation_notes',
                 'optional',
                 'order',
-                'top_dish'
+                'top_dish',
             ])
             ->withTimestamps()
             ->orderByPivot('order');
@@ -115,7 +116,7 @@ class Recipe extends Model
     {
         return $this->belongsToMany(Ingredient::class)
             ->withPivot([
-                'primary_ingredient'
+                'primary_ingredient',
             ])
             ->withTimestamps()
             ->orderByPivot('primary_ingredient');

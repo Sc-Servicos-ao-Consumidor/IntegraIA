@@ -21,7 +21,7 @@ class Ingredient extends Model
     {
         return $this->belongsToMany(Recipe::class)
             ->withPivot([
-                'primary_ingredient'
+                'primary_ingredient',
             ])
             ->withTimestamps()
             ->orderByPivot('primary_ingredient');

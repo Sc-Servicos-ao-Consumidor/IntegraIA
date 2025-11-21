@@ -2,10 +2,10 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
 use App\Models\Recipe;
 use App\Services\EmbeddingService;
 use App\Services\PrismService;
+use Illuminate\Console\Command;
 
 class GenerateRecipeEmbeddings extends Command
 {
@@ -36,11 +36,11 @@ class GenerateRecipeEmbeddings extends Command
         $force = $this->option('force');
 
         try {
-            $embeddingService = new EmbeddingService(new PrismService());
+            $embeddingService = new EmbeddingService(new PrismService);
 
             $query = Recipe::query();
 
-            if (!$force) {
+            if (! $force) {
                 $query->whereNull('embedding');
             }
 
@@ -52,6 +52,7 @@ class GenerateRecipeEmbeddings extends Command
 
             if ($recipes->isEmpty()) {
                 $this->info('No recipes to process.');
+
                 return Command::SUCCESS;
             }
 
@@ -70,27 +71,28 @@ class GenerateRecipeEmbeddings extends Command
                     $errorCount++;
                     $this->warn("\nFailed to generate embedding for recipe ID: {$recipe->id}");
                 }
-                
+
                 $progressBar->advance();
             }
 
             $progressBar->finish();
 
             $this->newLine(2);
-            $this->info("Recipe embedding generation completed!");
+            $this->info('Recipe embedding generation completed!');
             $this->table(
                 ['Status', 'Count'],
                 [
                     ['Success', $successCount],
                     ['Failed', $errorCount],
-                    ['Total', $recipes->count()]
+                    ['Total', $recipes->count()],
                 ]
             );
 
             return Command::SUCCESS;
 
         } catch (\Exception $e) {
-            $this->error('Error generating recipe embeddings: ' . $e->getMessage());
+            $this->error('Error generating recipe embeddings: '.$e->getMessage());
+
             return Command::FAILURE;
         }
     }

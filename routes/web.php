@@ -1,12 +1,12 @@
 <?php
 
-use App\Http\Controllers\RecipeController;
-use App\Http\Controllers\ProductController;
+use App\Http\Controllers\AIController;
 use App\Http\Controllers\ContentController;
 use App\Http\Controllers\GroupProductController;
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ProductController;
+use App\Http\Controllers\RecipeController;
 use App\Http\Controllers\TenantController;
-use App\Http\Controllers\AIController;
+use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::get('/', function () {
@@ -28,13 +28,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('recipes', RecipeController::class);
     Route::post('/recipes/assistant', [AIController::class, 'assistant']);
     Route::post('/recipes/assistant/feedback', [AIController::class, 'assistantFeedback']);
-    
+
     // Products management
     Route::resource('products', ProductController::class);
-    
+
     // Product Groups management
     Route::resource('group-products', GroupProductController::class);
-    
+
     // Contents management
     Route::resource('contents', ContentController::class);
 

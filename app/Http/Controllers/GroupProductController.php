@@ -5,16 +5,13 @@ namespace App\Http\Controllers;
 use App\Models\GroupProduct;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
-use Inertia\Inertia;
 
 class GroupProductController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
-    {
-    }
+    public function index() {}
 
     /**
      * Store a newly created resource in storage.
@@ -41,7 +38,7 @@ class GroupProductController extends Controller
     public function update(Request $request, GroupProduct $groupProduct)
     {
         $data = $request->validate([
-            'descricao' => 'required|string|max:255|unique:group_products,descricao,' . $groupProduct->id,
+            'descricao' => 'required|string|max:255|unique:group_products,descricao,'.$groupProduct->id,
             'codigo_padrao' => 'nullable|string|max:255',
             'observacao' => 'nullable|string|max:255',
         ]);

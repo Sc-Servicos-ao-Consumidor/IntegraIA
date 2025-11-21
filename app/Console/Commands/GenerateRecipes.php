@@ -5,8 +5,6 @@ namespace App\Console\Commands;
 use App\Models\Recipe;
 use App\Services\PrismService;
 use Illuminate\Console\Command;
-use NunoMaduro\Collision\Provider;
-use Prism\Prism\Prism;
 
 class GenerateRecipes extends Command
 {
@@ -69,12 +67,13 @@ class GenerateRecipes extends Command
             $this->info("✓ Added: $recipeName");
         }
 
-        $this->info("Done.");
+        $this->info('Done.');
     }
 
     protected function extractSection(string $text, string $label): string
     {
-        preg_match("/$label:\s*(.*?)\n(?:\w+:|$)/s", $text . "\n", $matches);
+        preg_match("/$label:\s*(.*?)\n(?:\w+:|$)/s", $text."\n", $matches);
+
         return $matches[1] ?? '';
     }
 }

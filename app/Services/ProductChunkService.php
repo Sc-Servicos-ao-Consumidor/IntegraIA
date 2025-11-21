@@ -40,6 +40,7 @@ class ProductChunkService
                 'error' => $e->getMessage(),
             ]);
         }
+
         return $created;
     }
 
@@ -54,7 +55,7 @@ class ProductChunkService
             $product->marca,
             optional($product->groupProduct)->nome,
         ]);
-        if (!empty($title)) {
+        if (! empty($title)) {
             $chunks[] = [
                 'chunk_type' => 'title_metadata',
                 'content' => implode("\n", $title),
@@ -88,5 +89,3 @@ class ProductChunkService
         return $chunks;
     }
 }
-
-

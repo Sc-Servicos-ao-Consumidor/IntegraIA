@@ -36,11 +36,11 @@ class GenerateProductEmbeddings extends Command
         $force = $this->option('force');
 
         try {
-            $embeddingService = new EmbeddingService(new PrismService());
+            $embeddingService = new EmbeddingService(new PrismService);
 
             $query = Product::query();
 
-            if (!$force) {
+            if (! $force) {
                 $query->whereNull('embedding');
             }
 
@@ -52,6 +52,7 @@ class GenerateProductEmbeddings extends Command
 
             if ($products->isEmpty()) {
                 $this->info('No products to process.');
+
                 return Command::SUCCESS;
             }
 
@@ -70,27 +71,28 @@ class GenerateProductEmbeddings extends Command
                     $errorCount++;
                     $this->warn("\nFailed to generate embedding for product ID: {$product->id}");
                 }
-                
+
                 $progressBar->advance();
             }
 
             $progressBar->finish();
 
             $this->newLine(2);
-            $this->info("Product embedding generation completed!");
+            $this->info('Product embedding generation completed!');
             $this->table(
                 ['Status', 'Count'],
                 [
                     ['Success', $successCount],
                     ['Failed', $errorCount],
-                    ['Total', $products->count()]
+                    ['Total', $products->count()],
                 ]
             );
 
             return Command::SUCCESS;
 
         } catch (\Exception $e) {
-            $this->error('Error generating product embeddings: ' . $e->getMessage());
+            $this->error('Error generating product embeddings: '.$e->getMessage());
+
             return Command::FAILURE;
         }
     }

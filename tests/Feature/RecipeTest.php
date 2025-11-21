@@ -2,9 +2,8 @@
 
 namespace Tests\Feature;
 
-use Tests\TestCase;
-use App\Models\Recipe;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
 
 class RecipeTest extends TestCase
 {
@@ -24,8 +23,8 @@ class RecipeTest extends TestCase
             'recipe_type' => 'doce',
             'preparation_method' => 'Modo',
             'selected_allergens' => [
-                ['allergen_id' => $allergenId]
-            ]
+                ['allergen_id' => $allergenId],
+            ],
         ]);
 
         $response->assertRedirect(); // Inertia redirect after form post

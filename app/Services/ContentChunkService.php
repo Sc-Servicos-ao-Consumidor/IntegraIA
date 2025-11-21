@@ -40,6 +40,7 @@ class ContentChunkService
                 'error' => $e->getMessage(),
             ]);
         }
+
         return $created;
     }
 
@@ -54,7 +55,7 @@ class ContentChunkService
             $content->pilares,
             $content->canal,
         ]);
-        if (!empty($title)) {
+        if (! empty($title)) {
             $chunks[] = [
                 'chunk_type' => 'title_metadata',
                 'content' => implode("\n", $title),
@@ -74,10 +75,16 @@ class ContentChunkService
 
         // Roles flags and links
         $roles = [];
-        if ($content->cozinheiro) { $roles[] = 'cozinheiro'; }
-        if ($content->comprador) { $roles[] = 'comprador'; }
-        if ($content->administrador) { $roles[] = 'administrador'; }
-        if (!empty($roles)) {
+        if ($content->cozinheiro) {
+            $roles[] = 'cozinheiro';
+        }
+        if ($content->comprador) {
+            $roles[] = 'comprador';
+        }
+        if ($content->administrador) {
+            $roles[] = 'administrador';
+        }
+        if (! empty($roles)) {
             $chunks[] = [
                 'chunk_type' => 'roles',
                 'content' => implode(', ', $roles),
@@ -85,7 +92,7 @@ class ContentChunkService
             ];
         }
 
-        if (!empty($content->links_conteudo) && is_array($content->links_conteudo)) {
+        if (! empty($content->links_conteudo) && is_array($content->links_conteudo)) {
             $chunks[] = [
                 'chunk_type' => 'links',
                 'content' => collect($content->links_conteudo)->filter()->implode("\n"),
@@ -96,5 +103,3 @@ class ContentChunkService
         return $chunks;
     }
 }
-
-

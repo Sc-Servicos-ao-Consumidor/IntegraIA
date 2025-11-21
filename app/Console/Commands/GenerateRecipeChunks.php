@@ -2,10 +2,10 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
 use App\Models\Recipe;
-use App\Services\RecipeChunkService;
 use App\Services\PrismService;
+use App\Services\RecipeChunkService;
+use Illuminate\Console\Command;
 
 class GenerateRecipeChunks extends Command
 {
@@ -35,11 +35,11 @@ class GenerateRecipeChunks extends Command
         $limit = $this->option('limit');
         $force = $this->option('force');
 
-        $service = new RecipeChunkService(new PrismService());
+        $service = new RecipeChunkService(new PrismService);
 
         $query = Recipe::query();
 
-        if (!$force) {
+        if (! $force) {
             // Only recipes without chunks
             $query->whereDoesntHave('chunks');
         }
@@ -52,6 +52,7 @@ class GenerateRecipeChunks extends Command
 
         if ($recipes->isEmpty()) {
             $this->info('No recipes to process.');
+
             return Command::SUCCESS;
         }
 
@@ -73,5 +74,3 @@ class GenerateRecipeChunks extends Command
         return Command::SUCCESS;
     }
 }
-
-

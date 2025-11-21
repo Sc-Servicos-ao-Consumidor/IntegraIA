@@ -2,17 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Product;
-use App\Models\GroupProduct;
-use App\Models\Recipe;
 use App\Models\Content;
+use App\Models\GroupProduct;
+use App\Models\Product;
+use App\Models\Recipe;
 use App\Services\EmbeddingService;
 use App\Services\PrismService;
 use App\Services\ProductChunkService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 
 class ProductController extends Controller
@@ -26,26 +25,26 @@ class ProductController extends Controller
         $search = trim((string) $request->input('search', ''));
 
         $products = Product::with([
-            'groupProduct', 
-            'images' => function($query) {
+            'groupProduct',
+            'images' => function ($query) {
                 $query->active()->ordered();
             },
             'packagings',
             'recipes:id,recipe_name as descricao',
-            'contents:id,nome_conteudo as descricao'
+            'contents:id,nome_conteudo as descricao',
         ])
-        ->when($search !== '', function ($query) use ($search) {
-            $query->where(function ($q) use ($search) {
-                $q->where('descricao', 'ilike', "%{$search}%")
-                  ->orWhere('codigo_padrao', 'ilike', "%{$search}%")
-                  ->orWhere('sku', 'ilike', "%{$search}%")
-                  ->orWhere('marca', 'ilike', "%{$search}%");
-            });
-        })
-        ->latest()
-        ->paginate($perPage)
-        ->withQueryString();
-        
+            ->when($search !== '', function ($query) use ($search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('descricao', 'ilike', "%{$search}%")
+                        ->orWhere('codigo_padrao', 'ilike', "%{$search}%")
+                        ->orWhere('sku', 'ilike', "%{$search}%")
+                        ->orWhere('marca', 'ilike', "%{$search}%");
+                });
+            })
+            ->latest()
+            ->paginate($perPage)
+            ->withQueryString();
+
         $groupProducts = GroupProduct::all();
         $recipes = Recipe::select('id', 'recipe_name as descricao')->get();
         $contents = Content::where('status', true)->select('id', 'nome_conteudo as descricao')->get();
@@ -55,7 +54,7 @@ class ProductController extends Controller
             'groupProducts' => $groupProducts,
             'recipes' => $recipes,
             'contents' => $contents,
-            'filters' => $request->only(['search', 'per_page'])
+            'filters' => $request->only(['search', 'per_page']),
         ]);
     }
 
@@ -65,7 +64,7 @@ class ProductController extends Controller
     public function store(Request $request)
     {
         //
-        
+
         // Validate product basic data
         $productData = $request->validate([
             'descricao' => 'required|string|max:255',
@@ -142,9 +141,9 @@ class ProductController extends Controller
             }
 
             // Handle images
-            if (!empty($imagesData['images'])) {
+            if (! empty($imagesData['images'])) {
                 foreach ($imagesData['images'] as $imageData) {
-                    if (!empty($imageData['url'])) {
+                    if (! empty($imageData['url'])) {
                         $product->images()->create(array_merge($imageData, [
                             'ordem' => $imageData['ordem'] ?? 0,
                             'ativo' => $imageData['ativo'] ?? true,
@@ -158,10 +157,10 @@ class ProductController extends Controller
             if ($request->has('selected_recipes') && is_array($request->selected_recipes)) {
                 $recipeData = [];
                 foreach ($request->selected_recipes as $index => $recipeInfo) {
-                    if (!empty($recipeInfo['recipe_id'])) {
+                    if (! empty($recipeInfo['recipe_id'])) {
                         $recipeData[$recipeInfo['recipe_id']] = [
                             'order' => $index + 1,
-                            'top_dish' => (bool)($recipeInfo['top_dish'] ?? false),
+                            'top_dish' => (bool) ($recipeInfo['top_dish'] ?? false),
                         ];
                     }
                 }
@@ -178,7 +177,7 @@ class ProductController extends Controller
 
             // Handle packaging data
             if ($request->has('packaging') && is_array($request->packaging)) {
-                
+
                 // Handle multiple packagings
                 if (isset($request->packaging['packagings']) && is_array($request->packaging['packagings'])) {
 
@@ -186,17 +185,19 @@ class ProductController extends Controller
                     $existingPackagingIds = $product->packagings()->pluck('id')->toArray();
                     $newPackagingIds = collect($request->packaging['packagings'])
                         ->pluck('id')
-                        ->filter(function($id) { return is_numeric($id) && $id > 0; })
+                        ->filter(function ($id) {
+                            return is_numeric($id) && $id > 0;
+                        })
                         ->toArray();
-                    
+
                     $packagingsToDelete = array_diff($existingPackagingIds, $newPackagingIds);
-                    if (!empty($packagingsToDelete)) {
+                    if (! empty($packagingsToDelete)) {
                         $product->packagings()->whereIn('id', $packagingsToDelete)->delete();
                     }
-                    
+
                     // Update existing packagings
                     foreach ($request->packaging['packagings'] as $packagingData) {
-                        
+
                         if (isset($packagingData['id']) && is_numeric($packagingData['id']) && $packagingData['id'] > 0) {
                             // Update existing packaging
                             $packaging = $product->packagings()->find($packagingData['id']);
@@ -208,17 +209,17 @@ class ProductController extends Controller
                 } else {
                     // Handle legacy single packaging approach or create default packaging
                     $packaging = $product->packagings()->first();
-                    if (!$packaging) {
+                    if (! $packaging) {
                         // Create default packaging for new products
                         $packaging = $product->packagings()->create([
                             'ulid' => Str::ulid(),
                             'codigo_padrao' => $product->codigo_padrao,
                             'sku' => $product->sku,
-                            'descricao' => 'Embalagem ' . $product->descricao,
+                            'descricao' => 'Embalagem '.$product->descricao,
                             'status' => true,
                         ]);
                     }
-                    
+
                     // Update with any provided data
                     if (isset($request->packaging['prompt_especificacao_embalagens'])) {
                         $packaging->update([
@@ -230,18 +231,19 @@ class ProductController extends Controller
 
             DB::commit();
 
-            $embeddingService = new EmbeddingService(new PrismService());
+            $embeddingService = new EmbeddingService(new PrismService);
             $embeddingService->generateEmbedding($product);
 
             // Generate product chunks
-            $productChunkService = new ProductChunkService(new PrismService());
+            $productChunkService = new ProductChunkService(new PrismService);
             $productChunkService->generateChunks($product);
 
             return redirect()->route('products.index')->with('success', 'Produto salvo com sucesso!');
 
         } catch (\Exception $e) {
             DB::rollback();
-            return redirect()->back()->withErrors(['error' => 'Erro ao salvar produto: ' . $e->getMessage()]);
+
+            return redirect()->back()->withErrors(['error' => 'Erro ao salvar produto: '.$e->getMessage()]);
         }
     }
 
@@ -251,6 +253,7 @@ class ProductController extends Controller
     public function destroy(Product $product)
     {
         $product->delete();
+
         return redirect()->back();
     }
 }

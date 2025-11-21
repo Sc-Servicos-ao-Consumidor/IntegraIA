@@ -19,7 +19,7 @@ return new class extends Migration
             $table->integer('order')->default(1);
             $table->text('notes')->nullable(); // Additional notes about the product in this content
             $table->timestamps();
-            
+
             $table->unique(['content_id', 'product_id']);
         });
     }

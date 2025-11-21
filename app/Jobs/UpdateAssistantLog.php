@@ -14,10 +14,15 @@ class UpdateAssistantLog implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     protected ?int $interactionId;
+
     protected string $sessionId;
+
     protected ?string $query;
+
     protected ?string $response;
+
     protected ?string $rating; // 'up' | 'down' | null
+
     protected ?string $expectedResponse;
 
     /**
@@ -52,18 +57,18 @@ class UpdateAssistantLog implements ShouldQueue
                 ->first();
         }
 
-        if (!$interaction) {
+        if (! $interaction) {
             $interaction = AssistantLog::where('session_id', $this->sessionId)
                 ->latest('id')
                 ->first();
         }
 
-        if (!$interaction) {
+        if (! $interaction) {
             $interaction = AssistantLog::create([
                 'session_id' => $this->sessionId,
                 'query' => (string) ($this->query ?? ''),
                 'response' => (string) ($this->response ?? ''),
-                'meta' => [ 'created_from_feedback' => true ],
+                'meta' => ['created_from_feedback' => true],
             ]);
         }
 
@@ -77,5 +82,3 @@ class UpdateAssistantLog implements ShouldQueue
         $interaction->save();
     }
 }
-
-

@@ -3,10 +3,10 @@
 namespace Database\Seeders;
 
 use App\Models\GroupProduct;
-use App\Models\Tenant;
 use App\Models\Product;
 use App\Models\ProductImage;
 use App\Models\ProductPackaging;
+use App\Models\Tenant;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
 
@@ -70,7 +70,7 @@ class ProductSeeder extends Seeder
                         'ativo' => true,
                         'valida_produtos_embalagem' => true,
                     ],
-                ]
+                ],
             ],
             [
                 'product' => [
@@ -111,7 +111,7 @@ class ProductSeeder extends Seeder
                         'ordem' => 1,
                         'ativo' => true,
                     ],
-                ]
+                ],
             ],
             [
                 'product' => [
@@ -151,7 +151,7 @@ class ProductSeeder extends Seeder
                         'ordem' => 1,
                         'ativo' => true,
                     ],
-                ]
+                ],
             ],
             [
                 'product' => [
@@ -191,19 +191,19 @@ class ProductSeeder extends Seeder
                         'ordem' => 1,
                         'ativo' => true,
                     ],
-                ]
+                ],
             ],
         ];
 
         foreach ($productsData as $data) {
             // Create the product
             $product = Product::create($data['product']);
-            
+
             // Create product packaging
             $packaging = $data['packaging'];
             $packaging['product_id'] = $product->id;
             ProductPackaging::create($packaging);
-            
+
             // Create product images
             foreach ($data['images'] as $imageData) {
                 $imageData['product_id'] = $product->id;

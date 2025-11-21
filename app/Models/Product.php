@@ -7,16 +7,16 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Pgvector\Laravel\HasNeighbors;
 use Pgvector\Laravel\Vector;
 
 class Product extends Model
 {
+    use BelongsToTenant;
     use HasFactory;
     use HasNeighbors;
-    use BelongsToTenant;
 
     protected $fillable = [
         'tenant_id',
@@ -26,13 +26,13 @@ class Product extends Model
         'sku',
         'group_product_id',
         'marca',
-        'prompt_uso_informacoes_produto', 
-        'especificacao_produto', 
-        'perfil_sabor', 
-        'descricao_tabela_nutricional', 
-        'descricao_lista_ingredientes', 
-        'descricao_modos_preparo', 
-        'descricao_rendimentos', 
+        'prompt_uso_informacoes_produto',
+        'especificacao_produto',
+        'perfil_sabor',
+        'descricao_tabela_nutricional',
+        'descricao_lista_ingredientes',
+        'descricao_modos_preparo',
+        'descricao_rendimentos',
         'descricao',
         'descricao_breve',
         'informacao_adicional',
@@ -62,8 +62,6 @@ class Product extends Model
     {
         return $this->belongsTo(GroupProduct::class);
     }
-
-    
 
     /**
      * Get all product images.
@@ -138,12 +136,12 @@ class Product extends Model
         return $this->belongsToMany(Recipe::class)
             ->withPivot([
                 'quantity',
-                'unit', 
+                'unit',
                 'ingredient_type',
                 'preparation_notes',
                 'optional',
                 'order',
-                'top_dish'
+                'top_dish',
             ])
             ->withTimestamps()
             ->orderByPivot('order');

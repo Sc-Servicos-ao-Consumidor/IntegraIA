@@ -69,7 +69,7 @@ class RecipeChunkService
             $recipe->yield,
             $recipe->channel,
         ]);
-        if (!empty($titleParts)) {
+        if (! empty($titleParts)) {
             $chunks[] = [
                 'chunk_type' => 'title_metadata',
                 'content' => implode("\n", $titleParts),
@@ -78,7 +78,7 @@ class RecipeChunkService
         }
 
         // Description
-        if (!empty($recipe->recipe_description)) {
+        if (! empty($recipe->recipe_description)) {
             $chunks[] = [
                 'chunk_type' => 'description',
                 'content' => (string) $recipe->recipe_description,
@@ -95,7 +95,7 @@ class RecipeChunkService
                 'position' => 0,
             ];
         }
-        if (!empty($recipe->ingredients_description)) {
+        if (! empty($recipe->ingredients_description)) {
             $chunks[] = [
                 'chunk_type' => 'ingredients_description',
                 'content' => (string) $recipe->ingredients_description,
@@ -104,7 +104,7 @@ class RecipeChunkService
         }
 
         // Preparation steps (split by newlines or periods)
-        if (!empty($recipe->preparation_method)) {
+        if (! empty($recipe->preparation_method)) {
             $raw = str_replace("\r", '', (string) $recipe->preparation_method);
             $byNewline = preg_split('/\n+/', $raw) ?: [];
             $steps = [];
@@ -139,7 +139,7 @@ class RecipeChunkService
             $this->implodeJsonArray($recipe->preparation_techniques),
             $this->implodeJsonArray($recipe->consumption_occasion),
         ]);
-        if (!empty($tagParts)) {
+        if (! empty($tagParts)) {
             $chunks[] = [
                 'chunk_type' => 'tags',
                 'content' => implode("\n", $tagParts),
@@ -165,5 +165,3 @@ class RecipeChunkService
         return '';
     }
 }
-
-

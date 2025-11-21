@@ -5,9 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Content;
 use App\Models\Product;
 use App\Models\Recipe;
+use App\Services\ContentChunkService;
 use App\Services\EmbeddingService;
 use App\Services\PrismService;
-use App\Services\ContentChunkService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -25,7 +25,7 @@ class ContentController extends Controller
             ->when($search !== '', function ($query) use ($search) {
                 $query->where(function ($q) use ($search) {
                     $q->where('nome_conteudo', 'ilike', "%{$search}%")
-                      ->orWhere('descricao_conteudo', 'ilike', "%{$search}%");
+                        ->orWhere('descricao_conteudo', 'ilike', "%{$search}%");
                 });
             })
             ->latest()
@@ -39,7 +39,7 @@ class ContentController extends Controller
             'contents' => $contents,
             'recipes' => $recipes,
             'products' => $products,
-            'filters' => $request->only(['search', 'per_page'])
+            'filters' => $request->only(['search', 'per_page']),
         ]);
     }
 
@@ -50,7 +50,7 @@ class ContentController extends Controller
     {
         $data = $request->validate([
             'nome_conteudo' => 'required|string|max:255',
-            'content_code' => 'nullable|string|max:255|unique:contents,content_code,' . $request->id,
+            'content_code' => 'nullable|string|max:255|unique:contents,content_code,'.$request->id,
             'tipo_conteudo' => 'required|string|max:255',
             'pilares' => 'nullable|string|max:255',
             'canal' => 'nullable',
@@ -95,7 +95,7 @@ class ContentController extends Controller
             foreach ($request->selected_recipes as $index => $recipeInfo) {
                 $recipeData[$recipeInfo['recipe_id']] = [
                     'order' => $index + 1,
-                    'top_dish' => (bool)($recipeInfo['top_dish'] ?? false),
+                    'top_dish' => (bool) ($recipeInfo['top_dish'] ?? false),
                 ];
             }
             $content->recipes()->sync($recipeData);
@@ -114,11 +114,11 @@ class ContentController extends Controller
             $content->products()->sync($productData);
         }
 
-        $embeddingService = new EmbeddingService(new PrismService());
+        $embeddingService = new EmbeddingService(new PrismService);
         $embeddingService->generateEmbedding($content);
 
         // Generate content chunks
-        $contentChunkService = new ContentChunkService(new PrismService());
+        $contentChunkService = new ContentChunkService(new PrismService);
         $contentChunkService->generateChunks($content);
 
         return null;

@@ -20,7 +20,7 @@ trait BelongsToTenant
             $tenantId = (int) (session('tenant_id') ?? 0);
             $table = $builder->getModel()->getTable();
             if ($tenantId) {
-                $builder->where($table . '.tenant_id', $tenantId);
+                $builder->where($table.'.tenant_id', $tenantId);
             } elseif (auth()->check()) {
                 // Authenticated but no tenant selected/available => return no rows
                 $builder->whereRaw('1 = 0');
@@ -31,7 +31,8 @@ trait BelongsToTenant
     public function scopeForCurrentTenant(Builder $query): Builder
     {
         $tenantId = (int) (session('tenant_id') ?? 0);
-        return $tenantId ? $query->where($query->getModel()->getTable() . '.tenant_id', $tenantId) : $query;
+
+        return $tenantId ? $query->where($query->getModel()->getTable().'.tenant_id', $tenantId) : $query;
     }
 
     public function tenant(): BelongsTo
@@ -39,6 +40,3 @@ trait BelongsToTenant
         return $this->belongsTo(Tenant::class);
     }
 }
-
-
- 

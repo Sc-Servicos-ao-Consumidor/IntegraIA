@@ -2,12 +2,12 @@
 
 namespace App\Services;
 
-use App\Models\Recipe;
-use App\Models\RecipeChunk;
-use App\Models\Product;
-use App\Models\ProductChunk;
 use App\Models\Content;
 use App\Models\ContentChunk;
+use App\Models\Product;
+use App\Models\ProductChunk;
+use App\Models\Recipe;
+use App\Models\RecipeChunk;
 use Illuminate\Support\Facades\Http;
 use Pgvector\Laravel\Vector;
 use Prism\Prism\Facades\Tool;
@@ -15,6 +15,7 @@ use Prism\Prism\Facades\Tool;
 class AIToolService
 {
     protected PrismService $prismService;
+
     protected EmbeddingService $embeddingService;
 
     public function __construct(PrismService $prismService, EmbeddingService $embeddingService)
@@ -90,7 +91,7 @@ class AIToolService
                 ->using(function (int $contentId) {
                     return $this->getContentDetails($contentId);
                 });
-        }        
+        }
 
         if ($isAllowed('find_recipes_with_product_id')) {
             $tools[] = Tool::as('find_recipes_with_product_id')
@@ -157,8 +158,8 @@ class AIToolService
     {
         $response = $this->prismService->getEmbedding($query);
         $embedding = $this->prismService->extractEmbeddingFromResponse($response);
-        
-        if (!$embedding || !is_array($embedding)) {
+
+        if (! $embedding || ! is_array($embedding)) {
             return 'Falha ao gerar embedding para a consulta';
         }
 
@@ -176,7 +177,7 @@ class AIToolService
         $bestByRecipe = [];
         foreach ($topChunks as $chunk) {
             $rid = $chunk->recipe_id;
-            if (!isset($bestByRecipe[$rid])) {
+            if (! isset($bestByRecipe[$rid])) {
                 $bestByRecipe[$rid] = [
                     'chunk' => $chunk,
                     'distance' => (float) $chunk->distance,
@@ -196,6 +197,7 @@ class AIToolService
             ->sortBy(fn ($r) => array_search($r->id, $orderedRecipeIds))
             ->map(function ($recipe) use ($bestByRecipe) {
                 $match = $bestByRecipe[$recipe->id]['chunk'] ?? null;
+
                 return [
                     'id' => $recipe->id,
                     'recipe_name' => $recipe->recipe_name,
@@ -230,8 +232,8 @@ class AIToolService
     {
         $response = $this->prismService->getEmbedding($query);
         $embedding = $this->prismService->extractEmbeddingFromResponse($response);
-        
-        if (!$embedding || !is_array($embedding)) {
+
+        if (! $embedding || ! is_array($embedding)) {
             return 'Falha ao gerar embedding para a consulta';
         }
 
@@ -247,7 +249,7 @@ class AIToolService
         $bestByProduct = [];
         foreach ($topChunks as $chunk) {
             $pid = $chunk->product_id;
-            if (!isset($bestByProduct[$pid])) {
+            if (! isset($bestByProduct[$pid])) {
                 $bestByProduct[$pid] = [
                     'chunk' => $chunk,
                     'distance' => (float) $chunk->distance,
@@ -268,6 +270,7 @@ class AIToolService
             ->sortBy(fn ($p) => array_search($p->id, $orderedProductIds))
             ->map(function ($product) use ($bestByProduct) {
                 $match = $bestByProduct[$product->id]['chunk'] ?? null;
+
                 return [
                     'id' => $product->id,
                     'nome_produto' => $product->descricao,
@@ -299,8 +302,8 @@ class AIToolService
     {
         $response = $this->prismService->getEmbedding($query);
         $embedding = $this->prismService->extractEmbeddingFromResponse($response);
-        
-        if (!$embedding || !is_array($embedding)) {
+
+        if (! $embedding || ! is_array($embedding)) {
             return 'Falha ao gerar embedding para a consulta';
         }
 
@@ -316,7 +319,7 @@ class AIToolService
         $bestByContent = [];
         foreach ($topChunks as $chunk) {
             $cid = $chunk->content_id;
-            if (!isset($bestByContent[$cid])) {
+            if (! isset($bestByContent[$cid])) {
                 $bestByContent[$cid] = [
                     'chunk' => $chunk,
                     'distance' => (float) $chunk->distance,
@@ -336,6 +339,7 @@ class AIToolService
             ->sortBy(fn ($c) => array_search($c->id, $orderedContentIds))
             ->map(function ($content) use ($bestByContent) {
                 $match = $bestByContent[$content->id]['chunk'] ?? null;
+
                 return [
                     'id' => $content->id,
                     'nome_conteudo' => $content->nome_conteudo,
@@ -365,31 +369,31 @@ class AIToolService
         $recipe = Recipe::with(['products', 'contents', 'ingredients'])
             ->find($recipeId);
 
-        if (!$recipe) {
+        if (! $recipe) {
             return 'Receita não encontrada';
         }
 
         return json_encode([
-                'id' => $recipe->id,
-                'recipe_name' => $recipe->recipe_name,
-                'recipe_code' => $recipe->recipe_code,
-                'cuisine' => $recipe->cuisine,
-                'recipe_type' => $recipe->recipe_type,
-                'service_order' => $recipe->service_order,
-                'preparation_time' => $recipe->preparation_time,
-                'difficulty_level' => $recipe->difficulty_level,
-                'yield' => $recipe->yield,
-                'channel' => $recipe->channel,
-                'recipe_description' => $recipe->recipe_description,
-                'ingredients_description' => $recipe->ingredients_description,
-                'preparation_method' => $recipe->preparation_method,
-                'usage_groups' => $recipe->usage_groups,
-                'preparation_techniques' => $recipe->preparation_techniques,
-                'consumption_occasion' => $recipe->consumption_occasion,
-                'contents_count' => $recipe->contents->count(),
-                'products_count' => $recipe->products->count(),
-                'ingredients' => $recipe->ingredients,
-                'recipe_prompt' => $recipe->recipe_prompt,
+            'id' => $recipe->id,
+            'recipe_name' => $recipe->recipe_name,
+            'recipe_code' => $recipe->recipe_code,
+            'cuisine' => $recipe->cuisine,
+            'recipe_type' => $recipe->recipe_type,
+            'service_order' => $recipe->service_order,
+            'preparation_time' => $recipe->preparation_time,
+            'difficulty_level' => $recipe->difficulty_level,
+            'yield' => $recipe->yield,
+            'channel' => $recipe->channel,
+            'recipe_description' => $recipe->recipe_description,
+            'ingredients_description' => $recipe->ingredients_description,
+            'preparation_method' => $recipe->preparation_method,
+            'usage_groups' => $recipe->usage_groups,
+            'preparation_techniques' => $recipe->preparation_techniques,
+            'consumption_occasion' => $recipe->consumption_occasion,
+            'contents_count' => $recipe->contents->count(),
+            'products_count' => $recipe->products->count(),
+            'ingredients' => $recipe->ingredients,
+            'recipe_prompt' => $recipe->recipe_prompt,
         ]);
     }
 
@@ -401,26 +405,26 @@ class AIToolService
         $product = Product::with(['groupProduct', 'images', 'recipes', 'contents'])
             ->find($productId);
 
-        if (!$product) {
+        if (! $product) {
             return 'Produto não encontrado';
         }
 
         return json_encode([
-                'id' => $product->id,
-                'descricao' => $product->descricao,
-                'marca' => $product->marca,
-                'codigo_padrao' => $product->codigo_padrao,
-                'sku' => $product->sku,
-                'status' => $product->status,
-                'group_product' => $product->groupProduct ? [
-                    'id' => $product->groupProduct->id,
-                    'nome' => $product->groupProduct->nome,
-                    'descricao' => $product->groupProduct->descricao,
-                ] : null,
-                'images' => $product->images,
-                'recipes_count' => $product->recipes->count(),
-                'contents_count' => $product->contents->count(),
-            ]);
+            'id' => $product->id,
+            'descricao' => $product->descricao,
+            'marca' => $product->marca,
+            'codigo_padrao' => $product->codigo_padrao,
+            'sku' => $product->sku,
+            'status' => $product->status,
+            'group_product' => $product->groupProduct ? [
+                'id' => $product->groupProduct->id,
+                'nome' => $product->groupProduct->nome,
+                'descricao' => $product->groupProduct->descricao,
+            ] : null,
+            'images' => $product->images,
+            'recipes_count' => $product->recipes->count(),
+            'contents_count' => $product->contents->count(),
+        ]);
     }
 
     /**
@@ -430,26 +434,26 @@ class AIToolService
     {
         $content = Content::find($contentId);
 
-        if (!$content) {
+        if (! $content) {
             return 'Conteúdo não encontrado';
         }
 
         return json_encode([
-                'id' => $content->id,
-                'nome_conteudo' => $content->nome_conteudo,
-                'content_code' => $content->content_code,
-                'tipo_conteudo' => $content->tipo_conteudo,
-                'pilares' => $content->pilares,
-                'canal' => $content->canal,
-                'links_conteudo' => $content->links_conteudo,
-                'cozinheiro' => $content->cozinheiro,
-                'comprador' => $content->comprador,
-                'administrador' => $content->administrador,
-                'descricao_conteudo' => $content->descricao_conteudo,
-                'recipe_count' => $content->recipes()->count(),
-                'product_count' => $content->products()->count(),
-                'content_prompt' => $content->content_prompt,
-            ]);
+            'id' => $content->id,
+            'nome_conteudo' => $content->nome_conteudo,
+            'content_code' => $content->content_code,
+            'tipo_conteudo' => $content->tipo_conteudo,
+            'pilares' => $content->pilares,
+            'canal' => $content->canal,
+            'links_conteudo' => $content->links_conteudo,
+            'cozinheiro' => $content->cozinheiro,
+            'comprador' => $content->comprador,
+            'administrador' => $content->administrador,
+            'descricao_conteudo' => $content->descricao_conteudo,
+            'recipe_count' => $content->recipes()->count(),
+            'product_count' => $content->products()->count(),
+            'content_prompt' => $content->content_prompt,
+        ]);
     }
 
     /**
@@ -458,13 +462,13 @@ class AIToolService
     protected function findRecipesWithProductId(int $productId, string $ingredientType): string
     {
         $product = Product::find($productId);
-        
-        if (!$product) {
+
+        if (! $product) {
             return 'Produto não encontrado';
         }
 
         $query = $product->recipes();
-        
+
         if ($ingredientType) {
             $query->wherePivot('ingredient_type', $ingredientType);
         }
@@ -492,16 +496,16 @@ class AIToolService
     {
         $content = Content::find($productId);
 
-        if (!$content) {
+        if (! $content) {
             return 'Conteúdo não encontrado';
         }
 
         return $content->map(function ($content) {
-                return json_encode([
-                    'id' => $content->id,
-                    'nome_conteudo' => $content->nome_conteudo,
-                ]);
-            });
+            return json_encode([
+                'id' => $content->id,
+                'nome_conteudo' => $content->nome_conteudo,
+            ]);
+        });
     }
 
     /**
@@ -511,17 +515,17 @@ class AIToolService
     {
         $recipe = Recipe::find($recipeId);
 
-        if (!$recipe) {
+        if (! $recipe) {
             return 'Receita não encontrada';
         }
 
         return $recipe->products->map(function ($product) {
-                return json_encode([
-                    'id' => $product->id,
-                    'nome_produto' => $product->descricao,
-                    'marca' => $product->marca,
-                ]);
-            });
+            return json_encode([
+                'id' => $product->id,
+                'nome_produto' => $product->descricao,
+                'marca' => $product->marca,
+            ]);
+        });
     }
 
     /**
@@ -531,16 +535,16 @@ class AIToolService
     {
         $content = Content::find($recipeId);
 
-        if (!$content) {
+        if (! $content) {
             return 'Conteúdo não encontrado';
         }
 
         return $content->map(function ($content) {
-                return json_encode([
-                    'id' => $content->id,
-                    'nome_conteudo' => $content->nome_conteudo,
-                ]);
-            });
+            return json_encode([
+                'id' => $content->id,
+                'nome_conteudo' => $content->nome_conteudo,
+            ]);
+        });
     }
 
     /**
@@ -549,8 +553,8 @@ class AIToolService
     protected function findProductsWithContentId(int $contentId): string
     {
         $content = Content::find($contentId);
-        
-        if (!$content) {
+
+        if (! $content) {
             return 'Conteúdo não encontrado';
         }
 
@@ -568,8 +572,8 @@ class AIToolService
     protected function findRecipesWithContentId(int $contentId): string
     {
         $content = Content::find($contentId);
-        
-        if (!$content) {
+
+        if (! $content) {
             return 'Conteúdo não encontrado';
         }
 
@@ -595,9 +599,8 @@ class AIToolService
         ]);
 
         if ($response->status() !== 200) {
-            return 'Falha ao transferir para agente humano: ' . $response->body();
-        }
-        else {
+            return 'Falha ao transferir para agente humano: '.$response->body();
+        } else {
             return 'Transferencia para agente humano realizada com sucesso';
         }
     }

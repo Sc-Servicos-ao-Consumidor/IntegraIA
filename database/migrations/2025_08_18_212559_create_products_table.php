@@ -19,19 +19,19 @@ return new class extends Migration
             $table->string('sku')->nullable();
             $table->foreignId('group_product_id')->nullable()->constrained('group_products');
             $table->string('marca')->nullable();
-            
+
             // Core product fields
             $table->string('descricao');
             $table->text('descricao_breve')->nullable();
             $table->text('url_imagem_principal')->nullable();
             $table->string('ean')->nullable();
-            
+
             // Hierarchy/classification ids from API
             $table->unsignedBigInteger('produto_familia_id')->nullable();
             $table->unsignedBigInteger('produto_grupo_id')->nullable();
             $table->unsignedBigInteger('produto_linha_id')->nullable();
             $table->unsignedBigInteger('produto_sub_linha_id')->nullable();
-            
+
             // Product specifications and descriptions
             $table->string('escolha_embalagem')->nullable();
             $table->text('prompt_uso_informacoes_produto')->nullable();
@@ -41,21 +41,21 @@ return new class extends Migration
             $table->text('descricao_lista_ingredientes')->nullable();
             $table->text('descricao_modos_preparo')->nullable();
             $table->text('descricao_rendimentos')->nullable();
-            
+
             // Location/contact and site
             $table->string('localizacao')->nullable();
             $table->string('nome_responsavel')->nullable();
             $table->string('telefone')->nullable();
             $table->string('whatsapp')->nullable();
             $table->string('site')->nullable();
-            
+
             // Status and flags
             $table->boolean('status')->default(true);
             $table->boolean('descontinuado')->default(false);
             $table->vector('embedding', 1536)->nullable();
-            
+
             $table->timestamps();
-            
+
             // Indexes
             $table->index(['produto_familia_id', 'produto_grupo_id', 'produto_linha_id', 'produto_sub_linha_id'], 'products_produto_hierarchy_idx');
         });
@@ -69,5 +69,3 @@ return new class extends Migration
         Schema::dropIfExists('products');
     }
 };
-
-

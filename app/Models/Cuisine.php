@@ -9,11 +9,11 @@ class Cuisine extends Model
 {
     protected $fillable = [
         'name',
-        'status'
+        'status',
     ];
 
     protected $casts = [
-        'status' => 'boolean'
+        'status' => 'boolean',
     ];
 
     /**

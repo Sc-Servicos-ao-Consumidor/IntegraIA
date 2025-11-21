@@ -15,14 +15,13 @@ return new class extends Migration
             $table->id();
             $table->foreignId('recipe_id')->constrained()->onDelete('cascade');
             $table->foreignId('ingredient_id')->constrained()->onDelete('cascade');
-            
 
             $table->boolean('primary_ingredient')->default(true);
             $table->timestamps();
-            
+
             // Prevent duplicate recipe-ingredient combinations and primary ingredient
             $table->unique(['recipe_id', 'ingredient_id']);
-            
+
             // Indexes for better performance
             $table->index(['recipe_id', 'primary_ingredient']);
             $table->index(['ingredient_id']);

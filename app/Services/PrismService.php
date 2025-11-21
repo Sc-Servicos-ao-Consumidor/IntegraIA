@@ -2,10 +2,10 @@
 
 namespace App\Services;
 
-use Prism\Prism\Facades\Prism;
+use Illuminate\Support\Facades\Log;
 use Prism\Prism\Enums\Provider;
 use Prism\Prism\Exceptions\PrismException;
-use Illuminate\Support\Facades\Log;
+use Prism\Prism\Facades\Prism;
 use Prism\Prism\ValueObjects\Messages\AssistantMessage;
 use Prism\Prism\ValueObjects\Messages\UserMessage;
 use Throwable;
@@ -13,6 +13,7 @@ use Throwable;
 class PrismService
 {
     private string $providerName;
+
     private string $modelName;
 
     public function __construct()
@@ -30,6 +31,7 @@ class PrismService
                 } elseif ($message['type'] === 'assistant') {
                     return new AssistantMessage($message['content']);
                 }
+
                 // Default fallback for unknown message types
                 return new UserMessage($message['content']);
             })
@@ -50,9 +52,11 @@ class PrismService
             return $response->embeddings[0]->embedding ?? [];
         } catch (PrismException $e) {
             Log::error('Embedding generation failed:', ['error' => $e->getMessage()]);
+
             return [];
         } catch (Throwable $e) {
             Log::error('Generic error in embedding:', ['error' => $e->getMessage()]);
+
             return [];
         }
     }
@@ -75,8 +79,8 @@ class PrismService
                 ->asText();
 
             if ($response->finishReason->name == 'Error') {
-                Log::error('Error: ' . $response->finishReason);
-                throw new \Exception('Error: ' . $response->finishReason);
+                Log::error('Error: '.$response->finishReason);
+                throw new \Exception('Error: '.$response->finishReason);
             }
 
             return [
@@ -85,15 +89,17 @@ class PrismService
             ];
         } catch (PrismException $e) {
             Log::error('Text generation failed:', ['error' => $e->getMessage()]);
+
             return [
                 'status' => 'error',
-                'response' => 'Text generation failed: ' . $e->getMessage()
+                'response' => 'Text generation failed: '.$e->getMessage(),
             ];
         } catch (Throwable $e) {
             Log::error('Generic error:', ['error' => $e->getMessage()]);
+
             return [
                 'status' => 'error',
-                'response' => 'Generic error: ' . $e->getMessage()
+                'response' => 'Generic error: '.$e->getMessage(),
             ];
         }
     }
@@ -122,7 +128,7 @@ class PrismService
      */
     private function buildSystemPrompt($context = null, $basePrompt = null): string
     {
-        $basePrompt = $basePrompt ?? " Você é um assistente virtual da empresa Unilever, especializado em receitas da plataforma Unilever, produtos e conteúdos culinários da marca.
+        $basePrompt = $basePrompt ?? ' Você é um assistente virtual da empresa Unilever, especializado em receitas da plataforma Unilever, produtos e conteúdos culinários da marca.
 
 
             **Nunca** crie, deduza, invente ou complete informações e/ou receitas que **não existam nas respostas das ferramentas disponíveis**.
@@ -166,10 +172,10 @@ class PrismService
             3. Para cada resultado encontrado, utiliza `search_details` para obter informações detalhadas.
             4. Responde com as opções mais relevantes, bem estruturadas e contextualizadas, destacando produtos Unilever quando aplicável.
 
-        ";
+        ';
 
         if ($context) {
-            $basePrompt .= "\n\nContexto relevante:\n" . (is_array($context) ? json_encode($context) : $context);
+            $basePrompt .= "\n\nContexto relevante:\n".(is_array($context) ? json_encode($context) : $context);
         }
 
         return $basePrompt;
@@ -179,5 +185,4 @@ class PrismService
     {
         return Provider::from($this->providerName);
     }
-
 }

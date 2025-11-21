@@ -35,5 +35,3 @@ class ProductChunk extends Model
         return $this->embedding ? new Vector($this->embedding) : null;
     }
 }
-
-

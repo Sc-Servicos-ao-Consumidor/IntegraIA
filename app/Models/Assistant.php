@@ -40,5 +40,3 @@ class Assistant extends Model
         return $this->hasMany(AssistantLog::class, 'assistant_id');
     }
 }
-
-

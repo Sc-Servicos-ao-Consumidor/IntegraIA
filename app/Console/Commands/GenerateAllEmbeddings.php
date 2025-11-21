@@ -2,9 +2,9 @@
 
 namespace App\Console\Commands;
 
-use App\Models\Recipe;
-use App\Models\Product;
 use App\Models\Content;
+use App\Models\Product;
+use App\Models\Recipe;
 use App\Services\EmbeddingService;
 use App\Services\PrismService;
 use Illuminate\Console\Command;
@@ -45,7 +45,7 @@ class GenerateAllEmbeddings extends Command
         }
 
         try {
-            $embeddingService = new EmbeddingService(new PrismService());
+            $embeddingService = new EmbeddingService(new PrismService);
             $totalStats = ['success' => 0, 'failed' => 0, 'total' => 0];
 
             if (in_array('recipes', $models)) {
@@ -82,7 +82,8 @@ class GenerateAllEmbeddings extends Command
             return Command::SUCCESS;
 
         } catch (\Exception $e) {
-            $this->error('Error generating embeddings: ' . $e->getMessage());
+            $this->error('Error generating embeddings: '.$e->getMessage());
+
             return Command::FAILURE;
         }
     }
@@ -101,7 +102,7 @@ class GenerateAllEmbeddings extends Command
             $query->where('status', true);
         }
 
-        if (!$force) {
+        if (! $force) {
             $query->whereNull('embedding');
         }
 
@@ -113,6 +114,7 @@ class GenerateAllEmbeddings extends Command
 
         if ($items->isEmpty()) {
             $this->info('No items to process.');
+
             return ['success' => 0, 'failed' => 0, 'total' => 0];
         }
 
@@ -130,7 +132,7 @@ class GenerateAllEmbeddings extends Command
             } else {
                 $errorCount++;
             }
-            
+
             $progressBar->advance();
         }
 
@@ -139,7 +141,7 @@ class GenerateAllEmbeddings extends Command
         return [
             'success' => $successCount,
             'failed' => $errorCount,
-            'total' => $items->count()
+            'total' => $items->count(),
         ];
     }
 
@@ -150,11 +152,11 @@ class GenerateAllEmbeddings extends Command
     {
         $this->newLine();
         $this->table(
-            [$type . ' - Status', 'Count'],
+            [$type.' - Status', 'Count'],
             [
                 ['Success', $stats['success']],
                 ['Failed', $stats['failed']],
-                ['Total', $stats['total']]
+                ['Total', $stats['total']],
             ]
         );
 

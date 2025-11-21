@@ -4,8 +4,8 @@ namespace App\Services;
 
 use App\Models\Recipe;
 use Illuminate\Support\Facades\Log;
-use Prism\Prism\Prism;
 use Prism\Prism\Enums\Provider;
+use Prism\Prism\Prism;
 
 class RecipeEmbeddingService
 {
@@ -25,7 +25,7 @@ class RecipeEmbeddingService
             collect($recipe->consumption_occasion ?? [])->implode(', '),
         ])->filter()->implode("\n");
 
-        try{
+        try {
             $response = Prism::embeddings()
                 ->using(Provider::OpenAI, 'text-embedding-3-large')
                 ->fromInput($embeddingInput)

@@ -18,7 +18,7 @@ return new class extends Migration
                     $table->dropColumn('tenant');
                 });
             }
-            if (!Schema::hasColumn('user_tenants', 'tenant_id')) {
+            if (! Schema::hasColumn('user_tenants', 'tenant_id')) {
                 Schema::table('user_tenants', function (Blueprint $table) {
                     $table->foreignId('tenant_id')->constrained('tenants')->cascadeOnDelete()->cascadeOnUpdate();
                 });

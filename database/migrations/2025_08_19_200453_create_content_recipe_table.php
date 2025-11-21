@@ -18,7 +18,7 @@ return new class extends Migration
             $table->boolean('top_dish')->nullable();
             $table->integer('order')->default(1);
             $table->timestamps();
-            
+
             $table->unique(['content_id', 'recipe_id']);
         });
     }

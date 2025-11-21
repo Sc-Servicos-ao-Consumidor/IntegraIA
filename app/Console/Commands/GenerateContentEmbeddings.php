@@ -36,11 +36,11 @@ class GenerateContentEmbeddings extends Command
         $force = $this->option('force');
 
         try {
-            $embeddingService = new EmbeddingService(new PrismService());
+            $embeddingService = new EmbeddingService(new PrismService);
 
             $query = Content::query();
 
-            if (!$force) {
+            if (! $force) {
                 $query->whereNull('embedding');
             }
 
@@ -52,6 +52,7 @@ class GenerateContentEmbeddings extends Command
 
             if ($contents->isEmpty()) {
                 $this->info('No content items to process.');
+
                 return Command::SUCCESS;
             }
 
@@ -70,27 +71,28 @@ class GenerateContentEmbeddings extends Command
                     $errorCount++;
                     $this->warn("\nFailed to generate embedding for content ID: {$content->id}");
                 }
-                
+
                 $progressBar->advance();
             }
 
             $progressBar->finish();
 
             $this->newLine(2);
-            $this->info("Content embedding generation completed!");
+            $this->info('Content embedding generation completed!');
             $this->table(
                 ['Status', 'Count'],
                 [
                     ['Success', $successCount],
                     ['Failed', $errorCount],
-                    ['Total', $contents->count()]
+                    ['Total', $contents->count()],
                 ]
             );
 
             return Command::SUCCESS;
 
         } catch (\Exception $e) {
-            $this->error('Error generating content embeddings: ' . $e->getMessage());
+            $this->error('Error generating content embeddings: '.$e->getMessage());
+
             return Command::FAILURE;
         }
     }

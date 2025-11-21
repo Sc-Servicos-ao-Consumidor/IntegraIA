@@ -4,13 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Jobs\UpdateAssistantLog;
 use App\Models\Assistant;
-use App\Models\Recipe;
-use App\Models\Product;
-use App\Models\Content;
-use App\Models\Tenant;
 use App\Models\AssistantLog;
-use App\Services\EmbeddingService;
+use App\Models\Content;
+use App\Models\Product;
+use App\Models\Recipe;
+use App\Models\Tenant;
 use App\Services\AIToolService;
+use App\Services\EmbeddingService;
 use App\Services\PrismService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -23,7 +23,7 @@ class AIController extends Controller
         $request->validate([
             'query' => 'required|string|min:1',
             'type' => 'nullable|string|in:recipes,products,content,all',
-            'limit' => 'nullable|integer|min:1|max:50'
+            'limit' => 'nullable|integer|min:1|max:50',
         ]);
 
         $query = $request->query('query');
@@ -31,12 +31,12 @@ class AIController extends Controller
         $limit = $request->query('limit', 2);
 
         try {
-            $prism = new PrismService();
+            $prism = new PrismService;
             $response = $prism->getEmbedding($query);
 
             $embedding = $prism->extractEmbeddingFromResponse($response);
 
-            if (!$embedding || !is_array($embedding)) {
+            if (! $embedding || ! is_array($embedding)) {
                 return response()->json(['error' => 'Failed to generate embedding for query.'], 500);
             }
 
@@ -82,7 +82,7 @@ class AIController extends Controller
             return response()->json($results);
 
         } catch (\Exception $e) {
-            return response()->json(['error' => 'Search failed: ' . $e->getMessage()], 500);
+            return response()->json(['error' => 'Search failed: '.$e->getMessage()], 500);
         }
     }
 
@@ -113,19 +113,19 @@ class AIController extends Controller
             'default' => true,
         ]);
 
-        if (!$assistant) {
+        if (! $assistant) {
             return response()->json([
                 'message' => 'Assistant not found.',
             ], 404);
         }
 
-        $prism = new PrismService();
+        $prism = new PrismService;
 
         $text = $prism->buildMessages([
             [
                 'type' => 'user',
-                'content' => $request->text
-            ]
+                'content' => $request->text,
+            ],
         ]);
 
         $context = $this->cleanResultFromEmbeddings($request->context);
@@ -152,7 +152,7 @@ class AIController extends Controller
 
             // Build base prompt prioritizing the Assistant's system_prompt, then tenant base prompt
             $assistantPrompt = $assistant->system_prompt ?? null;
-            $basePrompt = trim(($assistantPrompt ? $assistantPrompt . "\n\n" : '') . ($tenantBasePrompt ?? '')) ?: null;
+            $basePrompt = trim(($assistantPrompt ? $assistantPrompt."\n\n" : '').($tenantBasePrompt ?? '')) ?: null;
 
             $response = $prism->getResponse($text, $context, $tools, $basePrompt);
 
@@ -171,7 +171,7 @@ class AIController extends Controller
                 ],
             ]);
 
-            $ok = isset($response['status']) ? (bool)$response['status'] : ($assistantText !== null);
+            $ok = isset($response['status']) ? (bool) $response['status'] : ($assistantText !== null);
 
             if ($ok) {
                 return response()->json([
@@ -187,7 +187,7 @@ class AIController extends Controller
 
         } catch (\Exception $e) {
             return response()->json([
-                'response' => 'Assistant failed: ' . $e->getMessage()
+                'response' => 'Assistant failed: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -232,6 +232,7 @@ class AIController extends Controller
                     $cleaned[$key] = $value;
                 }
             }
+
             return $cleaned;
         }
 

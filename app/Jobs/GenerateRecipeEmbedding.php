@@ -25,11 +25,11 @@ class GenerateRecipeEmbedding implements ShouldQueue
     public function handle(): void
     {
         $recipe = Recipe::find($this->recipeId);
-        if (!$recipe) {
+        if (! $recipe) {
             return;
         }
 
-        $embeddingService = new EmbeddingService(new PrismService());
+        $embeddingService = new EmbeddingService(new PrismService);
         $embeddingService->generateEmbedding($recipe);
     }
 }

@@ -2,11 +2,10 @@
 
 namespace Database\Seeders;
 
-use App\Models\Tenant;
 use App\Models\Content;
 use App\Models\Product;
 use App\Models\Recipe;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\Tenant;
 use Illuminate\Database\Seeder;
 
 class ContentSeeder extends Seeder
@@ -23,7 +22,7 @@ class ContentSeeder extends Seeder
     private function createContents()
     {
         $contents = $this->getContentData();
-        
+
         foreach ($contents as $contentData) {
             Content::create($contentData);
         }
@@ -38,19 +37,19 @@ class ContentSeeder extends Seeder
         if ($recipes->count() > 0 && $contents->count() > 0) {
             // Link first content with first recipe
             $contents[0]->recipes()->attach($recipes[0]->id, [
-                'order' => 1
+                'order' => 1,
             ]);
 
             // Link second content with multiple recipes
             if ($recipes->count() > 1) {
                 $contents[1]->recipes()->attach($recipes[1]->id, [
-                    'order' => 1
+                    'order' => 1,
                 ]);
             }
-            
+
             if ($recipes->count() > 2) {
                 $contents[1]->recipes()->attach($recipes[2]->id, [
-                    'order' => 2
+                    'order' => 2,
                 ]);
             }
         }
@@ -62,15 +61,15 @@ class ContentSeeder extends Seeder
                 $contents[0]->products()->attach($products[0]->id, [
                     'featured' => 'sim',
                     'order' => 1,
-                    'notes' => 'Produto principal para massas artesanais'
+                    'notes' => 'Produto principal para massas artesanais',
                 ]);
             }
-            
+
             if ($products->count() > 1) {
                 $contents[0]->products()->attach($products[1]->id, [
                     'featured' => 'nao',
                     'order' => 2,
-                    'notes' => 'Ingrediente complementar'
+                    'notes' => 'Ingrediente complementar',
                 ]);
             }
 
@@ -79,7 +78,7 @@ class ContentSeeder extends Seeder
                 $contents[1]->products()->attach($products[2]->id, [
                     'featured' => 'sim',
                     'order' => 1,
-                    'notes' => 'Base para sobremesas veganas'
+                    'notes' => 'Base para sobremesas veganas',
                 ]);
             }
 
@@ -88,7 +87,7 @@ class ContentSeeder extends Seeder
                 $contents[2]->products()->attach($products[3]->id, [
                     'featured' => 'sim',
                     'order' => 1,
-                    'notes' => 'Produto de alto rendimento para buffets'
+                    'notes' => 'Produto de alto rendimento para buffets',
                 ]);
             }
         }
@@ -111,7 +110,7 @@ class ContentSeeder extends Seeder
                 'pilares' => 'treinamento',
                 'canal' => 'padaria',
                 'links_conteudo' => [
-                    ['nome' => 'Vídeo Tutorial', 'url' => 'https://youtube.com/watch?v=exemplo1']
+                    ['nome' => 'Vídeo Tutorial', 'url' => 'https://youtube.com/watch?v=exemplo1'],
                 ],
                 'cozinheiro' => true,
                 'comprador' => false,
@@ -131,7 +130,7 @@ class ContentSeeder extends Seeder
                 'pilares' => 'inspiracao',
                 'canal' => 'ala-carte',
                 'links_conteudo' => [
-                    ['nome' => 'Receitas Complementares', 'url' => 'https://exemplo.com/receitas-veganas']
+                    ['nome' => 'Receitas Complementares', 'url' => 'https://exemplo.com/receitas-veganas'],
                 ],
                 'cozinheiro' => true,
                 'comprador' => true,
@@ -151,7 +150,7 @@ class ContentSeeder extends Seeder
                 'pilares' => 'comprar',
                 'canal' => 'buffet',
                 'links_conteudo' => [
-                    ['nome' => 'Planilha de Custos', 'url' => 'https://exemplo.com/planilha-custos.xlsx']
+                    ['nome' => 'Planilha de Custos', 'url' => 'https://exemplo.com/planilha-custos.xlsx'],
                 ],
                 'cozinheiro' => false,
                 'comprador' => true,
@@ -171,7 +170,7 @@ class ContentSeeder extends Seeder
                 'pilares' => 'inspiracao',
                 'canal' => 'industrial',
                 'links_conteudo' => [
-                    ['nome' => 'Relatório Completo', 'url' => 'https://exemplo.com/relatorio-tendencias.pdf']
+                    ['nome' => 'Relatório Completo', 'url' => 'https://exemplo.com/relatorio-tendencias.pdf'],
                 ],
                 'cozinheiro' => true,
                 'comprador' => true,
@@ -191,14 +190,14 @@ class ContentSeeder extends Seeder
                 'pilares' => 'sac',
                 'canal' => 'lanchonete',
                 'links_conteudo' => [
-                    ['nome' => 'Manual de Atendimento', 'url' => 'https://exemplo.com/manual-sac.pdf']
+                    ['nome' => 'Manual de Atendimento', 'url' => 'https://exemplo.com/manual-sac.pdf'],
                 ],
                 'cozinheiro' => false,
                 'comprador' => false,
                 'administrador' => true,
                 'status' => true,
                 'descricao_conteudo' => 'Treinamento completo para equipes de atendimento ao cliente.',
-            ]
+            ],
         ];
     }
 }

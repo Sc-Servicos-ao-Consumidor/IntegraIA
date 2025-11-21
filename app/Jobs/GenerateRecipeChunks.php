@@ -25,11 +25,11 @@ class GenerateRecipeChunks implements ShouldQueue
     public function handle(): void
     {
         $recipe = Recipe::find($this->recipeId);
-        if (!$recipe) {
+        if (! $recipe) {
             return;
         }
 
-        $chunkService = new RecipeChunkService(new PrismService());
+        $chunkService = new RecipeChunkService(new PrismService);
         $chunkService->generateChunks($recipe);
     }
 }

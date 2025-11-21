@@ -2,9 +2,9 @@
 
 namespace App\Services;
 
-use App\Models\Recipe;
-use App\Models\Product;
 use App\Models\Content;
+use App\Models\Product;
+use App\Models\Recipe;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Log;
 
@@ -25,25 +25,27 @@ class EmbeddingService
         try {
             $embeddingText = $this->getEmbeddingText($model);
 
-            if (!$embeddingText) {
-                Log::warning("No embedding text generated for model", [
+            if (! $embeddingText) {
+                Log::warning('No embedding text generated for model', [
                     'model_type' => get_class($model),
-                    'model_id' => $model->id
+                    'model_id' => $model->id,
                 ]);
+
                 return false;
             }
 
             $response = $this->prismService->getEmbedding($embeddingText);
-            
+
             $embedding = $this->prismService->extractEmbeddingFromResponse($response);
-            
-            if (!$embedding || !is_array($embedding)) {
-                Log::error("No valid embedding returned from API", [
+
+            if (! $embedding || ! is_array($embedding)) {
+                Log::error('No valid embedding returned from API', [
                     'response_keys' => is_array($response) ? array_keys($response) : 'not_array',
                     'response_count' => is_array($response) ? count($response) : 0,
                     'model_type' => get_class($model),
-                    'model_id' => $model->id
+                    'model_id' => $model->id,
                 ]);
+
                 return false;
             }
 
@@ -55,8 +57,9 @@ class EmbeddingService
             Log::error('Error generating embedding', [
                 'error' => $e->getMessage(),
                 'model_type' => get_class($model),
-                'model_id' => $model->id
+                'model_id' => $model->id,
             ]);
+
             return false;
         }
     }
@@ -67,11 +70,11 @@ class EmbeddingService
     public function generateBatchEmbeddings(array $models): array
     {
         $results = [];
-        
+
         foreach ($models as $model) {
             $results[$model->id] = $this->generateEmbedding($model);
         }
-        
+
         return $results;
     }
 
@@ -131,7 +134,7 @@ class EmbeddingService
             $product->descricao_lista_ingredientes,
             $product->descricao_modos_preparo,
             $product->descricao_rendimentos,
-            $product->informacao_adicional,     
+            $product->informacao_adicional,
             $product->ean,
             $product->status,
         ]);
@@ -151,16 +154,16 @@ class EmbeddingService
             $content->pilares,
             $content->canal,
             $content->descricao_conteudo,
-        ], function($value) {
-            return !empty($value) && is_string($value);
+        ], function ($value) {
+            return ! empty($value) && is_string($value);
         });
 
         // Include links if present
         if ($content->links_conteudo && is_array($content->links_conteudo)) {
-            $linkStrings = array_filter($content->links_conteudo, function($link) {
-                return is_string($link) && !empty($link);
+            $linkStrings = array_filter($content->links_conteudo, function ($link) {
+                return is_string($link) && ! empty($link);
             });
-            if (!empty($linkStrings)) {
+            if (! empty($linkStrings)) {
                 $parts[] = implode(' ', $linkStrings);
             }
         }
@@ -173,7 +176,7 @@ class EmbeddingService
      */
     public function regenerateAllEmbeddings(string $modelClass): array
     {
-        if (!in_array($modelClass, [Recipe::class, Product::class, Content::class])) {
+        if (! in_array($modelClass, [Recipe::class, Product::class, Content::class])) {
             throw new \InvalidArgumentException('Unsupported model class');
         }
 
@@ -182,7 +185,7 @@ class EmbeddingService
             'total' => $models->count(),
             'success' => 0,
             'failed' => 0,
-            'errors' => []
+            'errors' => [],
         ];
 
         foreach ($models as $model) {
@@ -192,7 +195,7 @@ class EmbeddingService
                 $results['failed']++;
                 $results['errors'][] = [
                     'id' => $model->id,
-                    'type' => get_class($model)
+                    'type' => get_class($model),
                 ];
             }
         }

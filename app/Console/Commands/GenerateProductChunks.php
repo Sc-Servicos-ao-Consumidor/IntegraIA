@@ -2,14 +2,15 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
 use App\Models\Product;
-use App\Services\ProductChunkService;
 use App\Services\PrismService;
+use App\Services\ProductChunkService;
+use Illuminate\Console\Command;
 
 class GenerateProductChunks extends Command
 {
     protected $signature = 'embedding:chunk-products {--limit=} {--force}';
+
     protected $description = 'Generate chunked embeddings for products';
 
     public function handle()
@@ -19,10 +20,10 @@ class GenerateProductChunks extends Command
         $limit = $this->option('limit');
         $force = $this->option('force');
 
-        $service = new ProductChunkService(new PrismService());
+        $service = new ProductChunkService(new PrismService);
 
         $query = Product::query();
-        if (!$force) {
+        if (! $force) {
             $query->whereDoesntHave('chunks');
         }
         if ($limit) {
@@ -32,6 +33,7 @@ class GenerateProductChunks extends Command
         $products = $query->get();
         if ($products->isEmpty()) {
             $this->info('No products to process.');
+
             return Command::SUCCESS;
         }
 
@@ -47,8 +49,7 @@ class GenerateProductChunks extends Command
         $progress->finish();
         $this->newLine(2);
         $this->info("Created {$created} chunks across {$products->count()} products.");
+
         return Command::SUCCESS;
     }
 }
-
-

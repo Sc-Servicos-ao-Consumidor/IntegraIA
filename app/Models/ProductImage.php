@@ -2,10 +2,10 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Builder;
 
 class ProductImage extends Model
 {
@@ -90,6 +90,7 @@ class ProductImage extends Model
     public function getImageTypeNameAttribute(): string
     {
         $types = self::getImageTypes();
+
         return $types[$this->image_type] ?? 'Desconhecido';
     }
 
@@ -98,18 +99,18 @@ class ProductImage extends Model
      */
     public function getFormattedSizeAttribute(): ?string
     {
-        if (!$this->tamanho) {
+        if (! $this->tamanho) {
             return null;
         }
 
         $bytes = $this->tamanho;
         $units = ['B', 'KB', 'MB', 'GB'];
-        
+
         for ($i = 0; $bytes > 1024 && $i < count($units) - 1; $i++) {
             $bytes /= 1024;
         }
-        
-        return round($bytes, 2) . ' ' . $units[$i];
+
+        return round($bytes, 2).' '.$units[$i];
     }
 
     /**
@@ -118,9 +119,9 @@ class ProductImage extends Model
     public function getDimensionsAttribute(): ?string
     {
         if ($this->largura && $this->altura) {
-            return $this->largura . ' x ' . $this->altura . ' px';
+            return $this->largura.' x '.$this->altura.' px';
         }
-        
+
         return null;
     }
 
@@ -141,8 +142,8 @@ class ProductImage extends Model
         if (filter_var($this->url, FILTER_VALIDATE_URL)) {
             return $this->url;
         }
-        
+
         // Otherwise, prepend storage URL
-        return asset('storage/' . $this->url);
+        return asset('storage/'.$this->url);
     }
 }
