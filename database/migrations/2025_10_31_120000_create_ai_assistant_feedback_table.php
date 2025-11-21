@@ -38,5 +38,3 @@ return new class extends Migration
         Schema::dropIfExists('ai_assistant_feedback');
     }
 };
-
-

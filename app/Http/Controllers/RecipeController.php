@@ -8,11 +8,9 @@ use App\Models\Content;
 use App\Models\Ingredient;
 use App\Models\Allergen;
 use App\Models\Cuisine;
-use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Bus;
 use Inertia\Inertia;
-use Pgvector\Laravel\Distance;
 class RecipeController extends Controller
 {
     /**
