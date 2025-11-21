@@ -16,5 +16,3 @@ return new class extends Migration
         Schema::rename('assistants', 'ai_assistants');
     }
 };
-
-
