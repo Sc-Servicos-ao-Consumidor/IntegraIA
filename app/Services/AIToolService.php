@@ -16,12 +16,9 @@ class AIToolService
 {
     protected PrismService $prismService;
 
-    protected EmbeddingService $embeddingService;
-
-    public function __construct(PrismService $prismService, EmbeddingService $embeddingService)
+    public function __construct(PrismService $prismService)
     {
         $this->prismService = $prismService;
-        $this->embeddingService = $embeddingService;
     }
 
     /**
@@ -33,7 +30,7 @@ class AIToolService
         $hasFilter = is_array($allowedNames) && count($allowedNames) > 0;
 
         $isAllowed = function (string $name) use ($hasFilter, $allowedNames): bool {
-            return $hasFilter && in_array($name, $allowedNames, true);
+            return ! $hasFilter || in_array($name, $allowedNames, true);
         };
 
         if ($isAllowed('search_recipes')) {
@@ -152,43 +149,67 @@ class AIToolService
     }
 
     /**
-     * Search recipes using semantic search
+     * Generate embedding vector from input text
      */
-    protected function searchRecipes(string $query, int $limit = 10): string
+    protected function generateEmbeddingVector(string $query): ?Vector
     {
         $response = $this->prismService->getEmbedding($query);
         $embedding = $this->prismService->extractEmbeddingFromResponse($response);
 
         if (! $embedding || ! is_array($embedding)) {
-            return 'Falha ao gerar embedding para a consulta';
+            return null;
         }
 
-        $embeddingVector = new Vector($embedding);
+        return new Vector($embedding);
+    }
 
-        // Find most similar chunks, not recipes
-        $topChunks = RecipeChunk::query()
-            ->select(['id', 'recipe_id', 'chunk_type', 'position', 'content'])
+    /**
+     * Find best matching chunks grouped by parent id (e.g., recipe_id, product_id, content_id)
+     *
+     * @return array{orderedIds: array<int>, matchById: array<int, array{chunk: mixed, distance: float}>}
+     */
+    protected function findBestChunks(string $chunkModelClass, string $parentIdColumn, Vector $embeddingVector, int $limit): array
+    {
+        $topChunks = $chunkModelClass::query()
+            ->select(['id', $parentIdColumn, 'chunk_type', 'position', 'content'])
             ->selectRaw('embedding <=> ? as distance', [$embeddingVector])
             ->orderBy('distance')
             ->take(max($limit * 5, 20))
             ->get();
 
-        // Aggregate by recipe_id (best chunk per recipe)
-        $bestByRecipe = [];
+        $bestByParent = [];
         foreach ($topChunks as $chunk) {
-            $rid = $chunk->recipe_id;
-            if (! isset($bestByRecipe[$rid])) {
-                $bestByRecipe[$rid] = [
+            $parentId = $chunk->{$parentIdColumn};
+            if (! isset($bestByParent[$parentId])) {
+                $bestByParent[$parentId] = [
                     'chunk' => $chunk,
                     'distance' => (float) $chunk->distance,
                 ];
             }
-            if (count($bestByRecipe) >= $limit) {
+            if (count($bestByParent) >= $limit) {
                 break;
             }
         }
 
-        $orderedRecipeIds = array_keys($bestByRecipe);
+        return [
+            'orderedIds' => array_keys($bestByParent),
+            'matchById' => $bestByParent,
+        ];
+    }
+
+    /**
+     * Search recipes using semantic search
+     */
+    protected function searchRecipes(string $query, int $limit = 10): string
+    {
+        $embeddingVector = $this->generateEmbeddingVector($query);
+        if (! $embeddingVector) {
+            return 'Falha ao gerar embedding para a consulta';
+        }
+
+        $result = $this->findBestChunks(RecipeChunk::class, 'recipe_id', $embeddingVector, $limit);
+        $orderedRecipeIds = $result['orderedIds'];
+        $bestByRecipe = $result['matchById'];
 
         $recipes = Recipe::query()
             ->with(['products', 'contents', 'cuisines', 'allergens'])
@@ -230,37 +251,14 @@ class AIToolService
      */
     protected function searchProducts(string $query, int $limit = 10): string
     {
-        $response = $this->prismService->getEmbedding($query);
-        $embedding = $this->prismService->extractEmbeddingFromResponse($response);
-
-        if (! $embedding || ! is_array($embedding)) {
+        $embeddingVector = $this->generateEmbeddingVector($query);
+        if (! $embeddingVector) {
             return 'Falha ao gerar embedding para a consulta';
         }
 
-        $embeddingVector = new Vector($embedding);
-
-        $topChunks = ProductChunk::query()
-            ->select(['id', 'product_id', 'chunk_type', 'position', 'content'])
-            ->selectRaw('embedding <=> ? as distance', [$embeddingVector])
-            ->orderBy('distance')
-            ->take(max($limit * 5, 20))
-            ->get();
-
-        $bestByProduct = [];
-        foreach ($topChunks as $chunk) {
-            $pid = $chunk->product_id;
-            if (! isset($bestByProduct[$pid])) {
-                $bestByProduct[$pid] = [
-                    'chunk' => $chunk,
-                    'distance' => (float) $chunk->distance,
-                ];
-            }
-            if (count($bestByProduct) >= $limit) {
-                break;
-            }
-        }
-
-        $orderedProductIds = array_keys($bestByProduct);
+        $result = $this->findBestChunks(ProductChunk::class, 'product_id', $embeddingVector, $limit);
+        $orderedProductIds = $result['orderedIds'];
+        $bestByProduct = $result['matchById'];
 
         $products = Product::query()
             ->with(['groupProduct'])
@@ -300,37 +298,14 @@ class AIToolService
      */
     protected function searchContent(string $query, int $limit = 10): string
     {
-        $response = $this->prismService->getEmbedding($query);
-        $embedding = $this->prismService->extractEmbeddingFromResponse($response);
-
-        if (! $embedding || ! is_array($embedding)) {
+        $embeddingVector = $this->generateEmbeddingVector($query);
+        if (! $embeddingVector) {
             return 'Falha ao gerar embedding para a consulta';
         }
 
-        $embeddingVector = new Vector($embedding);
-
-        $topChunks = ContentChunk::query()
-            ->select(['id', 'content_id', 'chunk_type', 'position', 'content'])
-            ->selectRaw('embedding <=> ? as distance', [$embeddingVector])
-            ->orderBy('distance')
-            ->take(max($limit * 5, 20))
-            ->get();
-
-        $bestByContent = [];
-        foreach ($topChunks as $chunk) {
-            $cid = $chunk->content_id;
-            if (! isset($bestByContent[$cid])) {
-                $bestByContent[$cid] = [
-                    'chunk' => $chunk,
-                    'distance' => (float) $chunk->distance,
-                ];
-            }
-            if (count($bestByContent) >= $limit) {
-                break;
-            }
-        }
-
-        $orderedContentIds = array_keys($bestByContent);
+        $result = $this->findBestChunks(ContentChunk::class, 'content_id', $embeddingVector, $limit);
+        $orderedContentIds = $result['orderedIds'];
+        $bestByContent = $result['matchById'];
 
         $contents = Content::query()
             ->where('status', true)
@@ -474,7 +449,7 @@ class AIToolService
         }
 
         return $query->get()->map(function ($recipe) {
-            return json_encode([
+            return [
                 'id' => $recipe->id,
                 'recipe_name' => $recipe->recipe_name,
                 'cuisine' => $recipe->cuisine,
@@ -484,8 +459,8 @@ class AIToolService
                 'quantity' => $recipe->pivot->quantity,
                 'unit' => $recipe->pivot->unit,
                 'optional' => $recipe->pivot->optional,
-            ]);
-        });
+            ];
+        })->toJson();
 
     }
 
@@ -494,18 +469,18 @@ class AIToolService
      */
     protected function findContentWithProductId(int $productId): string
     {
-        $content = Content::find($productId);
+        $product = Product::with('contents')->find($productId);
 
-        if (! $content) {
+        if (! $product) {
             return 'Conteúdo não encontrado';
         }
 
-        return $content->map(function ($content) {
-            return json_encode([
+        return $product->contents->map(function ($content) {
+            return [
                 'id' => $content->id,
                 'nome_conteudo' => $content->nome_conteudo,
-            ]);
-        });
+            ];
+        })->toJson();
     }
 
     /**
@@ -520,12 +495,12 @@ class AIToolService
         }
 
         return $recipe->products->map(function ($product) {
-            return json_encode([
+            return [
                 'id' => $product->id,
                 'nome_produto' => $product->descricao,
                 'marca' => $product->marca,
-            ]);
-        });
+            ];
+        })->toJson();
     }
 
     /**
@@ -533,18 +508,18 @@ class AIToolService
      */
     protected function findContentWithRecipeId(int $recipeId): string
     {
-        $content = Content::find($recipeId);
+        $recipe = Recipe::with('contents')->find($recipeId);
 
-        if (! $content) {
+        if (! $recipe) {
             return 'Conteúdo não encontrado';
         }
 
-        return $content->map(function ($content) {
-            return json_encode([
+        return $recipe->contents->map(function ($content) {
+            return [
                 'id' => $content->id,
                 'nome_conteudo' => $content->nome_conteudo,
-            ]);
-        });
+            ];
+        })->toJson();
     }
 
     /**
@@ -559,11 +534,11 @@ class AIToolService
         }
 
         return $content->products->map(function ($product) {
-            return json_encode([
+            return [
                 'id' => $product->id,
                 'nome_produto' => $product->descricao,
-            ]);
-        });
+            ];
+        })->toJson();
     }
 
     /**
@@ -578,11 +553,11 @@ class AIToolService
         }
 
         return $content->recipes->map(function ($recipe) {
-            return json_encode([
+            return [
                 'id' => $recipe->id,
                 'recipe_name' => $recipe->recipe_name,
-            ]);
-        });
+            ];
+        })->toJson();
     }
 
     /**
