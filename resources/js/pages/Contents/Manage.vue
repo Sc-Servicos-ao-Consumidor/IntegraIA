@@ -362,6 +362,15 @@
                     :title="content.nome_conteudo || 'Sem título'"
                     :description="content.descricao_conteudo || 'Sem descrição'"
                 >
+                    <template #title>
+                        <h3
+                            @click="editContent(content)"
+                            class="font-medium text-slate-900 dark:text-slate-100 cursor-pointer hover:underline"
+                            title="Editar conteúdo"
+                        >
+                            {{ content.nome_conteudo || 'Sem título' }}
+                        </h3>
+                    </template>
                     <template #actions>
                         <button 
                             @click="editContent(content)" 

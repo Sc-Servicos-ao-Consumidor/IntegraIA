@@ -743,6 +743,15 @@
                     :subtitle="product.codigo_padrao || product.sku ? `${product.codigo_padrao ? 'Código: ' + product.codigo_padrao : ''}${product.codigo_padrao && product.sku ? ' • ' : ''}${product.sku ? 'SKU: ' + product.sku : ''}` : ''"
                     :status="product.status ? 'active' : 'inactive'"
                 >
+                        <template #title>
+                        <h3
+                            @click="editProduct(product)"
+                            class="font-medium text-slate-900 dark:text-slate-100 cursor-pointer hover:underline"
+                            title="Editar produto"
+                        >
+                            {{ product.descricao }}
+                        </h3>
+                    </template>
                     <template #associations>
                         <div v-if="product.recipes?.length" class="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
                             <span class="font-medium">🍳 Receitas:</span>

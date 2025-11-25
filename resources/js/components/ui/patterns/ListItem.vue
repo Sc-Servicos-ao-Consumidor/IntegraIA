@@ -48,7 +48,10 @@ const badgeVariants = {
       <div class="flex-1">
         <!-- Header with title and badges -->
         <div class="flex items-center gap-2 mb-2">
-          <h3 class="font-medium text-slate-900 dark:text-slate-100">{{ title }}</h3>
+          <template v-if="$slots.title">
+            <slot name="title" />
+          </template>
+          <h3 v-else class="font-medium text-slate-900 dark:text-slate-100">{{ title }}</h3>
           
           <!-- Status Badge -->
           <span 

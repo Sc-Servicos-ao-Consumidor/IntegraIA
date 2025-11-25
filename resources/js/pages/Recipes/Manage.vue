@@ -631,6 +631,15 @@
                     :title="recipe.recipe_name || 'Sem título'"
                     :description="recipe.recipe_description || 'Sem descrição'"
                 >
+                    <template #title>
+                        <h3
+                            @click="editRecipe(recipe)"
+                            class="font-medium text-slate-900 dark:text-slate-100 cursor-pointer hover:underline"
+                            title="Editar receita"
+                        >
+                            {{ recipe.recipe_name || 'Sem título' }}
+                        </h3>
+                    </template>
                     <template #associations>
                         <!-- Products -->
                         <div v-if="recipe.products?.length" class="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
