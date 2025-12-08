@@ -94,7 +94,7 @@
                 </template>
 
                 <div class="overflow-x-auto">
-                    <div class="min-w-[800px]">
+                    <div v-if="filteredLogs.length" class="min-w-[800px]">
                         <div class="grid grid-cols-12 px-3 py-2 text-xs font-semibold text-slate-600 dark:text-slate-300">
                             <div class="col-span-2">Data</div>
                             <div class="col-span-2">Avaliação</div>
@@ -136,6 +136,25 @@
                                     </button>
                                 </div>
                             </div>
+                        </div>
+                    </div>
+                    <div v-else class="p-12 my-4 text-center border-2 border-dashed rounded-lg border-gray-200 dark:border-gray-700">
+                        <div class="text-5xl mb-3">🗒️</div>
+                        <h3 class="text-lg font-semibold text-slate-800 dark:text-slate-200">Nenhum log encontrado</h3>
+                        <p v-if="isFiltered" class="mt-1 text-sm text-slate-600 dark:text-slate-400">
+                            Tente ajustar ou limpar os filtros para ver outros resultados.
+                        </p>
+                        <p v-else class="mt-1 text-sm text-slate-600 dark:text-slate-400">
+                            Ainda não há registros de interações para exibir.
+                        </p>
+                        <div v-if="isFiltered" class="mt-4">
+                            <button
+                                type="button"
+                                @click="clearFilters"
+                                class="px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 bg-white dark:bg-secondary border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-accent transition-colors duration-150 cursor-pointer hover:shadow-sm"
+                            >
+                                Limpar filtros
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -365,6 +384,14 @@ const filteredLogs = computed(() => {
         }
         return true
     })
+})
+
+const isFiltered = computed(() => {
+    return Boolean(
+        (applied.value.search || '').trim() ||
+        applied.value.rating ||
+        applied.value.assistantId
+    )
 })
 
 function applyLocalFilters() {
