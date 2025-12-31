@@ -69,6 +69,7 @@ class RecipeChunkService
             $recipe->yield,
             $recipe->channel,
         ]);
+
         if (! empty($titleParts)) {
             $chunks[] = [
                 'chunk_type' => 'title_metadata',
@@ -108,13 +109,16 @@ class RecipeChunkService
             $raw = str_replace("\r", '', (string) $recipe->preparation_method);
             $byNewline = preg_split('/\n+/', $raw) ?: [];
             $steps = [];
+
             foreach ($byNewline as $line) {
                 $line = trim($line);
                 if ($line === '') {
                     continue;
                 }
+
                 // Further split long lines by period if multiple sentences
                 $sentences = preg_split('/\.(\s+|$)/', $line) ?: [];
+
                 foreach ($sentences as $s) {
                     $s = trim($s);
                     if ($s !== '') {
@@ -139,6 +143,7 @@ class RecipeChunkService
             $this->implodeJsonArray($recipe->preparation_techniques),
             $this->implodeJsonArray($recipe->consumption_occasion),
         ]);
+
         if (! empty($tagParts)) {
             $chunks[] = [
                 'chunk_type' => 'tags',
@@ -155,9 +160,11 @@ class RecipeChunkService
         if (empty($value)) {
             return '';
         }
+
         if (is_string($value)) {
             return $value;
         }
+
         if (is_array($value)) {
             return collect($value)->filter()->implode(', ');
         }

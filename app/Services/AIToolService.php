@@ -165,7 +165,7 @@ class AIToolService
 
         $embeddingVector = new Vector($embedding);
 
-        // Find most similar chunks, not recipes
+        // Find most similar chunks
         $topChunks = RecipeChunk::query()
             ->select(['id', 'recipe_id', 'chunk_type', 'position', 'content'])
             ->selectRaw('embedding <=> ? as distance', [$embeddingVector])
@@ -215,7 +215,7 @@ class AIToolService
                     'consumption_occasion' => $recipe->consumption_occasion,
                     'cuisines' => $recipe->cuisines,
                     'allergens' => $recipe->allergens,
-                    'aditional_prompt' => $recipe->recipe_prompt,
+                    'additional_prompt' => $recipe->recipe_prompt,
                     'match_chunk_type' => $match?->chunk_type,
                     'match_chunk_content' => $match?->content,
                 ];
@@ -285,7 +285,7 @@ class AIToolService
                     'descricao_modos_preparo' => $product->descricao_modos_preparo,
                     'descricao_rendimentos' => $product->descricao_rendimentos,
                     'informacao_adicional' => $product->informacao_adicional,
-                    'aditional_prompt' => $product->prompt_uso_informacoes_produto,
+                    'additional_prompt' => $product->prompt_uso_informacoes_produto,
                     'match_chunk_type' => $match?->chunk_type,
                     'match_chunk_content' => $match?->content,
                 ];
@@ -352,7 +352,7 @@ class AIToolService
                     'comprador' => $content->comprador,
                     'administrador' => $content->administrador,
                     'descricao_conteudo' => $content->descricao_conteudo,
-                    'aditional_prompt' => $content->content_prompt,
+                    'additional_prompt' => $content->content_prompt,
                     'match_chunk_type' => $match?->chunk_type,
                     'match_chunk_content' => $match?->content,
                 ];
