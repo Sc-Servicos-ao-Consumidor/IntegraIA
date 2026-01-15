@@ -100,9 +100,7 @@ class AssistantController extends Controller
                 ],
             ]);
 
-            $ok = isset($response['status']) ? (bool) $response['status'] : ($assistantText !== null);
-
-            if ($ok) {
+            if ($response['status'] === 'success') {
                 return response()->json([
                     'response' => $assistantText ?? 'Sem resposta',
                     'interaction_id' => $interaction->id,
