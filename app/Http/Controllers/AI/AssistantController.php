@@ -27,7 +27,7 @@ class AssistantController extends Controller
 
         if ($validator->fails()) {
             return response()->json([
-                'message' => 'Validation error.',
+                'response' => 'Validation error.',
                 'errors' => $validator->errors(),
             ], 422);
         }
@@ -44,7 +44,7 @@ class AssistantController extends Controller
 
         if (! $assistant) {
             return response()->json([
-                'message' => 'Assistant not found.',
+                'response' => 'Assistant not found.',
             ], 404);
         }
 

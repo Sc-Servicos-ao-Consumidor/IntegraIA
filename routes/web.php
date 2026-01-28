@@ -10,6 +10,7 @@ use App\Http\Controllers\RecipeController;
 use App\Http\Controllers\TenantController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+use \App\Http\Middleware\HandleTenant;
 
 Route::get('/', function () {
     return redirect()->route('login');
@@ -17,9 +18,9 @@ Route::get('/', function () {
 
 Route::get('dashboard', function () {
     return redirect()->route('semantic-search');
-})->middleware(['auth', 'verified'])->name('dashboard');
+})->middleware(['auth', 'verified', HandleTenant::class])->name('dashboard');
 
-Route::middleware(['auth', 'verified'])->group(function () {
+Route::middleware(['auth', 'verified', HandleTenant::class])->group(function () {
     Route::get('/recipes/search', [SearchController::class, 'search']);
     Route::get('/recipes/search-ingredients', [RecipeController::class, 'searchIngredients']);
     Route::get('/recipes/search-cuisines', [RecipeController::class, 'searchCuisines']);
