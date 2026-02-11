@@ -12,6 +12,7 @@ use App\Services\PrismService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Models\Tenant;
+use Illuminate\Support\Facades\Log;
 
 class AssistantController extends Controller
 {
@@ -106,6 +107,7 @@ class AssistantController extends Controller
                     'interaction_id' => $interaction->id,
                 ], 200);
             } else {
+                Log::error('AI response error:', ['response' => $response]);
                 return response()->json([
                     'response' => $assistantText ?? 'Erro ao processar a solicitação',
                     'interaction_id' => $interaction->id,
@@ -113,6 +115,7 @@ class AssistantController extends Controller
             }
 
         } catch (\Exception $e) {
+            Log::error('Assistant error:', ['error' => $e->getMessage()]);
             return response()->json([
                 'response' => 'Assistant failed: '.$e->getMessage(),
             ], 500);
