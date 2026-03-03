@@ -91,28 +91,28 @@
                         <h4 class="text-sm font-medium text-slate-900 dark:text-slate-100 mb-3">💡 Exemplos de busca:</h4>
                         <div class="flex flex-wrap justify-center gap-2">
                             <button 
-                                @click="query = 'massa cremosa vegana'; search()"
+                                @click="query = 'Molho de pizza'; search()"
                                 class="px-4 py-2 bg-orange-50 hover:bg-orange-100 dark:bg-orange-900/30 dark:hover:bg-orange-900/50 text-orange-700 dark:text-orange-300 text-sm rounded-lg border border-orange-200 dark:border-orange-800 transition-all duration-200 hover:shadow-sm"
                             >
-                                massa cremosa vegana
+                                Molho de pizza
                             </button>
                             <button 
                                 @click="query = 'prato italiano tradicional'; search()"
                                 class="px-4 py-2 bg-orange-50 hover:bg-orange-100 dark:bg-orange-900/30 dark:hover:bg-orange-900/50 text-orange-700 dark:text-orange-300 text-sm rounded-lg border border-orange-200 dark:border-orange-800 transition-all duration-200 hover:shadow-sm"
                             >
-                                prato italiano tradicional
+                                Prato italiano tradicional
                             </button>
                             <button 
                                 @click="query = 'receita de empanada de carne'; search()"
                                 class="px-4 py-2 bg-orange-50 hover:bg-orange-100 dark:bg-orange-900/30 dark:hover:bg-orange-900/50 text-orange-700 dark:text-orange-300 text-sm rounded-lg border border-orange-200 dark:border-orange-800 transition-all duration-200 hover:shadow-sm"
                             >
-                                receita de empanada de carne
+                                Receita de empanada de carne
                             </button>
                             <button 
                                 @click="query = 'receita fácil para iniciantes'; search()"
                                 class="px-4 py-2 bg-orange-50 hover:bg-orange-100 dark:bg-orange-900/30 dark:hover:bg-orange-900/50 text-orange-700 dark:text-orange-300 text-sm rounded-lg border border-orange-200 dark:border-orange-800 transition-all duration-200 hover:shadow-sm"
                             >
-                                receita fácil para iniciantes
+                                Receita fácil para iniciantes
                             </button>
                         </div>
                     </div>

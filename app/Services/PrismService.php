@@ -77,6 +77,7 @@ class PrismService
                 ->withTools($tools)
                 ->withClientRetry(3, 100)
                 ->withMaxSteps(10)
+                ->withMaxTokens(4096)
                 ->asText();
 
             if ($response->finishReason->name == 'Error') {

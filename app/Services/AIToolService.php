@@ -41,8 +41,8 @@ class AIToolService
                 ->for('Buscar receitas com base em uma consulta de texto usando busca semântica')
                 ->withStringParameter('query', 'Texto da consulta para buscar receitas')
                 ->withNumberParameter('limit', 'Número máximo de receitas a retornar (padrão: 10)', false)
-                ->using(function (string $query, int $limit) {
-                    return $this->searchRecipes($query, $limit);
+                ->using(function (string $query, ?int $limit = null) {
+                    return $this->searchRecipes($query, $limit ?? 10);
                 });
         }
 
@@ -51,8 +51,8 @@ class AIToolService
                 ->for('Buscar produtos com base em uma consulta de texto usando busca semântica')
                 ->withStringParameter('query', 'Texto da consulta para buscar produtos')
                 ->withNumberParameter('limit', 'Número máximo de produtos a retornar (padrão: 10)', false)
-                ->using(function (string $query, int $limit) {
-                    return $this->searchProducts($query, $limit);
+                ->using(function (string $query, ?int $limit = null) {
+                    return $this->searchProducts($query, $limit ?? 10);
                 });
         }
 
@@ -61,8 +61,8 @@ class AIToolService
                 ->for('Buscar conteúdo com base em uma consulta de texto usando busca semântica')
                 ->withStringParameter('query', 'Texto da consulta para buscar conteúdo')
                 ->withNumberParameter('limit', 'Número máximo de conteúdos a retornar (padrão: 10)', false)
-                ->using(function (string $query, int $limit) {
-                    return $this->searchContent($query, $limit);
+                ->using(function (string $query, ?int $limit = null) {
+                    return $this->searchContent($query, $limit ?? 10);
                 });
         }
 
@@ -98,7 +98,7 @@ class AIToolService
                 ->for('Encontrar receitas que usam um produto específico')
                 ->withNumberParameter('productId', 'ID do produto')
                 ->withStringParameter('ingredientType', 'Tipo de ingrediente (main, supporting, ou null para ambos)', false)
-                ->using(function (int $productId, string $ingredientType) {
+                ->using(function (int $productId, ?string $ingredientType = null) {
                     return $this->findRecipesWithProductId($productId, $ingredientType);
                 });
         }
@@ -165,64 +165,25 @@ class AIToolService
 
         $embeddingVector = new Vector($embedding);
 
-        // Find most similar chunks
+        // Return the top 20 most similar recipe chunks
         $topChunks = RecipeChunk::query()
             ->select(['id', 'recipe_id', 'chunk_type', 'position', 'content'])
             ->selectRaw('embedding <=> ? as distance', [$embeddingVector])
             ->orderBy('distance')
-            ->take(max($limit * 5, 20))
-            ->get();
-
-        // Aggregate by recipe_id (best chunk per recipe)
-        $bestByRecipe = [];
-        foreach ($topChunks as $chunk) {
-            $rid = $chunk->recipe_id;
-            if (! isset($bestByRecipe[$rid])) {
-                $bestByRecipe[$rid] = [
-                    'chunk' => $chunk,
-                    'distance' => (float) $chunk->distance,
-                ];
-            }
-            if (count($bestByRecipe) >= $limit) {
-                break;
-            }
-        }
-
-        $orderedRecipeIds = array_keys($bestByRecipe);
-
-        $recipes = Recipe::query()
-            ->with(['products', 'contents', 'cuisines', 'allergens'])
-            ->whereIn('id', $orderedRecipeIds)
+            ->take(20)
             ->get()
-            ->sortBy(fn ($r) => array_search($r->id, $orderedRecipeIds))
-            ->map(function ($recipe) use ($bestByRecipe) {
-                $match = $bestByRecipe[$recipe->id]['chunk'] ?? null;
-
+            ->map(function ($chunk) {
                 return [
-                    'id' => $recipe->id,
-                    'recipe_name' => $recipe->recipe_name,
-                    'recipe_type' => $recipe->recipe_type,
-                    'service_order' => $recipe->service_order,
-                    'difficulty_level' => $recipe->difficulty_level,
-                    'preparation_time' => $recipe->preparation_time,
-                    'yield' => $recipe->yield,
-                    'channel' => $recipe->channel,
-                    'recipe_description' => $recipe->recipe_description,
-                    'ingredients_description' => $recipe->ingredients_description,
-                    'preparation_method' => $recipe->preparation_method,
-                    'usage_groups' => $recipe->usage_groups,
-                    'preparation_techniques' => $recipe->preparation_techniques,
-                    'consumption_occasion' => $recipe->consumption_occasion,
-                    'cuisines' => $recipe->cuisines,
-                    'allergens' => $recipe->allergens,
-                    'additional_prompt' => $recipe->recipe_prompt,
-                    'match_chunk_type' => $match?->chunk_type,
-                    'match_chunk_content' => $match?->content,
+                    'id' => $chunk->id,
+                    'recipe_id' => $chunk->recipe_id,
+                    'chunk_type' => $chunk->chunk_type,
+                    'position' => $chunk->position,
+                    'content' => $chunk->content,
+                    'distance' => isset($chunk->distance) ? (float) $chunk->distance : null,
                 ];
             });
 
-        return $recipes->toJson();
-
+        return $topChunks->toJson();
     }
 
     /**
@@ -239,60 +200,25 @@ class AIToolService
 
         $embeddingVector = new Vector($embedding);
 
+        // Return the top 20 most similar product chunks
         $topChunks = ProductChunk::query()
             ->select(['id', 'product_id', 'chunk_type', 'position', 'content'])
             ->selectRaw('embedding <=> ? as distance', [$embeddingVector])
             ->orderBy('distance')
-            ->take(max($limit * 5, 20))
-            ->get();
-
-        $bestByProduct = [];
-        foreach ($topChunks as $chunk) {
-            $pid = $chunk->product_id;
-            if (! isset($bestByProduct[$pid])) {
-                $bestByProduct[$pid] = [
-                    'chunk' => $chunk,
-                    'distance' => (float) $chunk->distance,
-                ];
-            }
-            if (count($bestByProduct) >= $limit) {
-                break;
-            }
-        }
-
-        $orderedProductIds = array_keys($bestByProduct);
-
-        $products = Product::query()
-            ->with(['groupProduct'])
-            ->where('status', true)
-            ->whereIn('id', $orderedProductIds)
+            ->take(20)
             ->get()
-            ->sortBy(fn ($p) => array_search($p->id, $orderedProductIds))
-            ->map(function ($product) use ($bestByProduct) {
-                $match = $bestByProduct[$product->id]['chunk'] ?? null;
-
+            ->map(function ($chunk) {
                 return [
-                    'id' => $product->id,
-                    'nome_produto' => $product->descricao,
-                    'codigo_padrao' => $product->codigo_padrao,
-                    'sku' => $product->sku,
-                    'group_product' => $product->groupProduct?->nome,
-                    'marca' => $product->marca,
-                    'especificacao_produto' => $product->especificacao_produto,
-                    'perfil_sabor' => $product->perfil_sabor,
-                    'descricao_tabela_nutricional' => $product->descricao_tabela_nutricional,
-                    'descricao_lista_ingredientes' => $product->descricao_lista_ingredientes,
-                    'descricao_modos_preparo' => $product->descricao_modos_preparo,
-                    'descricao_rendimentos' => $product->descricao_rendimentos,
-                    'informacao_adicional' => $product->informacao_adicional,
-                    'additional_prompt' => $product->prompt_uso_informacoes_produto,
-                    'match_chunk_type' => $match?->chunk_type,
-                    'match_chunk_content' => $match?->content,
+                    'id' => $chunk->id,
+                    'product_id' => $chunk->product_id,
+                    'chunk_type' => $chunk->chunk_type,
+                    'position' => $chunk->position,
+                    'content' => $chunk->content,
+                    'distance' => isset($chunk->distance) ? (float) $chunk->distance : null,
                 ];
             });
 
-        return $products->toJson();
-
+        return $topChunks->toJson();
     }
 
     /**
@@ -309,56 +235,25 @@ class AIToolService
 
         $embeddingVector = new Vector($embedding);
 
+        // Return the top 20 most similar content chunks
         $topChunks = ContentChunk::query()
             ->select(['id', 'content_id', 'chunk_type', 'position', 'content'])
             ->selectRaw('embedding <=> ? as distance', [$embeddingVector])
             ->orderBy('distance')
-            ->take(max($limit * 5, 20))
-            ->get();
-
-        $bestByContent = [];
-        foreach ($topChunks as $chunk) {
-            $cid = $chunk->content_id;
-            if (! isset($bestByContent[$cid])) {
-                $bestByContent[$cid] = [
-                    'chunk' => $chunk,
-                    'distance' => (float) $chunk->distance,
-                ];
-            }
-            if (count($bestByContent) >= $limit) {
-                break;
-            }
-        }
-
-        $orderedContentIds = array_keys($bestByContent);
-
-        $contents = Content::query()
-            ->where('status', true)
-            ->whereIn('id', $orderedContentIds)
+            ->take(20)
             ->get()
-            ->sortBy(fn ($c) => array_search($c->id, $orderedContentIds))
-            ->map(function ($content) use ($bestByContent) {
-                $match = $bestByContent[$content->id]['chunk'] ?? null;
-
+            ->map(function ($chunk) {
                 return [
-                    'id' => $content->id,
-                    'nome_conteudo' => $content->nome_conteudo,
-                    'content_code' => $content->content_code,
-                    'tipo_conteudo' => $content->tipo_conteudo,
-                    'pilares' => $content->pilares,
-                    'canal' => $content->canal,
-                    'links_conteudo' => $content->links_conteudo,
-                    'cozinheiro' => $content->cozinheiro,
-                    'comprador' => $content->comprador,
-                    'administrador' => $content->administrador,
-                    'descricao_conteudo' => $content->descricao_conteudo,
-                    'additional_prompt' => $content->content_prompt,
-                    'match_chunk_type' => $match?->chunk_type,
-                    'match_chunk_content' => $match?->content,
+                    'id' => $chunk->id,
+                    'content_id' => $chunk->content_id,
+                    'chunk_type' => $chunk->chunk_type,
+                    'position' => $chunk->position,
+                    'content' => $chunk->content,
+                    'distance' => isset($chunk->distance) ? (float) $chunk->distance : null,
                 ];
             });
 
-        return $contents->toJson();
+        return $topChunks->toJson();
     }
 
     /**
@@ -459,7 +354,7 @@ class AIToolService
     /**
      * Find recipes that use a specific product
      */
-    protected function findRecipesWithProductId(int $productId, string $ingredientType): string
+    protected function findRecipesWithProductId(int $productId, ?string $ingredientType = null): string
     {
         $product = Product::find($productId);
 
