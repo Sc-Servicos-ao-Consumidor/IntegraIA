@@ -478,10 +478,11 @@
 
 <script setup>
 import { router, Head, usePage } from '@inertiajs/vue3'
-import { ref, nextTick, computed } from 'vue'
+import { ref, nextTick, computed, watch } from 'vue'
 import axios from 'axios'
 import { marked } from 'marked'
 import AppLayout from '@/layouts/AppLayout.vue'
+import {useStream} from '@laravel/stream-vue'
 
 // Configure marked for security and better rendering
 marked.setOptions({
@@ -508,11 +509,64 @@ const assistantInteractionId = ref(null)
 const markdownError = ref(false)
 const showRawMarkdown = ref(false)
 
+const {
+    data: assistantStreamData,
+    isFetching: assistantIsFetching,
+    isStreaming: assistantIsStreaming,
+    send: sendAssistantStream,
+} = useStream('/recipes/assistant', {
+    onResponse: (response) => {
+        const interactionHeader = response.headers.get('X-Interaction-Id')
+        if (interactionHeader) {
+            const parsedId = parseInt(interactionHeader, 10)
+            assistantInteractionId.value = Number.isNaN(parsedId) ? interactionHeader : parsedId
+        }
+    },
+    onError: (error) => {
+        console.error('Assistant stream error:', error)
+        showToast('Erro ao obter resposta do assistente IA', 'warning')
+    },
+})
+
+watch(assistantStreamData, (value) => {
+    if (value == null) return
+
+    // Handle both plain text and JSON responses from the assistant endpoint.
+    // If it's JSON, extract only the `response` field and interaction_id.
+    try {
+        const parsed = typeof value === 'string' ? JSON.parse(value) : value
+        if (parsed && typeof parsed === 'object' && 'response' in parsed) {
+            assistantResponse.value = parsed.response ?? ''
+            if ('interaction_id' in parsed) {
+                assistantInteractionId.value = parsed.interaction_id ?? null
+            }
+            return
+        }
+    } catch (e) {
+        // Not valid JSON yet; fall back to raw value.
+    }
+
+    assistantResponse.value = typeof value === 'string' ? value : String(value)
+})
+
 // Feedback state
 const feedbackRating = ref(null) // 'up' | 'down'
 const feedbackText = ref('')
 const feedbackSubmitting = ref(false)
 const feedbackSubmitted = ref(false)
+const assistantRequestActive = ref(false)
+
+watch([assistantIsFetching, assistantIsStreaming], ([isFetching, isStreaming]) => {
+    if (!assistantRequestActive.value) return
+
+    const pending = isFetching || isStreaming
+    loading.value = pending
+
+    if (!pending) {
+        assistantRequestActive.value = false
+        showToast('Busca concluída!', 'success')
+    }
+})
 
 // Function to detect if content contains markdown
 function containsMarkdown(text) {
@@ -628,30 +682,46 @@ const search = async () => {
         // })
         // results.value = searchResponse.data
 
-        // Get AI assistant response if enabled
+        // Get AI assistant response if enabled (streaming)
         if (showAIAssistant.value) {
             try {
-                const assistantRes = await axios.post('/recipes/assistant', {
+                assistantResponse.value = ''
+                assistantInteractionId.value = null
+                assistantRequestActive.value = true
+
+                await sendAssistantStream({
                     text: query.value,
                     tenant_id: tenantId.value,
-                    use_tools: true
+                    use_tools: true,
                 })
-                assistantResponse.value = assistantRes.data.response
-                assistantInteractionId.value = assistantRes.data.interaction_id || null
+
+                // Fallback: if the stream finished before watcher ticked, close loading state here.
+                if (
+                    assistantRequestActive.value &&
+                    !assistantIsFetching.value &&
+                    !assistantIsStreaming.value
+                ) {
+                    assistantRequestActive.value = false
+                    loading.value = false
+                    showToast('Busca concluída!', 'success')
+                }
             } catch (assistantError) {
                 console.error('Assistant error:', assistantError)
+                assistantRequestActive.value = false
+                loading.value = false
                 showToast('Erro ao obter resposta do assistente IA', 'warning')
             }
+        } else {
+            loading.value = false
+            showToast('Busca concluída!', 'success')
         }
-
-        showToast(`Busca concluída!`, 'success')
 
     } catch (error) {
         console.error('Search error:', error)
         results.value = {}
-        showToast('Erro ao realizar a busca. Tente novamente.', 'error')
-    } finally {
+        assistantRequestActive.value = false
         loading.value = false
+        showToast('Erro ao realizar a busca. Tente novamente.', 'error')
     }
 }
 

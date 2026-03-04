@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Log;
 use Prism\Prism\Enums\Provider;
 use Prism\Prism\Exceptions\PrismException;
 use Prism\Prism\Facades\Prism;
+use Prism\Prism\Streaming\Events\TextDeltaEvent;
 use Prism\Prism\ValueObjects\Media\Audio;
 use Prism\Prism\ValueObjects\Messages\AssistantMessage;
 use Prism\Prism\ValueObjects\Messages\UserMessage;
@@ -49,7 +50,6 @@ class PrismService
                 ->using($this->getProvider(), config('services.prism_api.embedding_model', 'text-embedding-3-large'))
                 ->fromInput($query)
                 ->asEmbeddings();
-
             return $response->embeddings[0]->embedding ?? [];
         } catch (PrismException $e) {
             Log::error('Embedding generation failed:', ['error' => $e->getMessage()]);
@@ -76,7 +76,7 @@ class PrismService
                 ->withMessages($messages)
                 ->withTools($tools)
                 ->withClientRetry(3, 100)
-                ->withMaxSteps(10)
+                ->withMaxSteps(6)
                 ->withMaxTokens(4096)
                 ->asText();
 
@@ -84,7 +84,6 @@ class PrismService
                 Log::error('Error: '.$response->finishReason);
                 throw new \Exception('Error: '.$response->finishReason);
             }
-
             return [
                 'status' => 'success',
                 'response' => $response->text,
@@ -102,6 +101,61 @@ class PrismService
             return [
                 'status' => 'error',
                 'response' => 'Generic error: '.$e->getMessage(),
+            ];
+        }
+    }
+
+    /**
+     * Stream AI response chunks and return the full aggregated text.
+     */
+    public function getStreamedResponse(array $messages, $context = null, array $tools = [], $basePrompt = null, ?callable $onChunk = null): array
+    {
+        $prompt = $this->buildSystemPrompt($context, $basePrompt);
+
+        try {
+            $fullText = '';
+
+            $events = Prism::text()
+                ->using($this->getProvider(), $this->modelName)
+                ->withSystemPrompt($prompt)
+                ->withMessages($messages)
+                ->withTools($tools)
+                ->withClientRetry(3, 100)
+                ->withMaxSteps(6)
+                ->withMaxTokens(4096)
+                ->asStream();
+
+            foreach ($events as $event) {
+                if ($event instanceof TextDeltaEvent) {
+                    $delta = $event->delta ?? '';
+
+                    if ($delta !== '') {
+                        $fullText .= $delta;
+
+                        if ($onChunk) {
+                            $onChunk($delta);
+                        }
+                    }
+                }
+            }
+
+            return [
+                'status' => 'success',
+                'response' => $fullText,
+            ];
+        } catch (PrismException $e) {
+            Log::error('Text streaming failed:', ['error' => $e->getMessage()]);
+
+            return [
+                'status' => 'error',
+                'response' => 'Text streaming failed: '.$e->getMessage(),
+            ];
+        } catch (Throwable $e) {
+            Log::error('Generic streaming error:', ['error' => $e->getMessage()]);
+
+            return [
+                'status' => 'error',
+                'response' => 'Generic streaming error: '.$e->getMessage(),
             ];
         }
     }

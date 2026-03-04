@@ -20,6 +20,12 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->encryptCookies(except: ['appearance', 'sidebar_state']);
 
+        // Exclude AI assistant endpoints from CSRF validation to allow streaming requests
+        $middleware->validateCsrfTokens(except: [
+            '/recipes/assistant',
+            '/recipes/assistant/feedback',
+        ]);
+
         $middleware->web(append: [
             HandleAppearance::class,
             HandleInertiaRequests::class,

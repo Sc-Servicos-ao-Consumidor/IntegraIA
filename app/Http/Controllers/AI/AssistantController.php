@@ -84,35 +84,66 @@ class AssistantController extends Controller
             $assistantPrompt = $assistant->system_prompt ?? null;
             $basePrompt = trim(($assistantPrompt ? $assistantPrompt."\n\n" : '').($tenantBasePrompt ?? '')) ?: null;
 
-            $response = $prism->getResponse($text, $context, $tools, $basePrompt);
-
-            $assistantText = $response['response'] ?? (is_string($response) ? $response : null);
-
+            $sessionId = $request->hasSession() ? $request->session()->getId() : null;
+            $queryText = $request->text;
+            $assistantId = $assistant->id;
+            $assistantSlug = $assistant->slug;
             $interaction = AssistantLog::create([
                 'tenant_id' => $tenantId ?: null,
-                'assistant_id' => $assistant->id,
-                'session_id' => $request->hasSession() ? $request->session()->getId() : null,
-                'query' => $request->text,
-                'response' => $assistantText,
+                'assistant_id' => $assistantId,
+                'session_id' => $sessionId,
+                'query' => $queryText,
+                'response' => '',
                 'meta' => [
                     'use_tools' => (bool) $useTools,
                     'tenant_id' => $tenantId ?? null,
-                    'assistant_slug' => $assistant->slug,
+                    'assistant_slug' => $assistantSlug,
+                    'streamed' => true,
                 ],
             ]);
+            $interactionId = $interaction->id;
 
-            if ($response['status'] === 'success') {
-                return response()->json([
-                    'response' => $assistantText ?? 'Sem resposta',
-                    'interaction_id' => $interaction->id,
-                ], 200);
-            } else {
-                Log::error('AI response error:', ['response' => $response]);
-                return response()->json([
-                    'response' => $assistantText ?? 'Erro ao processar a solicitação',
-                    'interaction_id' => $interaction->id,
-                ], 500);
-            }
+            return response()->stream(function () use (
+                $prism,
+                $text,
+                $context,
+                $tools,
+                $basePrompt,
+                $interactionId
+            ) {
+                $streamedText = '';
+
+                $response = $prism->getStreamedResponse(
+                    $text,
+                    $context,
+                    $tools,
+                    $basePrompt,
+                    function (string $delta) use (&$streamedText) {
+                        $streamedText .= $delta;
+                        echo $delta;
+
+                        if (function_exists('ob_flush')) {
+                            @ob_flush();
+                        }
+                        flush();
+                    }
+                );
+
+                if (($response['status'] ?? 'error') !== 'success') {
+                    $errorText = $response['response'] ?? 'Erro ao processar a solicitação';
+                    echo $errorText;
+                    $streamedText = $streamedText !== '' ? $streamedText : $errorText;
+                }
+
+                AssistantLog::whereKey($interactionId)->update([
+                    'response' => $streamedText,
+                ]);
+            }, 200, [
+                'Content-Type' => 'text/plain; charset=UTF-8',
+                'Cache-Control' => 'no-cache, no-transform',
+                'X-Accel-Buffering' => 'no',
+                'X-Interaction-Id' => (string) $interactionId,
+            ]);
 
         } catch (\Exception $e) {
             Log::error('Assistant error:', ['error' => $e->getMessage()]);
