@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\Depreciated;
 
 use App\Models\GroupProduct;
 use App\Models\Product;

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\Depreciated;
 
 use Illuminate\Support\Facades\Log;
 use Prism\Prism\Enums\Provider;
