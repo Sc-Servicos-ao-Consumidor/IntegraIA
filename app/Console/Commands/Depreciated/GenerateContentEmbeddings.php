@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Console\Commands;
+namespace App\Console\Commands\Depreciated;
 
 use App\Models\Content;
 use App\Services\EmbeddingService;

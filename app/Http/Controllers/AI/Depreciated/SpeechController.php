@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\AI;
+namespace App\Http\Controllers\AI\Depreciated;
 
 use App\Http\Controllers\Controller;
 use App\Services\PrismService;
