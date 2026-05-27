@@ -1,0 +1,24 @@
+**Phase 3 implementada e completa. Resumo:**
+
+---
+
+### O que foi criado
+
+**Phase 3.1 — `CatalogSearchableTextService`** (`app/Services/Catalog/`)
+- `build(CatalogProduct): string` — eager-load de packages, concatena campos não-nulos/não-vazios na ordem correta (produto + packages)
+- `buildAndStore(CatalogProduct): void` — persiste no banco via `update()`
+
+**Phase 3.2 — `GenerateCatalogProductEmbedding`** (`app/Jobs/`)
+- Usa `Embeddings::for([$text])->dimensions(3072)->generate()` do `laravel/ai`
+- `$tries = 3`, `$backoff = [30, 60]`
+- Retorna early se produto não existe; loga warning se `searchable_text` vazio; re-throws em falha de AI para retry da fila
+
+**Phase 3.3 — `EmbedCatalogCommand`** (`app/Console/Commands/Catalog/`)
+- `catalog:embed --tenant= [--refresh]`
+- Sem `--refresh`: despacha apenas onde `embedding IS NULL`
+- Com `--refresh`: despacha para stale (`embedded_at IS NULL OR embedded_at < updated_at`)
+- Fire-and-forget via `Queue::dispatch()`
+
+**Decisão chave:** `dimensions(3072)` é obrigatório no job para corresponder à coluna `vector(3072)` do PostgreSQL — o fake padrão usa 1536 e causaria erro de DB.
+
+**Resultado:** 18/18 testes novos verdes · 112/114 total (2 falhas pré-existentes em `ExampleTest`/`DashboardTest`, sem relação com a feature)
