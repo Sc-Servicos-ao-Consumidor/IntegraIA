@@ -28,7 +28,7 @@ class CatalogImport implements SkipsOnError, SkipsOnFailure, ToCollection, WithH
 
     public function collection(Collection $collection): void
     {
-        foreach ($collection as $row) {
+        foreach ($collection as $index => $row) {
             $normalized = $this->normalizer->normalize($row->toArray());
 
             if (empty($normalized['product_id']) || empty($normalized['sku_package'])) {
@@ -37,6 +37,7 @@ class CatalogImport implements SkipsOnError, SkipsOnFailure, ToCollection, WithH
                 continue;
             }
 
+            $normalized['_row_number'] = (int) $index + 2; // row 1 is the header
             $this->rows->push($normalized);
         }
     }

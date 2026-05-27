@@ -1,0 +1,22 @@
+Phase 6 is complete. Here's a summary of what was done:
+
+**Implementation changes:**
+- `CatalogImport::collection()` — added `_row_number` (spreadsheet row index + 2, since row 1 is the header) to each normalized row
+- `CatalogImportService::import()` — both error catch blocks now extract `row_number` from `_row_number` and strip it from `row_data` before creating `CatalogImportError` records
+
+**Phase 6.1 tests** (`Phase6ImportRunStatusTest.php`, 5 tests):
+- Verifies `pending` → `running` transition via `started_at` being set
+- Verifies `running` → `completed` with `completed_at` set
+- Verifies `running` → `failed` on fatal error (mocking `Excel::import` to throw)
+- Verifies `row_number` (int) and `row_data` (array) are stored on `CatalogImportError` — uses `Event::listen` on `eloquent.creating: CatalogPackage` to force package failures, with `try-finally` cleanup
+- Verifies the original error message is preserved on `CatalogImportError`
+
+**Phase 6.2 tests** (`Phase6EmbeddingStatusTest.php`, 6 tests):
+- Verifies `embedded_at` is set after successful embedding
+- Verifies `scopeWithoutEmbedding` filters correctly
+- Verifies `scopeStale` returns records with null `embedded_at`
+- Verifies `scopeStale` returns records where `embedded_at < updated_at` (uses `DB::table` for precise timestamp control)
+- Verifies `scopeStale` excludes current records
+- Verifies `Log::error` is written on embedding failure before the exception re-throws
+
+**Result:** 179 passing, 2 pre-existing failures (unrelated).

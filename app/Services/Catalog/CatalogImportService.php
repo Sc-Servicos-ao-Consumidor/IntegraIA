@@ -96,7 +96,8 @@ class CatalogImportService
                             $failedCount++;
                             CatalogImportError::create([
                                 'catalog_import_run_id' => $run->id,
-                                'row_data' => $row,
+                                'row_number' => $row['_row_number'] ?? null,
+                                'row_data' => collect($row)->except('_row_number')->all(),
                                 'error_message' => $e->getMessage(),
                             ]);
                         }
@@ -106,7 +107,8 @@ class CatalogImportService
                     foreach ($productRows as $row) {
                         CatalogImportError::create([
                             'catalog_import_run_id' => $run->id,
-                            'row_data' => $row,
+                            'row_number' => $row['_row_number'] ?? null,
+                            'row_data' => collect($row)->except('_row_number')->all(),
                             'error_message' => $e->getMessage(),
                         ]);
                     }
