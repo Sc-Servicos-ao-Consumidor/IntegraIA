@@ -7,12 +7,15 @@
 #
 # Uso:
 #   chmod +x ralph.sh
-#   ./ralph.sh [--engine codex|claude] [caminho-do-arquivo]
+#   ./ralph.sh [--engine codex|claude] [--from-phase N] [--only-phase N] [caminho-do-arquivo]
 #
 # Exemplos:
 #   ./ralph.sh
 #   ./ralph.sh --engine codex
 #   ./ralph.sh --engine claude docs/project-phases.md
+#   ./ralph.sh --from-phase 4
+#   ./ralph.sh --only-phase 4
+#   TOKEN_WAIT_SECONDS=900 ./ralph.sh --from-phase 4
 #
 # Configuracoes opcionais:
 #   TOKEN_WAIT_SECONDS=600 ./ralph.sh
@@ -27,6 +30,8 @@ set -euo pipefail
 
 ENGINE="claude"
 INPUT_FILE=""
+FROM_PHASE=""
+ONLY_PHASE=""
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -36,6 +41,22 @@ while [[ $# -gt 0 ]]; do
       ;;
     --engine=*)
       ENGINE="${1#*=}"
+      shift
+      ;;
+    --from-phase)
+      FROM_PHASE="$2"
+      shift 2
+      ;;
+    --from-phase=*)
+      FROM_PHASE="${1#*=}"
+      shift
+      ;;
+    --only-phase)
+      ONLY_PHASE="$2"
+      shift 2
+      ;;
+    --only-phase=*)
+      ONLY_PHASE="${1#*=}"
       shift
       ;;
     *)
@@ -52,11 +73,28 @@ if [[ "$ENGINE" != "codex" && "$ENGINE" != "claude" ]]; then
   exit 1
 fi
 
+if [[ -n "$FROM_PHASE" && ! "$FROM_PHASE" =~ ^[0-9]+$ ]]; then
+  echo "--from-phase deve ser um numero inteiro."
+  exit 1
+fi
+
+if [[ -n "$ONLY_PHASE" && ! "$ONLY_PHASE" =~ ^[0-9]+$ ]]; then
+  echo "--only-phase deve ser um numero inteiro."
+  exit 1
+fi
+
+if [[ -n "$FROM_PHASE" && -n "$ONLY_PHASE" ]]; then
+  echo "Use apenas --from-phase ou --only-phase, nao os dois ao mesmo tempo."
+  exit 1
+fi
+
 PHASES_DIR=".phases"
 LOG_DIR=".phases/logs"
 PROMPT_DIR=".phases/prompts"
 MANIFEST="$PHASES_DIR/manifest.txt"
-PROGRESS_FILE="$PHASES_DIR/.progress"
+
+# Fica fora de .phases porque .phases e recriada a cada execucao.
+PROGRESS_FILE=".ralph-progress"
 
 MAX_RETRIES=2
 
@@ -257,6 +295,46 @@ split_phases() {
   done < "$INPUT_FILE"
 
   success "$phase_count fases extraidas"
+}
+
+phase_number_from_title() {
+  local title="$1"
+
+  echo "$title" | sed -E 's/^Phase[[:space:]]+([0-9]+).*/\1/'
+}
+
+should_skip_phase_by_filter() {
+  local title="$1"
+  local phase_number
+  phase_number=$(phase_number_from_title "$title")
+
+  if [[ -n "$FROM_PHASE" && "$phase_number" -lt "$FROM_PHASE" ]]; then
+    return 0
+  fi
+
+  if [[ -n "$ONLY_PHASE" && "$phase_number" -ne "$ONLY_PHASE" ]]; then
+    return 0
+  fi
+
+  return 1
+}
+
+skip_reason_for_phase() {
+  local title="$1"
+  local phase_number
+  phase_number=$(phase_number_from_title "$title")
+
+  if [[ -n "$FROM_PHASE" && "$phase_number" -lt "$FROM_PHASE" ]]; then
+    echo "--from-phase $FROM_PHASE"
+    return 0
+  fi
+
+  if [[ -n "$ONLY_PHASE" && "$phase_number" -ne "$ONLY_PHASE" ]]; then
+    echo "--only-phase $ONLY_PHASE"
+    return 0
+  fi
+
+  echo ""
 }
 
 build_prompt_file() {
@@ -470,12 +548,29 @@ main() {
   total_phases=$(wc -l < "$MANIFEST")
 
   echo ""
-  log "$total_phases fases para implementar"
+  log "$total_phases fases encontradas"
+  echo ""
+
+  if [[ -n "$FROM_PHASE" ]]; then
+    warn "Retomando a partir da fase $FROM_PHASE"
+  fi
+
+  if [[ -n "$ONLY_PHASE" ]]; then
+    warn "Executando somente a fase $ONLY_PHASE"
+  fi
+
   echo ""
 
   local num=0
   while IFS="|" read -r file title; do
     num=$((num + 1))
+
+    if should_skip_phase_by_filter "$title"; then
+      local reason
+      reason=$(skip_reason_for_phase "$title")
+      echo -e "  ${BLUE}[$num] $title (pulada por $reason)${NC}"
+      continue
+    fi
 
     if is_phase_done "$file"; then
       echo -e "  ${GREEN}[$num] $title (ja completada)${NC}"
@@ -501,6 +596,14 @@ main() {
 
   while IFS="|" read -r file title; do
     current=$((current + 1))
+
+    if should_skip_phase_by_filter "$title"; then
+      local reason
+      reason=$(skip_reason_for_phase "$title")
+      log "Pulando $title ($reason)"
+      skipped_phases+=("$title")
+      continue
+    fi
 
     if is_phase_done "$file"; then
       log "Pulando $title (ja completada)"

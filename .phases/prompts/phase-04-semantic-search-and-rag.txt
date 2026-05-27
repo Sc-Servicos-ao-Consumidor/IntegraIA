@@ -1,0 +1,134 @@
+Voce e um desenvolvedor Laravel senior implementando uma feature de busca semantica de catalogo de produtos.
+
+## Stack do projeto
+- Laravel v13, PHP 8.5
+- Inertia.js v2 + Vue 3 (NAO usa Livewire — nunca crie nada relacionado a Livewire)
+- Pest PHP v4 (testes — rode com: ./vendor/bin/sail artisan test --compact)
+- Tailwind CSS v4
+- PostgreSQL + pgvector (via Laravel Sail / Docker)
+- Filas: Laravel Horizon + Redis
+- XLS: maatwebsite/excel
+- IA e embeddings: laravel/ai SDK (v0)
+- Autenticacao de API: Laravel Sanctum
+
+## Arquivos de referencia obrigatorios
+- CLAUDE.md — regras do projeto (LEIA ANTES de qualquer coisa — siga todas as regras)
+- docs/project-phases.md — plano completo de fases (contexto geral)
+- docs/user-stories.md — user stories e criterios de aceite
+- docs/database-schema.md — schema das tabelas do catalogo (catalog_products, catalog_packages, etc.)
+- docs/project-description.md — descricao geral da plataforma
+
+## Escopo desta feature
+BACKEND ONLY. Nao crie:
+- Views Blade, paginas Inertia, componentes Vue
+- CSS, classes Tailwind, layouts
+- Qualquer coisa relacionada a Livewire
+
+## Convencoes obrigatorias (do CLAUDE.md)
+- Use Sail para TODOS os comandos: ./vendor/bin/sail artisan ...
+- NUNCA encadeie comandos de criacao de migration com && ou ; (timestamps ficam identicos)
+- Registre Observers via atributo PHP no model, NAO em AppServiceProvider
+- Services em app/Services/Catalog/, logica de negocio fora dos controllers
+- Jobs em app/Jobs/Catalog/
+- Controllers de API em app/Http/Controllers/Api/Catalog/
+- Enums em app/Enums/
+- Imports XLS em app/Imports/
+- Crie factories para todos os models novos
+- NAO use BelongsToTenant em models que sao acessados por jobs (sem sessao no CLI/queue)
+- Tenant e resolvido por parametro explicito ou pelo token Sanctum do usuario autenticado
+
+## Sua tarefa
+Implemente COMPLETAMENTE cada item [ ] da fase descrita abaixo.
+
+Para cada item:
+1. Implemente o codigo completo — sem TODOs (exceto onde o plano explicita "stub")
+2. Crie os testes Pest listados como criterio de aceite
+3. Rode os testes: ./vendor/bin/sail artisan test --compact
+4. Se um teste falhar, corrija o codigo e rode novamente
+5. Quando os testes passarem, formate: ./vendor/bin/sail php vendor/bin/pint --dirty --format agent
+6. So avance ao proximo item quando os testes estiverem verdes
+
+Ao final de todos os itens, rode uma vez:
+./vendor/bin/sail artisan test --compact
+
+## Fase a implementar
+## Phase 4 — Semantic Search and RAG
+
+> **User Stories:** US-4.1, US-4.2, US-4.3
+
+---
+
+### Phase 4.1 — `CatalogSearchService`
+
+- [ ] Create `app/Services/Catalog/CatalogSearchService.php`
+- [ ] Method `search(string $query, int $tenantId, int $limit = 5): Collection`
+  - Throws `InvalidArgumentException` if `$query` is empty
+  - Calls `laravel/ai` SDK to generate an embedding for `$query`
+  - Performs neighbor search on `CatalogProduct` scoped to `$tenantId` using `nearestNeighbors('embedding', $vector)->limit($limit)`
+  - Eager-loads `packages` on results
+  - Returns collection of `CatalogProduct` models (with packages loaded)
+- [ ] Method `searchAsRagContext(string $query, int $tenantId, int $limit = 5): array`
+  - Calls `search()` internally
+  - Transforms each result into a structured array:
+    ```php
+    [
+        'product_name', 'product_description', 'brand_name',
+        'category_name', 'sub_category_name', 'line_name',
+        'packages' => [['sku_package', 'sku_package_name', 'package_description', 'gross_weight', 'net_weight', 'ean']]
+    ]
+    ```
+  - Never includes `embedding` vectors in the output
+  - Returns empty array when no results are found
+
+**Pest tests:**
+```
+- it throws InvalidArgumentException for an empty query string
+- it returns CatalogProduct records ordered by semantic similarity (mock neighbor search)
+- it limits results to the configured limit
+- it eager-loads packages on search results
+- it returns an empty collection when no results match
+- searchAsRagContext returns the expected array structure
+- searchAsRagContext never includes embedding values in output
+- searchAsRagContext returns an empty array when no results are found
+- searchAsRagContext includes all package fields for each product
+```
+
+---
+
+### Phase 4.2 — `CatalogAnswerService`
+
+> **Note:** In the pipeline, search runs in a separate job (`CatalogSearchJob`) before this service is called. This service must accept pre-loaded RAG context — it must NOT call `CatalogSearchService` internally. This keeps each pipeline stage independently testable and prevents double embedding generation.
+
+- [ ] Create `app/Services/Catalog/CatalogAnswerService.php`
+- [ ] No constructor injection of `CatalogSearchService`
+- [ ] Method `answerFromContext(string $question, array $ragContext): array`
+  - Accepts pre-loaded RAG context (output of `CatalogSearchService::searchAsRagContext()`)
+  - If `$ragContext` is empty, returns: `['answer' => '<safe fallback message>', 'products' => []]`
+  - Builds a system prompt instructing the model to answer using only the provided catalog context
+  - Calls `laravel/ai` SDK to generate a text response
+  - Returns:
+    ```php
+    [
+        'answer'   => string,
+        'products' => [
+            [
+                'codigo_padrao', 'product_name', 'brand_name', 'category_name',
+                'sub_category_name', 'line_name', 'product_img_url',
+                'packages' => [['sku_package', 'sku_package_name', 'package_description',
+                                'gross_weight', 'net_weight', 'ean', 'package_img_url']]
+            ]
+        ]
+    ]
+    ```
+  - Never exposes raw embeddings, vector values, or internal model metadata in the return value
+
+**Pest tests:**
+```
+- it returns an answer and products array when ragContext is non-empty
+- it returns a safe fallback answer and empty products array when ragContext is empty (not an exception)
+- it includes all product fields and nested package fields in the products array
+- it never exposes embedding values in the returned array
+- it calls the AI model with a prompt that contains the ragContext data
+```
+
+---

@@ -1,0 +1,13 @@
+Phase 4 is complete. Here's a summary of what was implemented:
+
+**Phase 4.1 — `CatalogSearchService`** (`app/Services/Catalog/CatalogSearchService.php`)
+- `search()` — throws `InvalidArgumentException` for empty query, generates embedding via `Embeddings::for()->dimensions(3072)->generate()`, performs kNN search using `nearestNeighbors('embedding', $vector, Distance::Cosine)` scoped to tenant, eager-loads packages
+- `searchAsRagContext()` — calls `search()` internally, maps results to a structured array with all display fields (including `codigo_padrao`, `product_img_url`, package `package_img_url`), never includes `embedding`, `searchable_text`, or `embedded_at`
+
+**Phase 4.2 — `CatalogAnswerService`** (`app/Services/Catalog/CatalogAnswerService.php`) + **`CatalogAnswerAgent`** (`app/Ai/Agents/CatalogAnswerAgent.php`)
+- `answerFromContext()` — accepts pre-loaded RAG context, returns safe fallback for empty context, builds a prompt with the context JSON and calls `CatalogAnswerAgent`, returns `answer` + `products` array (clean, no embeddings)
+- Agent is a named class (not anonymous) to enable `::fake()` and `::assertPrompted()` in tests
+
+**Fix applied:** `nearestNeighbors` requires `Distance` as third argument in this version of `pgvector-php` — added `Distance::Cosine`.
+
+Result: **14/14 tests green**, 126 total passing, 2 pre-existing unrelated failures.
