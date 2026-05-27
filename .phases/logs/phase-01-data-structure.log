@@ -1,0 +1,32 @@
+Phase 1 is complete. Here's a summary of everything implemented:
+
+---
+
+## Phase 1 — Data Structure ✅
+
+### Migrations (Phase 1.1)
+| Migration | Status |
+|---|---|
+| `catalog_import_statuses` | ✅ |
+| `catalog_import_runs` | ✅ |
+| `catalog_import_errors` | ✅ |
+| `catalog_products` (with `vector(3072)`) | ✅ |
+| `catalog_packages` | ✅ |
+
+### Models (Phase 1.2)
+- `CatalogProduct` — `HasNeighbors`, `HasFactory`, `scopeWithoutEmbedding`, `scopeStale`, relationships to `CatalogPackage` and `Tenant`
+- `CatalogPackage` — decimal casts, `catalogProduct()` relationship
+- `CatalogImportStatus` — `runs()` relationship
+- `CatalogImportRun` — datetime casts, `status()`, `errors()`, `tenant()` relationships
+- `CatalogImportError` — `row_data` cast to array, `run()` relationship
+
+### Factories (Phase 1.3)
+- `CatalogProductFactory` — with `embedded()` state using `new Vector()`
+- `CatalogPackageFactory`
+- `CatalogImportRunFactory` — with `running()`, `completed()`, `failed()` states
+- `TenantFactory` — created (was missing)
+
+### Tests
+**36/36 passing** across `Phase1MigrationsTest`, `Phase1ModelsTest`, `Phase1FactoriesTest`.
+
+The 2 pre-existing failures in `ExampleTest` and `DashboardTest` are unrelated to this feature (they test routes that redirect for tenant-less users).

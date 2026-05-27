@@ -10,14 +10,18 @@
 #   ./ralph.sh [--engine codex|claude] [caminho-do-arquivo]
 #
 # Exemplos:
-#   ./ralph.sh                          # default: claude
-#   ./ralph.sh --engine codex           # usa Codex CLI
+#   ./ralph.sh
+#   ./ralph.sh --engine codex
 #   ./ralph.sh --engine claude docs/project-phases.md
 #
+# Configuracoes opcionais:
+#   TOKEN_WAIT_SECONDS=600 ./ralph.sh
+#   TOKEN_WAIT_SECONDS=600 TOKEN_WAIT_MAX_ATTEMPTS=6 ./ralph.sh
+#
 # Pre-requisitos:
-#   - Codex:  npm install -g @openai/codex  + OPENAI_API_KEY no ambiente
-#   - Claude: npm install -g @anthropic-ai/claude-code + ANTHROPIC_API_KEY no ambiente
-#   - Estar na raiz do projeto Laravel (dentro de um repo git)
+#   - Codex: npm install -g @openai/codex + OPENAI_API_KEY no ambiente
+#   - Claude: npm install -g @anthropic-ai/claude-code + login feito no Claude Code CLI
+#   - Estar na raiz do projeto Laravel, dentro de um repo git
 
 set -euo pipefail
 
@@ -53,7 +57,16 @@ LOG_DIR=".phases/logs"
 PROMPT_DIR=".phases/prompts"
 MANIFEST="$PHASES_DIR/manifest.txt"
 PROGRESS_FILE="$PHASES_DIR/.progress"
+
 MAX_RETRIES=2
+
+# Quando detectar limite/token/rate limit, aguarda e tenta novamente.
+# 600 = 10 minutos.
+TOKEN_WAIT_SECONDS="${TOKEN_WAIT_SECONDS:-600}"
+
+# 0 = espera infinitamente ate voltar.
+# Exemplo: TOKEN_WAIT_MAX_ATTEMPTS=6 tenta por 1 hora se TOKEN_WAIT_SECONDS=600.
+TOKEN_WAIT_MAX_ATTEMPTS="${TOKEN_WAIT_MAX_ATTEMPTS:-0}"
 
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -69,20 +82,21 @@ fail()    { echo -e "${RED}[$(date '+%H:%M:%S')] $1${NC}"; }
 format_duration() {
   local total_seconds=$1
   local hours=$((total_seconds / 3600))
-  local minutes=$(( (total_seconds % 3600) / 60 ))
+  local minutes=$(((total_seconds % 3600) / 60))
   local seconds=$((total_seconds % 60))
 
-  if [ $hours -gt 0 ]; then
-    printf "%dh %dm %ds" $hours $minutes $seconds
-  elif [ $minutes -gt 0 ]; then
-    printf "%dm %ds" $minutes $seconds
+  if [ "$hours" -gt 0 ]; then
+    printf "%dh %dm %ds" "$hours" "$minutes" "$seconds"
+  elif [ "$minutes" -gt 0 ]; then
+    printf "%dm %ds" "$minutes" "$seconds"
   else
-    printf "%ds" $seconds
+    printf "%ds" "$seconds"
   fi
 }
 
 format_timestamp() {
   local ts=$1
+
   if [[ "$(uname)" == "Darwin" ]]; then
     date -r "$ts" '+%d/%m/%Y %H:%M:%S'
   else
@@ -90,18 +104,23 @@ format_timestamp() {
   fi
 }
 
-# ─────────────────────────────────────────────────────────
-# Deteccao de token/credito esgotado
-# Encerra o script inteiro com exit 2 se detectado.
-# ─────────────────────────────────────────────────────────
 TOKEN_ERROR_PATTERNS=(
   "insufficient_quota"
   "exceeded your current quota"
   "rate_limit_exceeded"
+  "rate limit"
+  "rate limits"
+  "usage limit"
+  "usage_limit"
+  "usage limits"
+  "limit reached"
+  "limit exceeded"
+  "quota exceeded"
   "billing_hard_limit_reached"
   "credit balance is too low"
   "Your credit balance"
   "overloaded_error"
+  "overloaded"
   "insufficient balance"
   "payment required"
   "HTTP 402"
@@ -110,25 +129,46 @@ TOKEN_ERROR_PATTERNS=(
   "status: 429"
   "529"
   "too many requests"
+  "try again later"
+  "please try again later"
+  "temporarily unavailable"
 )
 
-check_token_exhaustion() {
+has_token_exhaustion() {
   local log_file="$1"
-  [ -f "$log_file" ] || return 0
+  [ -f "$log_file" ] || return 1
 
   for pattern in "${TOKEN_ERROR_PATTERNS[@]}"; do
     if grep -qi "$pattern" "$log_file" 2>/dev/null; then
       echo ""
-      fail "╔══════════════════════════════════════════════════════════╗"
-      fail "║  TOKEN / CREDITO ESGOTADO — encerrando tudo             ║"
-      fail "╠══════════════════════════════════════════════════════════╣"
-      fail "║  Padrao detectado: $pattern"
-      fail "║  Log: $log_file"
-      fail "╚══════════════════════════════════════════════════════════╝"
+      warn "╔══════════════════════════════════════════════════════════╗"
+      warn "║  LIMITE / RATE LIMIT / USAGE LIMIT DETECTADO            ║"
+      warn "╠══════════════════════════════════════════════════════════╣"
+      warn "║  Padrao detectado: $pattern"
+      warn "║  Log: $log_file"
+      warn "╚══════════════════════════════════════════════════════════╝"
       echo ""
-      exit 2
+      return 0
     fi
   done
+
+  return 1
+}
+
+wait_for_token_recovery() {
+  local wait_attempt="$1"
+
+  if [[ "$TOKEN_WAIT_MAX_ATTEMPTS" -gt 0 && "$wait_attempt" -gt "$TOKEN_WAIT_MAX_ATTEMPTS" ]]; then
+    fail "Limite de esperas atingido: $TOKEN_WAIT_MAX_ATTEMPTS"
+    return 1
+  fi
+
+  warn "Aguardando $(format_duration "$TOKEN_WAIT_SECONDS") antes de tentar novamente..."
+  warn "Tentativa de espera: $wait_attempt"
+
+  sleep "$TOKEN_WAIT_SECONDS"
+
+  return 0
 }
 
 preflight_checks() {
@@ -137,6 +177,7 @@ preflight_checks() {
       fail "codex CLI nao encontrado. Instale com: npm install -g @openai/codex"
       exit 1
     fi
+
     if [[ -z "${OPENAI_API_KEY:-}" ]]; then
       fail "OPENAI_API_KEY nao definida no ambiente."
       exit 1
@@ -146,9 +187,9 @@ preflight_checks() {
       fail "Claude Code CLI nao encontrado. Instale com: npm install -g @anthropic-ai/claude-code"
       exit 1
     fi
+
     if [[ -z "${ANTHROPIC_API_KEY:-}" ]]; then
-      fail "ANTHROPIC_API_KEY nao definida no ambiente."
-      exit 1
+      warn "ANTHROPIC_API_KEY nao definida. Continuando com a autenticacao do Claude Code CLI."
     fi
   fi
 
@@ -197,11 +238,16 @@ split_phases() {
         | sed 's/--*/-/g' \
         | sed 's/-$//' \
         | sed 's/^-//')
-      slug=$(echo "$slug" | sed -E 's/phase-([0-9])$/phase-0\1/' | sed -E 's/phase-([0-9])-/phase-0\1-/')
+
+      slug=$(echo "$slug" \
+        | sed -E 's/phase-([0-9])$/phase-0\1/' \
+        | sed -E 's/phase-([0-9])-/phase-0\1-/')
 
       current_file="$PHASES_DIR/${slug}.md"
+
       echo "$line" > "$current_file"
       echo "${slug}.md|${raw_title}" >> "$MANIFEST"
+
       continue
     fi
 
@@ -312,6 +358,31 @@ run_engine() {
   fi
 }
 
+run_engine_with_token_wait() {
+  local prompt_file="$1"
+  local log_file="$2"
+  local wait_attempt=1
+
+  while true; do
+    set +e
+    run_engine "$prompt_file" "$log_file"
+    local engine_status=$?
+    set -e
+
+    if has_token_exhaustion "$log_file"; then
+      if ! wait_for_token_recovery "$wait_attempt"; then
+        return 99
+      fi
+
+      wait_attempt=$((wait_attempt + 1))
+      warn "Tentando novamente apos espera por limite/token..."
+      continue
+    fi
+
+    return "$engine_status"
+  done
+}
+
 run_phase() {
   local phase_file="$1"
   local phase_title="$2"
@@ -328,32 +399,38 @@ run_phase() {
   local phase_success=false
   local prompt_file=""
 
-  while [ $attempt -le $MAX_RETRIES ]; do
+  while [ "$attempt" -le "$MAX_RETRIES" ]; do
     attempt=$((attempt + 1))
 
-    if [ $attempt -gt 1 ]; then
+    if [ "$attempt" -gt 1 ]; then
       warn "Tentativa $attempt/$((MAX_RETRIES + 1))..."
     fi
 
-    if [ $attempt -eq 1 ]; then
+    if [ "$attempt" -eq 1 ]; then
       prompt_file=$(build_prompt_file "$phase_file")
     fi
 
-    if run_engine "$prompt_file" "$log_file"; then
-      # Verifica token esgotado mesmo em saidas com exit 0 (ex: mensagem de erro no stdout)
-      check_token_exhaustion "$log_file"
+    set +e
+    run_engine_with_token_wait "$prompt_file" "$log_file"
+    local engine_status=$?
+    set -e
+
+    if [ "$engine_status" -eq 0 ]; then
       phase_success=true
       break
-    else
-      # Verifica token esgotado antes de tentar retry
-      check_token_exhaustion "$log_file"
+    fi
 
-      fail "$ENGINE retornou erro"
-      if [ $attempt -le $MAX_RETRIES ]; then
-        local test_output
-        test_output=$(tail -50 "$log_file" 2>/dev/null || echo "Sem output disponivel")
-        prompt_file=$(build_retry_prompt_file "$phase_file" "$test_output")
-      fi
+    if [ "$engine_status" -eq 99 ]; then
+      fail "$ENGINE nao retomou apos o limite configurado de esperas."
+      break
+    fi
+
+    fail "$ENGINE retornou erro"
+
+    if [ "$attempt" -le "$MAX_RETRIES" ]; then
+      local test_output
+      test_output=$(tail -50 "$log_file" 2>/dev/null || echo "Sem output disponivel")
+      prompt_file=$(build_retry_prompt_file "$phase_file" "$test_output")
     fi
   done
 
@@ -362,7 +439,7 @@ run_phase() {
   local phase_duration=$((phase_end - phase_start))
 
   if $phase_success; then
-    success "$phase_title — COMPLETA ($(format_duration $phase_duration))"
+    success "$phase_title — COMPLETA ($(format_duration "$phase_duration"))"
 
     if git rev-parse --is-inside-work-tree &> /dev/null 2>&1; then
       git add -A
@@ -372,11 +449,12 @@ run_phase() {
 
     echo "$phase_file" >> "$PROGRESS_FILE"
     return 0
-  else
-    fail "$phase_title — FALHOU apos $((MAX_RETRIES + 1)) tentativas ($(format_duration $phase_duration))"
-    fail "Log disponivel em: $log_file"
-    return 1
   fi
+
+  fail "$phase_title — FALHOU apos $((MAX_RETRIES + 1)) tentativas ($(format_duration "$phase_duration"))"
+  fail "Log disponivel em: $log_file"
+
+  return 1
 }
 
 is_phase_done() {
@@ -398,6 +476,7 @@ main() {
   local num=0
   while IFS="|" read -r file title; do
     num=$((num + 1))
+
     if is_phase_done "$file"; then
       echo -e "  ${GREEN}[$num] $title (ja completada)${NC}"
     else
@@ -412,7 +491,8 @@ main() {
 
   local start_time
   start_time=$(date +%s)
-  log "Inicio: $(format_timestamp $start_time)"
+
+  log "Inicio: $(format_timestamp "$start_time")"
 
   local current=0
   local failed_phases=()
@@ -449,36 +529,40 @@ main() {
   log "RELATORIO FINAL (engine: $ENGINE)"
   echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
-  if [ ${#completed_phases[@]} -gt 0 ]; then
+  if [ "${#completed_phases[@]}" -gt 0 ]; then
     echo ""
     success "Completadas (${#completed_phases[@]}):"
+
     for phase in "${completed_phases[@]}"; do
       echo -e "    ${GREEN}$phase${NC}"
     done
   fi
 
-  if [ ${#skipped_phases[@]} -gt 0 ]; then
+  if [ "${#skipped_phases[@]}" -gt 0 ]; then
     echo ""
     log "Puladas (${#skipped_phases[@]}):"
+
     for phase in "${skipped_phases[@]}"; do
       echo -e "    $phase"
     done
   fi
 
-  if [ ${#failed_phases[@]} -gt 0 ]; then
+  if [ "${#failed_phases[@]}" -gt 0 ]; then
     echo ""
     fail "Falharam (${#failed_phases[@]}):"
+
     for phase in "${failed_phases[@]}"; do
       echo -e "    ${RED}$phase${NC}"
     done
+
     echo ""
     fail "Verifique os logs em $LOG_DIR/"
   fi
 
   echo ""
-  log "Inicio:        $(format_timestamp $start_time)"
-  log "Fim:           $(format_timestamp $end_time)"
-  log "Duracao total: $(format_duration $total_duration)"
+  log "Inicio:        $(format_timestamp "$start_time")"
+  log "Fim:           $(format_timestamp "$end_time")"
+  log "Duracao total: $(format_duration "$total_duration")"
   echo ""
 }
 
