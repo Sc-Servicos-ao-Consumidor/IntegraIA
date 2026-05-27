@@ -1,0 +1,31 @@
+Phase 5 is fully implemented. Here's a summary of everything created:
+
+**Migrations**
+- `catalog_pipeline_statuses` — `id`, `name` unique, timestamps
+- `catalog_requests` — all columns with FKs to `tenants` and `catalog_pipeline_statuses`, indexes on `tenant_id` and `(tenant_id, catalog_pipeline_status_id)`
+
+**Seeder & DatabaseSeeder**
+- `CatalogPipelineStatusSeeder` — seeds `pending`, `processing`, `completed`, `failed`
+- Registered in `DatabaseSeeder`
+
+**Models**
+- `CatalogPipelineStatus` — `HasMany` → `CatalogRequest` via `runs()`
+- `CatalogRequest` — no `BelongsToTenant`, casts `search_results`/`ai_answer` as arrays and timestamps as datetimes, `status()` + `tenant()` BelongsTo
+
+**Factory**
+- `CatalogRequestFactory` — default `pending` state, plus `processing()`, `completed()`, `failed()` states
+
+**Jobs** (`app/Jobs/Catalog/`)
+- `WhatsAppTypingJob` — `$tries=1`, stub with TODO comment
+- `CatalogSearchJob` — transitions to `processing` on start, saves `search_results`, transitions to `failed`+sets `completed_at` on exception
+- `GenerateCatalogAnswerJob` — reads pre-loaded `search_results`, saves `ai_answer`, same failure pattern
+- `SendWhatsAppMessageJob` — stub, transitions to `completed`+sets `completed_at`
+
+**Service**
+- `CatalogPipelineService::dispatch()` — validates non-empty question, creates `CatalogRequest`, fires `WhatsAppTypingJob` standalone, then `Bus::chain([Search, Answer, Send])->dispatch()`
+
+**Controller & Route**
+- `CatalogPipelineController` — validates `question`/`contact_id`, resolves tenant via `$user->tenants()->first()->id`, returns `202 { request_id }`
+- Route: `POST /api/catalog/pipeline` under `auth:sanctum`
+
+**Results:** 42/42 new tests pass · 168 total passing · 2 pre-existing unrelated failures unchanged

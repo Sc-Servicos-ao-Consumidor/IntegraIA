@@ -4,6 +4,7 @@ use App\Http\Controllers\AI\AssistantController;
 use App\Http\Controllers\AI\SearchController;
 use App\Http\Controllers\AI\SpeechController;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\Catalog\CatalogPipelineController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -15,6 +16,9 @@ Route::get('/user', function (Request $request) {
 Route::post('/auth/token', [AuthController::class, 'login']);
 
 Route::middleware(['auth:sanctum'])->group(function () {
+
+    // Catalog pipeline
+    Route::post('/catalog/pipeline', CatalogPipelineController::class);
 
     // Semantic search
     Route::get('/semantic-search', [SearchController::class, 'search']);

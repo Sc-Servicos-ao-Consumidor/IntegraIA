@@ -29,6 +29,7 @@ class DatabaseSeeder extends Seeder
             ContentSeeder::class,
             CuisineSeeder::class,
             CatalogImportStatusSeeder::class,
+            CatalogPipelineStatusSeeder::class,
         ]);
 
         // Attach default tenant to the default user
