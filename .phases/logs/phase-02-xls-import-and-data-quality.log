@@ -1,0 +1,27 @@
+Phase 2 implementada e todos os 33 testes passando. Aqui está o resumo do que foi entregue:
+
+---
+
+## Phase 2 — Resumo
+
+### 2.1 — `maatwebsite/excel` instalado
+- A versão `3.x` é incompatível com PHP 8.5. Instalei a `4.x-dev` que usa `phpoffice/phpspreadsheet ^5.3` e suporta PHP `^8.3` + Laravel 13.
+
+### 2.2 — `CatalogFieldNormalizer` (`app/Services/Catalog/`)
+- `normalize(array $row): array` que: trim sem remover `\n` em campos de descrição, empty strings → `null`, `gross_weight`/`net_weight` → `float|null` com suporte a vírgula decimal.
+- **7 testes** passando.
+
+### 2.3 — `CatalogImport` (`app/Imports/`)
+- Implementa `ToCollection`, `WithHeadingRow`, `SkipsOnError`, `SkipsOnFailure`.
+- Injeta `CatalogFieldNormalizer`, skipa linhas sem `product_id` ou `sku_package`, rastreia `$skippedCount`.
+- **4 testes** passando com arquivos XLSX reais.
+
+### 2.4 — `CatalogImportService` (`app/Services/Catalog/`)
+- Recebe `int $tenantId` no construtor.
+- Abre o run, faz upsert de `CatalogProduct` por `(tenant_id, codigo_padrao)` e de `CatalogPackage` por `(catalog_product_id, sku_package)`, registra erros em `CatalogImportError`, atualiza contadores e timestamps.
+- **15 testes** passando (criação, atualização, idempotência, contadores, timestamps).
+
+### 2.5 — `catalog:import` Artisan Command
+- Signature: `catalog:import {file} {--tenant=}` com validação de tenant e arquivo.
+- Cria `CatalogImportRun` antes de importar, exibe tabela de resumo, exit code 0/1.
+- **7 testes** passando.
