@@ -13,8 +13,6 @@ Forbidden directory names include:
 - `old/`
 - `archive/`
 - `archives/`
-- `backup/`
-- `backups/`
 - `_deprecated/`
 - `_legacy/`
 
