@@ -20,6 +20,8 @@ class CatalogAnswerService
 
         $response = (new CatalogAnswerAgent)->prompt($fullPrompt);
 
+        dd($response);
+
         $products = array_map(fn (array $product) => [
             'codigo_padrao' => $product['codigo_padrao'] ?? null,
             'product_name' => $product['product_name'] ?? null,
