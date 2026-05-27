@@ -20,13 +20,4 @@ Route::middleware(['auth:sanctum'])->group(function () {
     // Catalog pipeline
     Route::post('/catalog/pipeline', CatalogPipelineController::class);
 
-    // Semantic search
-    Route::get('/semantic-search', [SearchController::class, 'search']);
-
-    // Assistant
-    Route::post('/assistant', [AssistantController::class, 'assistant']);
-
-    Route::post('/text-to-speech', [SpeechController::class, 'textToSpeech']);
-
-    Route::post('/speech-to-text', [SpeechController::class, 'speechToText']);
 });

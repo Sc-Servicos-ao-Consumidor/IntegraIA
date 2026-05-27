@@ -11,6 +11,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
 use Laravel\Ai\Embeddings;
+use Laravel\Ai\Enums\Lab;
 
 class GenerateCatalogProductEmbedding implements ShouldQueue
 {
@@ -42,7 +43,7 @@ class GenerateCatalogProductEmbedding implements ShouldQueue
         }
 
         try {
-            $response = Embeddings::for([$product->searchable_text])->dimensions(3072)->generate();
+            $response = Embeddings::for([$product->searchable_text])->dimensions(1536)->generate(Lab::OpenAI, model: 'text-embedding-3-small');
 
             $product->update([
                 'embedding' => $response->embeddings[0],

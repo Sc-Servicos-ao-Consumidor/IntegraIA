@@ -6,6 +6,7 @@ use App\Models\CatalogProduct;
 use Illuminate\Support\Collection;
 use InvalidArgumentException;
 use Laravel\Ai\Embeddings;
+use Laravel\Ai\Enums\Lab;
 use Pgvector\Laravel\Distance;
 
 class CatalogSearchService
@@ -16,7 +17,9 @@ class CatalogSearchService
             throw new InvalidArgumentException('Query string cannot be empty.');
         }
 
-        $response = Embeddings::for([$query])->dimensions(3072)->generate();
+        $response = Embeddings::for([$query])->dimensions(1536)->generate(Lab::OpenAI, model: 'text-embedding-3-small');
+
+
         $vector = $response->embeddings[0];
 
         return CatalogProduct::where('tenant_id', $tenantId)
