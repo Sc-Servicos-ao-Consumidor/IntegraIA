@@ -20,14 +20,12 @@ class AddToCartTool implements Tool
 
     public function handle(Request $request): string
     {
-        // TODO: integrar com a API de carrinho
+        // TODO: implementar VendasService::addToCart() quando a API de carrinho estiver disponível
         return json_encode([
+            'sucesso' => false,
+            'mensagem' => 'API de carrinho ainda não configurada.',
             'sku_package' => $request['sku_package'],
             'quantity' => $request['quantity'],
-            'tenant_id' => $this->tenantId,
-            'contact_id' => $this->contactId,
-            'status' => 'unavailable',
-            'message' => 'API de carrinho ainda não configurada.',
         ], JSON_UNESCAPED_UNICODE);
     }
 

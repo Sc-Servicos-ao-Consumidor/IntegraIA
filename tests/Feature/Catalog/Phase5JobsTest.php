@@ -1,6 +1,8 @@
 <?php
 
 use App\Ai\Agents\CatalogAnswerAgent;
+use App\Integrations\Vendas\VendasClient;
+use App\Integrations\Vendas\VendasProductService;
 use App\Jobs\Catalog\CatalogSearchJob;
 use App\Jobs\Catalog\GenerateCatalogAnswerJob;
 use App\Jobs\Catalog\RunCatalogAgentJob;
@@ -20,7 +22,7 @@ it('RunCatalogAgentJob transitions status to processing and saves the agent answ
     $request = CatalogRequest::factory()->create(['question' => 'Qual azeite vocês têm?']);
 
     $job = new RunCatalogAgentJob($request->id);
-    $job->handle();
+    $job->handle(new VendasProductService(new VendasClient));
 
     $request->refresh();
     expect($request->status->name)->toBe('processing')
@@ -34,8 +36,9 @@ it('RunCatalogAgentJob transitions status to failed and sets completed_at on exc
     $request = CatalogRequest::factory()->create();
 
     $job = new RunCatalogAgentJob($request->id);
+    $service = new VendasProductService(new VendasClient);
 
-    expect(fn () => $job->handle())->toThrow(RuntimeException::class);
+    expect(fn () => $job->handle($service))->toThrow(RuntimeException::class);
 
     $request->refresh();
     expect($request->status->name)->toBe('failed')
@@ -47,7 +50,7 @@ it('RunCatalogAgentJob returns early without error when CatalogRequest does not 
 
     $job = new RunCatalogAgentJob(99999);
 
-    expect(fn () => $job->handle())->not->toThrow(Throwable::class);
+    expect(fn () => $job->handle(new VendasProductService(new VendasClient)))->not->toThrow(Throwable::class);
 
     CatalogAnswerAgent::assertNeverPrompted();
 });

@@ -1,6 +1,8 @@
 <?php
 
 use App\Ai\Tools\GetProductPricesTool;
+use App\Integrations\Vendas\VendasClient;
+use App\Integrations\Vendas\VendasProductService;
 use Illuminate\Support\Facades\Http;
 use Laravel\Ai\Tools\Request;
 
@@ -22,6 +24,11 @@ function priceApiResponse(array $precos = []): array
     ];
 }
 
+function makePriceTool(int $tenantId = 1): GetProductPricesTool
+{
+    return new GetProductPricesTool(new VendasProductService(new VendasClient), $tenantId);
+}
+
 it('returns price data for valid package SKUs', function () {
     Http::fake([
         '*/store/product-price/*' => Http::response(priceApiResponse([
@@ -41,8 +48,7 @@ it('returns price data for valid package SKUs', function () {
         ]), 200),
     ]);
 
-    $tool = new GetProductPricesTool(tenantId: 1);
-    $result = json_decode($tool->handle(makePriceRequest(['7893500066545'])), true);
+    $result = json_decode(makePriceTool()->handle(makePriceRequest(['7893500066545'])), true);
 
     expect($result['sucesso'])->toBeTrue()
         ->and($result['precos'])->toHaveCount(1)
@@ -58,8 +64,7 @@ it('batches multiple SKUs in a single API call', function () {
         ]), 200),
     ]);
 
-    $tool = new GetProductPricesTool(tenantId: 1);
-    $result = json_decode($tool->handle(makePriceRequest(['7893500066545', '7893500020158'])), true);
+    $result = json_decode(makePriceTool()->handle(makePriceRequest(['7893500066545', '7893500020158'])), true);
 
     expect($result['sucesso'])->toBeTrue()
         ->and($result['precos'])->toHaveCount(2);
@@ -72,8 +77,7 @@ it('returns error payload on HTTP failure', function () {
         '*/store/product-price/*' => Http::response([], 500),
     ]);
 
-    $tool = new GetProductPricesTool(tenantId: 1);
-    $result = json_decode($tool->handle(makePriceRequest(['7893500066545'])), true);
+    $result = json_decode(makePriceTool()->handle(makePriceRequest(['7893500066545'])), true);
 
     expect($result['sucesso'])->toBeFalse()
         ->and($result['mensagem'])->toContain('500');
@@ -87,22 +91,20 @@ it('returns error payload when API responds with sucesso=false', function () {
         ], 200),
     ]);
 
-    $tool = new GetProductPricesTool(tenantId: 1);
-    $result = json_decode($tool->handle(makePriceRequest(['7893500066545'])), true);
+    $result = json_decode(makePriceTool()->handle(makePriceRequest(['7893500066545'])), true);
 
     expect($result['sucesso'])->toBeFalse()
         ->and($result['mensagem'])->toBe('Token inválido.');
 });
 
 it('sends Authorization and tenant headers with the request', function () {
-    config()->set('services.store_api.token', 'test-token-123');
+    config()->set('services.vendas.token', 'test-token-123');
 
     Http::fake([
         '*/store/product-price/*' => Http::response(priceApiResponse(), 200),
     ]);
 
-    $tool = new GetProductPricesTool(tenantId: 1);
-    $tool->handle(makePriceRequest(['7893500066545']));
+    makePriceTool()->handle(makePriceRequest(['7893500066545']));
 
     Http::assertSent(function ($request) {
         $headers = $request->headers();

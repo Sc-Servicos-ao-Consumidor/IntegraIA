@@ -49,9 +49,9 @@ return [
         'token' => env('BOTMAKER_TOKEN'),
     ],
 
-    'store_api' => [
-        'url' => env('STORE_API_URL', 'https://vendas.scservicos.app/api/v1'),
-        'token' => env('STORE_API_TOKEN'),
+    'vendas' => [
+        'url' => env('VENDAS_URL', 'https://vendas.scservicos.app/api/v1'),
+        'token' => env('VENDAS_TOKEN'),
     ],
 
 ];

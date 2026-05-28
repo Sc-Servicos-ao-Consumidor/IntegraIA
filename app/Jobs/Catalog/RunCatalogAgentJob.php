@@ -3,6 +3,7 @@
 namespace App\Jobs\Catalog;
 
 use App\Ai\Agents\CatalogAnswerAgent;
+use App\Integrations\Vendas\VendasProductService;
 use App\Models\CatalogPipelineStatus;
 use App\Models\CatalogRequest;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -20,7 +21,7 @@ class RunCatalogAgentJob implements ShouldQueue
 
     public function __construct(public int $catalogRequestId) {}
 
-    public function handle(): void
+    public function handle(VendasProductService $vendasProductService): void
     {
         $request = CatalogRequest::find($this->catalogRequestId);
 
@@ -37,10 +38,10 @@ class RunCatalogAgentJob implements ShouldQueue
 
         try {
             $agent = new CatalogAnswerAgent(
+                vendasProductService: $vendasProductService,
                 tenantId: $request->tenant_id,
                 contactId: $request->contact_id,
             );
-
 
             $response = $agent->prompt($request->question);
 

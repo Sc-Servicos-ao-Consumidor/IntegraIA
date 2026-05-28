@@ -5,6 +5,7 @@ namespace App\Ai\Agents;
 use App\Ai\Tools\AddToCartTool;
 use App\Ai\Tools\GetProductPricesTool;
 use App\Ai\Tools\SearchProductsTool;
+use App\Integrations\Vendas\VendasProductService;
 use Laravel\Ai\Attributes\MaxSteps;
 use Laravel\Ai\Attributes\Model;
 use Laravel\Ai\Attributes\Provider;
@@ -25,6 +26,7 @@ class CatalogAnswerAgent implements Agent, HasTools
     use Promptable;
 
     public function __construct(
+        private readonly VendasProductService $vendasProductService,
         private readonly int $tenantId,
         private readonly string $contactId,
     ) {}
@@ -55,7 +57,7 @@ class CatalogAnswerAgent implements Agent, HasTools
     {
         return [
             new SearchProductsTool($this->tenantId),
-            new GetProductPricesTool($this->tenantId),
+            new GetProductPricesTool($this->vendasProductService, $this->tenantId),
             new AddToCartTool($this->tenantId, $this->contactId),
         ];
     }
