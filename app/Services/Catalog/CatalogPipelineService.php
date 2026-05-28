@@ -3,8 +3,8 @@
 namespace App\Services\Catalog;
 
 use App\Jobs\Catalog\RunCatalogAgentJob;
-use App\Jobs\Catalog\SendWhatsAppMessageJob;
-use App\Jobs\Catalog\WhatsAppTypingJob;
+use App\Jobs\WhatsApp\SendWhatsAppMessageJob;
+use App\Jobs\WhatsApp\WhatsAppTypingJob;
 use App\Models\CatalogPipelineStatus;
 use App\Models\CatalogRequest;
 use Illuminate\Support\Facades\Bus;
@@ -26,7 +26,7 @@ class CatalogPipelineService
             'question' => $question,
         ]);
 
-        WhatsAppTypingJob::dispatch($contactId, $tenantId);
+        WhatsAppTypingJob::dispatch($contactId);
 
         Bus::chain([
             new RunCatalogAgentJob($request->id),

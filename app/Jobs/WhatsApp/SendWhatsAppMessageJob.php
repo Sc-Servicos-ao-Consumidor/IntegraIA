@@ -1,18 +1,15 @@
 <?php
 
-namespace App\Jobs\Catalog;
+namespace App\Jobs\WhatsApp;
 
-use App\Models\CatalogPipelineStatus;
+use App\Enums\CatalogPipelineStatus;
 use App\Models\CatalogRequest;
-use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Foundation\Bus\Dispatchable;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Queue\SerializesModels;
+use Illuminate\Foundation\Queue\Queueable;
 
 class SendWhatsAppMessageJob implements ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    use Queueable;
 
     public int $tries = 3;
 
@@ -30,10 +27,9 @@ class SendWhatsAppMessageJob implements ShouldQueue
 
         $aiAnswer = $request->ai_answer;
         $contactId = $request->contact_id;
-        $tenantId = $request->tenant_id;
 
         // TODO: call WhatsApp send message API
-        // Parameters: $contactId (recipient), $aiAnswer (message payload), $tenantId (tenant context)
+        // Parameters: $contactId (recipient), $aiAnswer (message payload)
 
         $request->update([
             'catalog_pipeline_status_id' => CatalogPipelineStatus::idFor('completed'),
