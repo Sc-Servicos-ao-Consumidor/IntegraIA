@@ -1,16 +1,15 @@
 <?php
 
 use App\Ai\Agents\CatalogAnswerAgent;
+use App\Integrations\Botmaker\BotmakerService;
 use App\Integrations\Vendas\VendasClient;
 use App\Integrations\Vendas\VendasProductService;
 use App\Jobs\Catalog\CatalogSearchJob;
-use App\Jobs\Catalog\GenerateCatalogAnswerJob;
 use App\Jobs\Catalog\RunCatalogAgentJob;
-use App\Jobs\Catalog\SendWhatsAppMessageJob;
-use App\Jobs\Catalog\WhatsAppTypingJob;
+use App\Jobs\WhatsApp\SendWhatsAppMessageJob;
+use App\Jobs\WhatsApp\WhatsAppTypingJob;
 use App\Models\CatalogRequest;
 use App\Models\Tenant;
-use App\Services\Catalog\CatalogAnswerService;
 use App\Services\Catalog\CatalogSearchService;
 
 // ============================================================
@@ -168,17 +167,18 @@ it('CatalogAnswerAgent messages() limits history to 7 messages', function () {
 // Phase 5.4 — WhatsAppTypingJob
 // ============================================================
 
-it('WhatsAppTypingJob can be instantiated with contactId and tenantId', function () {
-    $job = new WhatsAppTypingJob('+5511999999999', 1);
+it('WhatsAppTypingJob can be instantiated with contactId', function () {
+    $job = new WhatsAppTypingJob('+5511999999999');
 
-    expect($job->contactId)->toBe('+5511999999999')
-        ->and($job->tenantId)->toBe(1);
+    expect($job->contactId)->toBe('+5511999999999');
 });
 
 it('WhatsAppTypingJob does not throw during handle() execution', function () {
-    $job = new WhatsAppTypingJob('+5511999999999', 1);
+    $job = new WhatsAppTypingJob('+5511999999999');
+    $botmakerService = Mockery::mock(BotmakerService::class);
+    $botmakerService->shouldReceive('sendTyping')->once();
 
-    expect(fn () => $job->handle())->not->toThrow(Throwable::class);
+    expect(fn () => $job->handle($botmakerService))->not->toThrow(Throwable::class);
 });
 
 // ============================================================
@@ -263,101 +263,6 @@ it('CatalogSearchJob returns early without error when CatalogRequest does not ex
     $mockService->shouldNotReceive('searchAsRagContext');
 
     $job = new CatalogSearchJob(99999);
-
-    expect(fn () => $job->handle($mockService))->not->toThrow(Throwable::class);
-});
-
-// ============================================================
-// Phase 5.6 — GenerateCatalogAnswerJob
-// ============================================================
-
-it('GenerateCatalogAnswerJob loads the CatalogRequest and generates the AI answer', function () {
-    $request = CatalogRequest::factory()->create([
-        'question' => 'Qual o melhor arroz?',
-        'search_results' => [['product_name' => 'Arroz Premium']],
-    ]);
-
-    $mockService = Mockery::mock(CatalogAnswerService::class);
-    $mockService->shouldReceive('answerFromContext')
-        ->once()
-        ->with('Qual o melhor arroz?', [['product_name' => 'Arroz Premium']])
-        ->andReturn(['answer' => 'O melhor é Arroz Premium', 'products' => []]);
-
-    $job = new GenerateCatalogAnswerJob($request->id);
-    $job->handle($mockService);
-
-    $request->refresh();
-    expect($request->ai_answer)->toBeArray()
-        ->and($request->ai_answer['answer'])->toBe('O melhor é Arroz Premium');
-});
-
-it('GenerateCatalogAnswerJob passes the pre-loaded search_results to CatalogAnswerService (does not search again)', function () {
-    $searchResults = [['product_name' => 'Produto A'], ['product_name' => 'Produto B']];
-    $request = CatalogRequest::factory()->create(['search_results' => $searchResults]);
-
-    $mockService = Mockery::mock(CatalogAnswerService::class);
-    $mockService->shouldReceive('answerFromContext')
-        ->once()
-        ->withArgs(fn ($question, $context) => $context === $searchResults)
-        ->andReturn(['answer' => 'Resposta', 'products' => []]);
-
-    $job = new GenerateCatalogAnswerJob($request->id);
-    $job->handle($mockService);
-});
-
-it('GenerateCatalogAnswerJob saves the ai_answer array on the CatalogRequest', function () {
-    $request = CatalogRequest::factory()->create(['search_results' => []]);
-
-    $mockService = Mockery::mock(CatalogAnswerService::class);
-    $mockService->shouldReceive('answerFromContext')
-        ->once()
-        ->andReturn(['answer' => 'Sem resultados', 'products' => []]);
-
-    $job = new GenerateCatalogAnswerJob($request->id);
-    $job->handle($mockService);
-
-    $request->refresh();
-    expect($request->ai_answer)->toBeArray()
-        ->and($request->ai_answer)->toHaveKeys(['answer', 'products']);
-});
-
-it('GenerateCatalogAnswerJob handles empty search_results gracefully (fallback answer path)', function () {
-    $request = CatalogRequest::factory()->create(['search_results' => null]);
-
-    $mockService = Mockery::mock(CatalogAnswerService::class);
-    $mockService->shouldReceive('answerFromContext')
-        ->once()
-        ->with($request->question, [])
-        ->andReturn(['answer' => 'Não encontrei produtos', 'products' => []]);
-
-    $job = new GenerateCatalogAnswerJob($request->id);
-
-    expect(fn () => $job->handle($mockService))->not->toThrow(Throwable::class);
-
-    $request->refresh();
-    expect($request->ai_answer['answer'])->toBe('Não encontrei produtos');
-});
-
-it('GenerateCatalogAnswerJob transitions status to failed and sets completed_at on exception', function () {
-    $request = CatalogRequest::factory()->create(['search_results' => []]);
-
-    $mockService = Mockery::mock(CatalogAnswerService::class);
-    $mockService->shouldReceive('answerFromContext')->once()->andThrow(new RuntimeException('AI failed'));
-
-    $job = new GenerateCatalogAnswerJob($request->id);
-
-    expect(fn () => $job->handle($mockService))->toThrow(RuntimeException::class);
-
-    $request->refresh();
-    expect($request->status->name)->toBe('failed')
-        ->and($request->completed_at)->not->toBeNull();
-});
-
-it('GenerateCatalogAnswerJob returns early without error when CatalogRequest does not exist', function () {
-    $mockService = Mockery::mock(CatalogAnswerService::class);
-    $mockService->shouldNotReceive('answerFromContext');
-
-    $job = new GenerateCatalogAnswerJob(99999);
 
     expect(fn () => $job->handle($mockService))->not->toThrow(Throwable::class);
 });

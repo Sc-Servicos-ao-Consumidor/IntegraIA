@@ -40,7 +40,9 @@ class CatalogSearchService
         return $results->map(fn (CatalogProduct $product) => [
             'codigo_padrao' => $product->codigo_padrao,
             'product_name' => $product->product_name,
+            'product_description' => $product->product_description,
             'brand_name' => $product->brand_name,
+            'category_name' => $product->category_name,
             'sub_category_name' => $product->sub_category_name,
             'line_name' => $product->line_name,
             'product_img_url' => $product->product_img_url,

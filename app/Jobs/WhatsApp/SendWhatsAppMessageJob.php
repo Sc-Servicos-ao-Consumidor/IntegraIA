@@ -2,7 +2,7 @@
 
 namespace App\Jobs\WhatsApp;
 
-use App\Enums\CatalogPipelineStatus;
+use App\Models\CatalogPipelineStatus;
 use App\Models\CatalogRequest;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;

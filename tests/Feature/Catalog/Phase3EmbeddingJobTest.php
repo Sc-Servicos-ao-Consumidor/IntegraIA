@@ -15,7 +15,7 @@ function phase3EmbeddingFake(): void
 {
     Embeddings::fake(function (EmbeddingsPrompt $prompt) {
         return array_map(
-            fn () => Embeddings::fakeEmbedding(3072),
+            fn () => Embeddings::fakeEmbedding(1536),
             $prompt->inputs
         );
     });

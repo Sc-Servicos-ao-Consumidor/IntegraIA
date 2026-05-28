@@ -34,7 +34,7 @@ class CatalogProductFactory extends Factory
     public function embedded(): static
     {
         return $this->state(fn (array $attributes) => [
-            'embedding' => new Vector(array_fill(0, 3072, fake()->randomFloat(6, -1, 1))),
+            'embedding' => new Vector(array_fill(0, 1536, 1.0 / sqrt(1536))),
             'embedded_at' => now(),
         ]);
     }

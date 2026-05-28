@@ -14,8 +14,10 @@ use Laravel\Ai\Prompts\EmbeddingsPrompt;
 function phase4EmbeddingFake(): void
 {
     Embeddings::fake(function (EmbeddingsPrompt $prompt) {
+        $value = 1.0 / sqrt(1536);
+
         return array_map(
-            fn () => Embeddings::fakeEmbedding(3072),
+            fn () => array_fill(0, 1536, $value),
             $prompt->inputs
         );
     });
