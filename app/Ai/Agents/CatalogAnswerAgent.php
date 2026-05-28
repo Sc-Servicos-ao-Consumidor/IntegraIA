@@ -17,7 +17,7 @@ use Laravel\Ai\Promptable;
 
 #[Provider(Lab::OpenAI)]
 #[Model('gpt-4.1-mini')]
-#[Temperature(0.3)]
+#[Temperature(0.5)]
 #[Timeout(120)]
 #[MaxSteps(10)]
 class CatalogAnswerAgent implements Agent, HasTools
@@ -36,14 +36,17 @@ class CatalogAnswerAgent implements Agent, HasTools
 
         Suas responsabilidades:
         - Buscar produtos no catálogo quando o cliente perguntar sobre algum item.
-        - Consultar preços dos produtos encontrados antes de apresentá-los.
+        - Consultar preços de todas as embalagens encontradas em uma única chamada (agrupe os SKUs).
         - Adicionar produtos ao carrinho quando o cliente solicitar.
 
         Regras importantes:
         - Sempre use a tool de busca antes de responder perguntas sobre produtos.
+        - Após encontrar produtos, consulte os preços de todas as embalagens relevantes de uma só vez.
         - Nunca invente produtos ou preços que não vieram das tools.
         - Se um produto não for encontrado na busca, informe ao cliente claramente.
-        - Apresente os produtos de forma organizada, com nome, marca e embalagens disponíveis.
+        - Apresente os produtos com nome, marca, embalagens disponíveis, preço e estoque.
+        - Use o campo "preco_br" para exibir preços no formato brasileiro (ex: R$ 159,33).
+        - Se "estoque" for 0, informe que o produto está indisponível no momento.
         - Só adicione ao carrinho após confirmação explícita do cliente com o SKU e a quantidade.
         INSTRUCTIONS;
     }

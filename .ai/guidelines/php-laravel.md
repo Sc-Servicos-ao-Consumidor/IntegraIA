@@ -1,4 +1,4 @@
-## General code instructions
+# General code instructions
 
 - Do not generate obvious comments above methods, classes, or code blocks.
 - Do not add docblocks for variables unless they are needed to help static analysis or clarify a non-obvious type, for example:
@@ -105,9 +105,53 @@ User::query()->create($data);
 
 ---
 
+## API integrations
+
+- API integrations must live inside `app/Integrations`.
+- Each integration must have its own subfolder inside `app/Integrations`.
+- For example, a Meta integration must live in `app/Integrations/Meta`.
+- The API client class must be responsible for consuming the external API.
+- For example, a Meta integration should have a `MetaClient` class to configure and execute HTTP requests to Meta APIs.
+- The integration Service class must contain the API search/orchestration logic for that integration.
+- For example, a Meta integration should have a `MetaService` class with the searches and operations that use `MetaClient`.
+- Integration Services are an exception to the general `app/Services` location rule and must stay inside their integration folder.
+
+Example structure:
+
+```text
+app/
+└── Integrations/
+    └── Meta/
+        ├── MetaClient.php
+        └── MetaService.php
+```
+
+Client request pattern example:
+
+```php
+protected function request()
+{
+    static $client;
+
+    if (! $client) {
+        $client = Http::withToken(config('services.digisac.token'))
+            ->baseUrl(config('services.digisac.url'))
+            ->acceptJson()
+            ->contentType('application/json')
+            ->connectTimeout(3)
+            ->timeout(config('digisac.timeout', 30));
+    }
+
+    return $client;
+}
+```
+
+---
+
 ## Service classes
 
-- Create Service classes in `app/Services/`.
+- Create general Service classes in `app/Services/`.
+- Integration-specific Service classes must be created inside `app/Integrations/{IntegrationName}/`.
 - Use Service classes to encapsulate reusable business logic.
 - Services must not contain presentation logic such as Inertia responses, views, redirects, or flash messages.
 - Services should return data, models, DTO-like arrays, or throw exceptions.

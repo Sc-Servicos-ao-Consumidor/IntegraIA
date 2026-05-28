@@ -41,6 +41,7 @@ class RunCatalogAgentJob implements ShouldQueue
                 contactId: $request->contact_id,
             );
 
+
             $response = $agent->prompt($request->question);
 
             $request->update(['ai_answer' => $response->text]);

@@ -1,10 +1,6 @@
 <?php
 
 return [
-    'products_api' => [
-        'url' => env('PRODUCTS_API_URL'),
-        'token' => env('PRODUCTS_APIw_TOKEN'),
-    ],
 
     /*
     |--------------------------------------------------------------------------
@@ -51,6 +47,11 @@ return [
     'botmaker' => [
         'base_url' => env('BOTMAKER_BASE_URL'),
         'token' => env('BOTMAKER_TOKEN'),
+    ],
+
+    'store_api' => [
+        'url' => env('STORE_API_URL', 'https://vendas.scservicos.app/api/v1'),
+        'token' => env('STORE_API_TOKEN'),
     ],
 
 ];
