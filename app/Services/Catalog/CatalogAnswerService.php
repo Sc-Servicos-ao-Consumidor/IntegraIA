@@ -6,7 +6,7 @@ use App\Ai\Agents\CatalogAnswerAgent;
 
 class CatalogAnswerService
 {
-    public function answerFromContext(string $question, array $ragContext): array
+    public function answerFromContext(string $question, array $ragContext, int $tenantId = 0, string $contactId = ''): array
     {
         if (empty($ragContext)) {
             return [
@@ -18,9 +18,7 @@ class CatalogAnswerService
         $contextText = json_encode($ragContext, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
         $fullPrompt = "Contexto do catálogo:\n{$contextText}\n\nPergunta: {$question}";
 
-        $response = (new CatalogAnswerAgent)->prompt($fullPrompt);
-
-        dd($response);
+        $response = (new CatalogAnswerAgent($tenantId, $contactId))->prompt($fullPrompt);
 
         $products = array_map(fn (array $product) => [
             'codigo_padrao' => $product['codigo_padrao'] ?? null,
@@ -42,7 +40,7 @@ class CatalogAnswerService
         ], $ragContext);
 
         return [
-            'answer' => (string) $response,
+            'answer' => $response->text,
             'products' => $products,
         ];
     }

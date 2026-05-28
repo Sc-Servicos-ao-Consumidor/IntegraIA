@@ -1,12 +1,56 @@
 <?php
 
+use App\Ai\Agents\CatalogAnswerAgent;
 use App\Jobs\Catalog\CatalogSearchJob;
 use App\Jobs\Catalog\GenerateCatalogAnswerJob;
+use App\Jobs\Catalog\RunCatalogAgentJob;
 use App\Jobs\Catalog\SendWhatsAppMessageJob;
 use App\Jobs\Catalog\WhatsAppTypingJob;
 use App\Models\CatalogRequest;
 use App\Services\Catalog\CatalogAnswerService;
 use App\Services\Catalog\CatalogSearchService;
+
+// ============================================================
+// RunCatalogAgentJob
+// ============================================================
+
+it('RunCatalogAgentJob transitions status to processing and saves the agent answer', function () {
+    CatalogAnswerAgent::fake(['Recomendo o Azeite Extravirgem Nova Oliva.']);
+
+    $request = CatalogRequest::factory()->create(['question' => 'Qual azeite vocês têm?']);
+
+    $job = new RunCatalogAgentJob($request->id);
+    $job->handle();
+
+    $request->refresh();
+    expect($request->status->name)->toBe('processing')
+        ->and($request->ai_answer)->toBe('Recomendo o Azeite Extravirgem Nova Oliva.')
+        ->and($request->started_at)->not->toBeNull();
+});
+
+it('RunCatalogAgentJob transitions status to failed and sets completed_at on exception', function () {
+    CatalogAnswerAgent::fake(fn () => throw new RuntimeException('Agent failed'));
+
+    $request = CatalogRequest::factory()->create();
+
+    $job = new RunCatalogAgentJob($request->id);
+
+    expect(fn () => $job->handle())->toThrow(RuntimeException::class);
+
+    $request->refresh();
+    expect($request->status->name)->toBe('failed')
+        ->and($request->completed_at)->not->toBeNull();
+});
+
+it('RunCatalogAgentJob returns early without error when CatalogRequest does not exist', function () {
+    CatalogAnswerAgent::fake();
+
+    $job = new RunCatalogAgentJob(99999);
+
+    expect(fn () => $job->handle())->not->toThrow(Throwable::class);
+
+    CatalogAnswerAgent::assertNeverPrompted();
+});
 
 // ============================================================
 // Phase 5.4 — WhatsAppTypingJob

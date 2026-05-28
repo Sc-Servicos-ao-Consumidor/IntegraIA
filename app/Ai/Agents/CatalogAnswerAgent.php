@@ -2,24 +2,58 @@
 
 namespace App\Ai\Agents;
 
+use App\Ai\Tools\AddToCartTool;
+use App\Ai\Tools\GetProductPricesTool;
+use App\Ai\Tools\SearchProductsTool;
+use Laravel\Ai\Attributes\MaxSteps;
 use Laravel\Ai\Attributes\Model;
 use Laravel\Ai\Attributes\Provider;
 use Laravel\Ai\Attributes\Temperature;
 use Laravel\Ai\Attributes\Timeout;
 use Laravel\Ai\Contracts\Agent;
+use Laravel\Ai\Contracts\HasTools;
 use Laravel\Ai\Enums\Lab;
 use Laravel\Ai\Promptable;
 
 #[Provider(Lab::OpenAI)]
-#[Model('gpt-5.4-nano')]
-#[Temperature(0.7)]
+#[Model('gpt-4.1-mini')]
+#[Temperature(0.3)]
 #[Timeout(120)]
-class CatalogAnswerAgent implements Agent
+#[MaxSteps(10)]
+class CatalogAnswerAgent implements Agent, HasTools
 {
     use Promptable;
 
+    public function __construct(
+        private readonly int $tenantId,
+        private readonly string $contactId,
+    ) {}
+
     public function instructions(): string
     {
-        return 'Você é um assistente especializado em catálogo de produtos. Responda perguntas somente com base no contexto do catálogo fornecido na mensagem do usuário. Não invente informações que não estejam no catálogo. Se a resposta não puder ser encontrada no catálogo fornecido, informe isso claramente.';
+        return <<<'INSTRUCTIONS'
+        Você é um assistente de vendas especializado em catálogo de produtos.
+
+        Suas responsabilidades:
+        - Buscar produtos no catálogo quando o cliente perguntar sobre algum item.
+        - Consultar preços dos produtos encontrados antes de apresentá-los.
+        - Adicionar produtos ao carrinho quando o cliente solicitar.
+
+        Regras importantes:
+        - Sempre use a tool de busca antes de responder perguntas sobre produtos.
+        - Nunca invente produtos ou preços que não vieram das tools.
+        - Se um produto não for encontrado na busca, informe ao cliente claramente.
+        - Apresente os produtos de forma organizada, com nome, marca e embalagens disponíveis.
+        - Só adicione ao carrinho após confirmação explícita do cliente com o SKU e a quantidade.
+        INSTRUCTIONS;
+    }
+
+    public function tools(): iterable
+    {
+        return [
+            new SearchProductsTool($this->tenantId),
+            new GetProductPricesTool($this->tenantId),
+            new AddToCartTool($this->tenantId, $this->contactId),
+        ];
     }
 }

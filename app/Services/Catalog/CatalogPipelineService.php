@@ -2,8 +2,7 @@
 
 namespace App\Services\Catalog;
 
-use App\Jobs\Catalog\CatalogSearchJob;
-use App\Jobs\Catalog\GenerateCatalogAnswerJob;
+use App\Jobs\Catalog\RunCatalogAgentJob;
 use App\Jobs\Catalog\SendWhatsAppMessageJob;
 use App\Jobs\Catalog\WhatsAppTypingJob;
 use App\Models\CatalogPipelineStatus;
@@ -31,12 +30,10 @@ class CatalogPipelineService
         WhatsAppTypingJob::dispatch($contactId, $tenantId);
 
         Bus::chain([
-            new CatalogSearchJob($request->id),
-            new GenerateCatalogAnswerJob($request->id),
+            new RunCatalogAgentJob($request->id),
             new SendWhatsAppMessageJob($request->id),
         ])->dispatch();
 
         return $request;
     }
-    
 }

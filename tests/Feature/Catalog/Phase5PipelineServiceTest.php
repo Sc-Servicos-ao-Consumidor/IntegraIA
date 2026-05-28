@@ -1,7 +1,6 @@
 <?php
 
-use App\Jobs\Catalog\CatalogSearchJob;
-use App\Jobs\Catalog\GenerateCatalogAnswerJob;
+use App\Jobs\Catalog\RunCatalogAgentJob;
 use App\Jobs\Catalog\SendWhatsAppMessageJob;
 use App\Jobs\Catalog\WhatsAppTypingJob;
 use App\Models\CatalogRequest;
@@ -39,7 +38,7 @@ it('CatalogPipelineService dispatches WhatsAppTypingJob as a standalone fire-and
     Bus::assertDispatched(WhatsAppTypingJob::class, fn (WhatsAppTypingJob $job) => $job->contactId === '+5511999999999' && $job->tenantId === $tenant->id);
 });
 
-it('CatalogPipelineService dispatches CatalogSearchJob, GenerateCatalogAnswerJob, and SendWhatsAppMessageJob as a chain', function () {
+it('CatalogPipelineService dispatches RunCatalogAgentJob and SendWhatsAppMessageJob as a chain', function () {
     Bus::fake();
 
     $tenant = Tenant::factory()->create();
@@ -48,8 +47,7 @@ it('CatalogPipelineService dispatches CatalogSearchJob, GenerateCatalogAnswerJob
     $catalogRequest = $service->dispatch('Quero comprar arroz', '+5511999999999', $tenant->id);
 
     Bus::assertChained([
-        new CatalogSearchJob($catalogRequest->id),
-        new GenerateCatalogAnswerJob($catalogRequest->id),
+        new RunCatalogAgentJob($catalogRequest->id),
         new SendWhatsAppMessageJob($catalogRequest->id),
     ]);
 });
