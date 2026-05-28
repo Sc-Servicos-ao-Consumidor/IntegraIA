@@ -14,14 +14,15 @@ class CatalogPipelineController extends Controller
         $validated = $request->validate([
             'question' => ['required', 'string', 'min:1'],
             'contact_id' => ['required', 'string'],
+            'session_id' => ['required', 'string'],
             'tenant' => ['required', 'integer'],
         ]);
 
-
         $catalogRequest = $pipeline->dispatch(
-            $validated['question'],
-            $validated['contact_id'],
-            $validated['tenant'],
+            question: $validated['question'],
+            contactId: $validated['contact_id'],
+            sessionId: $validated['session_id'],
+            tenantId: $validated['tenant'],
         );
 
         return response()->json(['request_id' => $catalogRequest->id], 202);

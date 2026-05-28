@@ -37,10 +37,8 @@ class GenerateCatalogAnswerJob implements ShouldQueue
 
             $request->update(['ai_answer' => $answer]);
         } catch (\Throwable $e) {
-            $failedStatus = CatalogPipelineStatus::firstOrCreate(['name' => 'failed']);
-
             $request->update([
-                'catalog_pipeline_status_id' => $failedStatus->id,
+                'catalog_pipeline_status_id' => CatalogPipelineStatus::idFor('failed'),
                 'completed_at' => now(),
             ]);
 

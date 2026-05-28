@@ -12,18 +12,17 @@ use InvalidArgumentException;
 
 class CatalogPipelineService
 {
-    public function dispatch(string $question, string $contactId, int $tenantId): CatalogRequest
+    public function dispatch(string $question, string $contactId, string $sessionId, int $tenantId): CatalogRequest
     {
         if (trim($question) === '') {
             throw new InvalidArgumentException('Question cannot be empty.');
         }
 
-        $pendingStatus = CatalogPipelineStatus::firstOrCreate(['name' => 'pending']);
-
         $request = CatalogRequest::create([
             'tenant_id' => $tenantId,
-            'catalog_pipeline_status_id' => $pendingStatus->id,
+            'catalog_pipeline_status_id' => CatalogPipelineStatus::idFor('pending'),
             'contact_id' => $contactId,
+            'session_id' => $sessionId,
             'question' => $question,
         ]);
 

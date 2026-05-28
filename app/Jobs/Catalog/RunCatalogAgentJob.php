@@ -29,11 +29,9 @@ class RunCatalogAgentJob implements ShouldQueue
             return;
         }
 
-        $processingStatus = CatalogPipelineStatus::firstOrCreate(['name' => 'processing']);
-
         $request->update([
             'started_at' => now(),
-            'catalog_pipeline_status_id' => $processingStatus->id,
+            'catalog_pipeline_status_id' => CatalogPipelineStatus::idFor('processing'),
         ]);
 
         try {
@@ -41,16 +39,16 @@ class RunCatalogAgentJob implements ShouldQueue
                 vendasProductService: $vendasProductService,
                 tenantId: $request->tenant_id,
                 contactId: $request->contact_id,
+                sessionId: $request->session_id ?? '',
+                catalogRequestId: $request->id,
             );
 
             $response = $agent->prompt($request->question);
 
             $request->update(['ai_answer' => $response->text]);
         } catch (\Throwable $e) {
-            $failedStatus = CatalogPipelineStatus::firstOrCreate(['name' => 'failed']);
-
             $request->update([
-                'catalog_pipeline_status_id' => $failedStatus->id,
+                'catalog_pipeline_status_id' => CatalogPipelineStatus::idFor('failed'),
                 'completed_at' => now(),
             ]);
 

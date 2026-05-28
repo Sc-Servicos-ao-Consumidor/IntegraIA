@@ -9,6 +9,7 @@ use App\Jobs\Catalog\RunCatalogAgentJob;
 use App\Jobs\Catalog\SendWhatsAppMessageJob;
 use App\Jobs\Catalog\WhatsAppTypingJob;
 use App\Models\CatalogRequest;
+use App\Models\Tenant;
 use App\Services\Catalog\CatalogAnswerService;
 use App\Services\Catalog\CatalogSearchService;
 
@@ -16,13 +17,17 @@ use App\Services\Catalog\CatalogSearchService;
 // RunCatalogAgentJob
 // ============================================================
 
+function makeVendasService(): VendasProductService
+{
+    return new VendasProductService(new VendasClient);
+}
+
 it('RunCatalogAgentJob transitions status to processing and saves the agent answer', function () {
     CatalogAnswerAgent::fake(['Recomendo o Azeite Extravirgem Nova Oliva.']);
 
     $request = CatalogRequest::factory()->create(['question' => 'Qual azeite vocês têm?']);
 
-    $job = new RunCatalogAgentJob($request->id);
-    $job->handle(new VendasProductService(new VendasClient));
+    (new RunCatalogAgentJob($request->id))->handle(makeVendasService());
 
     $request->refresh();
     expect($request->status->name)->toBe('processing')
@@ -35,10 +40,8 @@ it('RunCatalogAgentJob transitions status to failed and sets completed_at on exc
 
     $request = CatalogRequest::factory()->create();
 
-    $job = new RunCatalogAgentJob($request->id);
-    $service = new VendasProductService(new VendasClient);
-
-    expect(fn () => $job->handle($service))->toThrow(RuntimeException::class);
+    expect(fn () => (new RunCatalogAgentJob($request->id))->handle(makeVendasService()))
+        ->toThrow(RuntimeException::class);
 
     $request->refresh();
     expect($request->status->name)->toBe('failed')
@@ -48,11 +51,117 @@ it('RunCatalogAgentJob transitions status to failed and sets completed_at on exc
 it('RunCatalogAgentJob returns early without error when CatalogRequest does not exist', function () {
     CatalogAnswerAgent::fake();
 
-    $job = new RunCatalogAgentJob(99999);
-
-    expect(fn () => $job->handle(new VendasProductService(new VendasClient)))->not->toThrow(Throwable::class);
+    expect(fn () => (new RunCatalogAgentJob(99999))->handle(makeVendasService()))
+        ->not->toThrow(Throwable::class);
 
     CatalogAnswerAgent::assertNeverPrompted();
+});
+
+it('RunCatalogAgentJob stores the session_id on the CatalogRequest', function () {
+    CatalogAnswerAgent::fake(['Resposta do agente.']);
+
+    $request = CatalogRequest::factory()->create(['session_id' => 'SESSION123']);
+
+    (new RunCatalogAgentJob($request->id))->handle(makeVendasService());
+
+    expect($request->fresh()->session_id)->toBe('SESSION123');
+});
+
+it('CatalogAnswerAgent messages() returns empty array when no previous session history exists', function () {
+    $request = CatalogRequest::factory()->create(['session_id' => 'NEW_SESSION']);
+
+    $agent = new CatalogAnswerAgent(
+        vendasProductService: makeVendasService(),
+        tenantId: $request->tenant_id,
+        contactId: $request->contact_id,
+        sessionId: $request->session_id,
+        catalogRequestId: $request->id,
+    );
+
+    expect($agent->messages())->toBeEmpty();
+});
+
+it('CatalogAnswerAgent messages() loads previous answered requests as history', function () {
+    $sessionId = 'HIST_SESSION_'.fake()->bothify('????');
+
+    $previous = CatalogRequest::factory()->create([
+        'session_id' => $sessionId,
+        'question' => 'Qual o preço do azeite?',
+        'ai_answer' => 'O azeite custa R$ 29,90.',
+    ]);
+
+    $current = CatalogRequest::factory()->create([
+        'session_id' => $sessionId,
+        'question' => 'E o arroz?',
+    ]);
+
+    $agent = new CatalogAnswerAgent(
+        vendasProductService: makeVendasService(),
+        tenantId: $current->tenant_id,
+        contactId: $current->contact_id,
+        sessionId: $sessionId,
+        catalogRequestId: $current->id,
+    );
+
+    $messages = collect($agent->messages());
+
+    expect($messages)->toHaveCount(2)
+        ->and($messages[0]->role->value)->toBe('user')
+        ->and($messages[0]->content)->toBe('Qual o preço do azeite?')
+        ->and($messages[1]->role->value)->toBe('assistant')
+        ->and($messages[1]->content)->toBe('O azeite custa R$ 29,90.');
+});
+
+it('CatalogAnswerAgent messages() does not include the current request in history', function () {
+    $sessionId = 'NOSELF_SESSION_'.fake()->bothify('????');
+
+    $current = CatalogRequest::factory()->create([
+        'session_id' => $sessionId,
+        'question' => 'Qual arroz?',
+        'ai_answer' => 'Temos Tio João.',
+    ]);
+
+    $agent = new CatalogAnswerAgent(
+        vendasProductService: makeVendasService(),
+        tenantId: $current->tenant_id,
+        contactId: $current->contact_id,
+        sessionId: $sessionId,
+        catalogRequestId: $current->id,
+    );
+
+    expect($agent->messages())->toBeEmpty();
+});
+
+it('CatalogAnswerAgent messages() limits history to 7 messages', function () {
+    $sessionId = 'LIMIT_SESSION_'.fake()->bothify('????');
+
+    $tenant = Tenant::factory()->create();
+
+    for ($i = 1; $i <= 5; $i++) {
+        CatalogRequest::factory()->create([
+            'tenant_id' => $tenant->id,
+            'session_id' => $sessionId,
+            'question' => "Pergunta {$i}",
+            'ai_answer' => "Resposta {$i}",
+            'created_at' => now()->subMinutes(10 - $i),
+        ]);
+    }
+
+    $current = CatalogRequest::factory()->create([
+        'tenant_id' => $tenant->id,
+        'session_id' => $sessionId,
+        'question' => 'Pergunta atual',
+    ]);
+
+    $agent = new CatalogAnswerAgent(
+        vendasProductService: makeVendasService(),
+        tenantId: $current->tenant_id,
+        contactId: $current->contact_id,
+        sessionId: $sessionId,
+        catalogRequestId: $current->id,
+    );
+
+    expect(collect($agent->messages()))->toHaveCount(7);
 });
 
 // ============================================================

@@ -29,11 +29,9 @@ class CatalogSearchJob implements ShouldQueue
             return;
         }
 
-        $processingStatus = CatalogPipelineStatus::firstOrCreate(['name' => 'processing']);
-
         $request->update([
             'started_at' => now(),
-            'catalog_pipeline_status_id' => $processingStatus->id,
+            'catalog_pipeline_status_id' => CatalogPipelineStatus::idFor('processing'),
         ]);
 
         try {
@@ -41,10 +39,8 @@ class CatalogSearchJob implements ShouldQueue
 
             $request->update(['search_results' => $results]);
         } catch (\Throwable $e) {
-            $failedStatus = CatalogPipelineStatus::firstOrCreate(['name' => 'failed']);
-
             $request->update([
-                'catalog_pipeline_status_id' => $failedStatus->id,
+                'catalog_pipeline_status_id' => CatalogPipelineStatus::idFor('failed'),
                 'completed_at' => now(),
             ]);
 

@@ -18,6 +18,7 @@ class CatalogRequestFactory extends Factory
             'tenant_id' => Tenant::factory(),
             'catalog_pipeline_status_id' => fn () => CatalogPipelineStatus::firstOrCreate(['name' => 'pending'])->id,
             'contact_id' => fake()->numerify('+55119########'),
+            'session_id' => fake()->bothify('??????????_####-##-##T##:##:##.###Z'),
             'question' => fake()->sentence(8).'?',
             'search_results' => null,
             'ai_answer' => null,

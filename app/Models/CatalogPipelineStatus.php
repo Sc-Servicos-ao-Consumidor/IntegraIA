@@ -16,4 +16,15 @@ class CatalogPipelineStatus extends Model
     {
         return $this->hasMany(CatalogRequest::class);
     }
+
+    public static function idFor(string $name): int
+    {
+        static $cache = [];
+
+        if (app()->environment('testing')) {
+            return static::firstOrCreate(['name' => $name])->id;
+        }
+
+        return $cache[$name] ??= static::firstOrCreate(['name' => $name])->id;
+    }
 }

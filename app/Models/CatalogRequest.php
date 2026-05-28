@@ -14,6 +14,7 @@ class CatalogRequest extends Model
         'tenant_id',
         'catalog_pipeline_status_id',
         'contact_id',
+        'session_id',
         'question',
         'search_results',
         'ai_answer',

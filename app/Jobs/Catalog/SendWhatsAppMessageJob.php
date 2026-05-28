@@ -35,10 +35,8 @@ class SendWhatsAppMessageJob implements ShouldQueue
         // TODO: call WhatsApp send message API
         // Parameters: $contactId (recipient), $aiAnswer (message payload), $tenantId (tenant context)
 
-        $completedStatus = CatalogPipelineStatus::firstOrCreate(['name' => 'completed']);
-
         $request->update([
-            'catalog_pipeline_status_id' => $completedStatus->id,
+            'catalog_pipeline_status_id' => CatalogPipelineStatus::idFor('completed'),
             'completed_at' => now(),
         ]);
     }

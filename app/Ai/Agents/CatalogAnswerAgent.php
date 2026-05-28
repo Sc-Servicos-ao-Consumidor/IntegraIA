@@ -6,14 +6,17 @@ use App\Ai\Tools\AddToCartTool;
 use App\Ai\Tools\GetProductPricesTool;
 use App\Ai\Tools\SearchProductsTool;
 use App\Integrations\Vendas\VendasProductService;
+use App\Models\CatalogRequest;
 use Laravel\Ai\Attributes\MaxSteps;
 use Laravel\Ai\Attributes\Model;
 use Laravel\Ai\Attributes\Provider;
 use Laravel\Ai\Attributes\Temperature;
 use Laravel\Ai\Attributes\Timeout;
 use Laravel\Ai\Contracts\Agent;
+use Laravel\Ai\Contracts\Conversational;
 use Laravel\Ai\Contracts\HasTools;
 use Laravel\Ai\Enums\Lab;
+use Laravel\Ai\Messages\Message;
 use Laravel\Ai\Promptable;
 
 #[Provider(Lab::OpenAI)]
@@ -21,14 +24,18 @@ use Laravel\Ai\Promptable;
 #[Temperature(0.5)]
 #[Timeout(120)]
 #[MaxSteps(10)]
-class CatalogAnswerAgent implements Agent, HasTools
+class CatalogAnswerAgent implements Agent, Conversational, HasTools
 {
     use Promptable;
+
+    private const HISTORY_LIMIT = 7;
 
     public function __construct(
         private readonly VendasProductService $vendasProductService,
         private readonly int $tenantId,
         private readonly string $contactId,
+        private readonly string $sessionId,
+        private readonly int $catalogRequestId,
     ) {}
 
     public function instructions(): string
@@ -51,6 +58,29 @@ class CatalogAnswerAgent implements Agent, HasTools
         - Se "estoque" for 0, informe que o produto está indisponível no momento.
         - Só adicione ao carrinho após confirmação explícita do cliente com o SKU e a quantidade.
         INSTRUCTIONS;
+    }
+
+    public function messages(): iterable
+    {
+        $messages = [];
+
+        CatalogRequest::where('session_id', $this->sessionId)
+            ->where('id', '!=', $this->catalogRequestId)
+            ->whereNotNull('ai_answer')
+            ->orderBy('created_at', 'desc')
+            ->limit(4)
+            ->get()
+            ->reverse()
+            ->each(function (CatalogRequest $previous) use (&$messages) {
+                $answer = is_array($previous->ai_answer)
+                    ? json_encode($previous->ai_answer, JSON_UNESCAPED_UNICODE)
+                    : $previous->ai_answer;
+
+                $messages[] = new Message('user', $previous->question);
+                $messages[] = new Message('assistant', (string) $answer);
+            });
+
+        return array_slice($messages, -self::HISTORY_LIMIT);
     }
 
     public function tools(): iterable
