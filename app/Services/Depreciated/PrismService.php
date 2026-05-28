@@ -50,6 +50,7 @@ class PrismService
                 ->using($this->getProvider(), config('services.prism_api.embedding_model', 'text-embedding-3-large'))
                 ->fromInput($query)
                 ->asEmbeddings();
+
             return $response->embeddings[0]->embedding ?? [];
         } catch (PrismException $e) {
             Log::error('Embedding generation failed:', ['error' => $e->getMessage()]);
@@ -84,6 +85,7 @@ class PrismService
                 Log::error('Error: '.$response->finishReason);
                 throw new \Exception('Error: '.$response->finishReason);
             }
+
             return [
                 'status' => 'success',
                 'response' => $response->text,
@@ -179,24 +181,22 @@ class PrismService
         return null;
     }
 
-    /** 
+    /**
      * Text to Speech conversion
-     * @param string $text
-     * @param string $voice
-     * 
+     *
      * @return array|null
      */
     public function textToSpeech(string $text, string $voice = 'alloy')
     {
         try {
             $response = Prism::textToSpeech()
-                ->using($this->getProvider(),'tts-1')
+                ->using($this->getProvider(), 'tts-1')
                 ->withInput($text)
                 ->withVoice($voice)
                 ->asAudio();
 
             if ($response->audio->hasBase64()) {
-                //TODO: add file put to storage and return URL
+                // TODO: add file put to storage and return URL
                 return $response->base64 ?? null;
             }
 
@@ -204,18 +204,17 @@ class PrismService
 
         } catch (PrismException $e) {
             Log::error('Text-to-Speech failed:', ['error' => $e->getMessage()]);
+
             return null;
         } catch (Throwable $e) {
             Log::error('Generic error in Text-to-Speech:', ['error' => $e->getMessage()]);
+
             return null;
         }
     }
 
-    /** 
+    /**
      * Speech to Text conversion
-     * @param string $audioUrl
-     * 
-     * @return string|null
      */
     public function speechToText(string $audioUrl): ?string
     {
@@ -225,15 +224,17 @@ class PrismService
             $response = Prism::audio()
                 ->using($this->getProvider(), 'whisper-1')
                 ->withInput($audio)
-            ->asText();
+                ->asText();
 
             return $response->text ?? null;
 
         } catch (PrismException $e) {
             Log::error('Speech-to-Text failed:', ['error' => $e->getMessage()]);
+
             return null;
         } catch (Throwable $e) {
             Log::error('Generic error in Speech-to-Text:', ['error' => $e->getMessage()]);
+
             return null;
         }
     }

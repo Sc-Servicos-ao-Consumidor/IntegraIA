@@ -8,9 +8,9 @@ use App\Http\Controllers\GroupProductController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\RecipeController;
 use App\Http\Controllers\TenantController;
+use App\Http\Middleware\HandleTenant;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
-use \App\Http\Middleware\HandleTenant;
 
 Route::get('/', function () {
     return redirect()->route('login');
@@ -44,8 +44,8 @@ Route::middleware(['auth', 'verified', HandleTenant::class])->group(function () 
     // Tenant switching
     Route::post('/tenant/switch', [TenantController::class, 'switch'])->name('tenant.switch');
 
-	// Assistant Logs
-	Route::get('/assistant-logs', [AssistantLogController::class, 'index'])->name('assistant-logs.index');
+    // Assistant Logs
+    Route::get('/assistant-logs', [AssistantLogController::class, 'index'])->name('assistant-logs.index');
 });
 
 require __DIR__.'/settings.php';

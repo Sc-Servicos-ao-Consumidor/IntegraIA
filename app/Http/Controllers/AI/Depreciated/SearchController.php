@@ -3,12 +3,12 @@
 namespace App\Http\Controllers\AI\Depreciated;
 
 use App\Http\Controllers\Controller;
-use App\Services\PrismService;
-use Illuminate\Http\Request;
-use Pgvector\Laravel\Distance;
 use App\Models\Content;
 use App\Models\Product;
 use App\Models\Recipe;
+use App\Services\PrismService;
+use Illuminate\Http\Request;
+use Pgvector\Laravel\Distance;
 
 class SearchController extends Controller
 {

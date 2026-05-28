@@ -6,13 +6,13 @@ use App\Http\Controllers\Controller;
 use App\Jobs\UpdateAssistantLog;
 use App\Models\Assistant;
 use App\Models\AssistantLog;
+use App\Models\Tenant;
 use App\Services\AIToolService;
 use App\Services\EmbeddingService;
 use App\Services\PrismService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
-use App\Models\Tenant;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 
 class AssistantController extends Controller
 {
@@ -147,6 +147,7 @@ class AssistantController extends Controller
 
         } catch (\Exception $e) {
             Log::error('Assistant error:', ['error' => $e->getMessage()]);
+
             return response()->json([
                 'response' => 'Assistant failed: '.$e->getMessage(),
             ], 500);

@@ -22,6 +22,7 @@ class UpdateAssistantLog implements ShouldQueue
     protected ?string $response;
 
     protected ?string $rating; // 'up' | 'down' | null
+
     protected ?string $comment;
 
     /**

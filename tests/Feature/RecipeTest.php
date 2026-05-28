@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
 class RecipeTest extends TestCase
@@ -13,8 +14,8 @@ class RecipeTest extends TestCase
     public function it_creates_a_recipe_successfully()
     {
         // seed an allergen
-        \Illuminate\Support\Facades\DB::table('allergens')->insert(['name' => 'Glúten']);
-        $allergenId = \Illuminate\Support\Facades\DB::table('allergens')->where('name', 'Glúten')->value('id');
+        DB::table('allergens')->insert(['name' => 'Glúten']);
+        $allergenId = DB::table('allergens')->where('name', 'Glúten')->value('id');
 
         $response = $this->post('/recipes', [
             'id' => 1,

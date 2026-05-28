@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Concerns\BelongsToTenant;
+use Database\Factories\RecipeFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -14,8 +15,9 @@ class Recipe extends Model
 {
     use BelongsToTenant;
 
-    /** @use HasFactory<\Database\Factories\RecipeFactory> */
+    /** @use HasFactory<RecipeFactory> */
     use HasFactory;
+
     use HasNeighbors;
 
     protected $fillable = [

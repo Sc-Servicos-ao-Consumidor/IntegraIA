@@ -1,8 +1,5 @@
 <?php
 
-use App\Http\Controllers\AI\AssistantController;
-use App\Http\Controllers\AI\SearchController;
-use App\Http\Controllers\AI\SpeechController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\Catalog\CatalogPipelineController;
 use Illuminate\Http\Request;
