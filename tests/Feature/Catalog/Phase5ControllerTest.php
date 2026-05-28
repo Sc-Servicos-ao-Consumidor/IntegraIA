@@ -1,7 +1,8 @@
 <?php
 
-use App\Jobs\Catalog\CatalogSearchJob;
-use App\Jobs\Catalog\WhatsAppTypingJob;
+use App\Jobs\Catalog\RunCatalogAgentJob;
+use App\Jobs\WhatsApp\SendWhatsAppMessageJob;
+use App\Jobs\WhatsApp\WhatsAppTypingJob;
 use App\Models\CatalogRequest;
 use App\Models\Tenant;
 use App\Models\User;
@@ -23,11 +24,13 @@ function phase5CreateUserWithTenant(): array
 it('POST /api/catalog/pipeline returns 202 Accepted with a request_id when input is valid', function () {
     Bus::fake();
 
-    [$user] = phase5CreateUserWithTenant();
+    [$user, $tenant] = phase5CreateUserWithTenant();
 
     $response = $this->actingAs($user, 'sanctum')->postJson('/api/catalog/pipeline', [
         'question' => 'Qual é o melhor arroz?',
         'contact_id' => '+5511999999999',
+        'session_id' => 'sess-abc123',
+        'tenant' => $tenant->id,
     ]);
 
     $response->assertStatus(202)
@@ -38,16 +41,23 @@ it('POST /api/catalog/pipeline returns 202 Accepted with a request_id when input
 it('POST /api/catalog/pipeline creates a CatalogRequest and dispatches the pipeline jobs', function () {
     Bus::fake();
 
-    [$user] = phase5CreateUserWithTenant();
+    [$user, $tenant] = phase5CreateUserWithTenant();
 
     $this->actingAs($user, 'sanctum')->postJson('/api/catalog/pipeline', [
         'question' => 'Quais produtos têm desconto?',
         'contact_id' => '+5511888888888',
+        'session_id' => 'sess-def456',
+        'tenant' => $tenant->id,
     ]);
 
     expect(CatalogRequest::count())->toBe(1);
+
     Bus::assertDispatched(WhatsAppTypingJob::class);
-    Bus::assertDispatched(CatalogSearchJob::class);
+
+    Bus::assertChained([
+        RunCatalogAgentJob::class,
+        SendWhatsAppMessageJob::class,
+    ]);
 });
 
 it('POST /api/catalog/pipeline returns 422 when question is missing', function () {
@@ -88,6 +98,8 @@ it('POST /api/catalog/pipeline returns 401 for unauthenticated requests', functi
     $response = $this->postJson('/api/catalog/pipeline', [
         'question' => 'Qual produto?',
         'contact_id' => '+5511999999999',
+        'session_id' => 'sess-xyz',
+        'tenant' => 1,
     ]);
 
     $response->assertStatus(401);
