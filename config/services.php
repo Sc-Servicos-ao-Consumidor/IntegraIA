@@ -47,6 +47,7 @@ return [
     'botmaker' => [
         'base_url' => env('BOTMAKER_BASE_URL'),
         'token' => env('BOTMAKER_TOKEN'),
+        'channel_id' => env('BOTMAKER_CHANNEL_ID'),
     ],
 
     'vendas' => [
