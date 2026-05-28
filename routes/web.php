@@ -1,7 +1,5 @@
 <?php
 
-use App\Http\Controllers\AI\AssistantController;
-use App\Http\Controllers\AI\SearchController;
 use App\Http\Controllers\AssistantLogController;
 use App\Http\Controllers\ContentController;
 use App\Http\Controllers\GroupProductController;
@@ -21,7 +19,7 @@ Route::get('dashboard', function () {
 })->middleware(['auth', 'verified', HandleTenant::class])->name('dashboard');
 
 Route::middleware(['auth', 'verified', HandleTenant::class])->group(function () {
-    Route::get('/recipes/search', [SearchController::class, 'search']);
+    // Route::get('/recipes/search', [SearchController::class, 'search']);
     Route::get('/recipes/search-ingredients', [RecipeController::class, 'searchIngredients']);
     Route::get('/recipes/search-cuisines', [RecipeController::class, 'searchCuisines']);
     Route::get('/recipes/search-allergens', [RecipeController::class, 'searchAllergens']);
@@ -29,8 +27,8 @@ Route::middleware(['auth', 'verified', HandleTenant::class])->group(function () 
         return Inertia::render('Recipes/SemanticSearch');
     })->name('semantic-search');
     Route::resource('recipes', RecipeController::class);
-    Route::post('/recipes/assistant', [AssistantController::class, 'assistant']);
-    Route::post('/recipes/assistant/feedback', [AssistantController::class, 'assistantFeedback']);
+    // Route::post('/recipes/assistant', [AssistantController::class, 'assistant']);
+    // Route::post('/recipes/assistant/feedback', [AssistantController::class, 'assistantFeedback']);
 
     // Products management
     Route::resource('products', ProductController::class);
