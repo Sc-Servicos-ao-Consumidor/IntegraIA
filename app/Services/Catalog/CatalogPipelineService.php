@@ -38,4 +38,5 @@ class CatalogPipelineService
 
         return $request;
     }
+    
 }

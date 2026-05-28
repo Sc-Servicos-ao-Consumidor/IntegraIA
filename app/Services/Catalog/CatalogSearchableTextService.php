@@ -12,26 +12,35 @@ class CatalogSearchableTextService
             $product->load('packages');
         }
 
-        $parts = array_filter([
-            $product->product_name,
-            $product->product_description,
-            $product->brand_name,
-            $product->category_name,
-            $product->sub_category_name,
-            $product->line_name,
-        ], fn ($value) => $value !== null && $value !== '');
+        $parts = [];
 
-        foreach ($product->packages as $package) {
-            $packageParts = array_filter([
-                $package->sku_package_name,
-                $package->package_description,
-                $package->ean,
-            ], fn ($value) => $value !== null && $value !== '');
-
-            array_push($parts, ...$packageParts);
+        if (! empty($product->product_name)) {
+            $parts[] = "Produto: {$product->product_name}";
         }
 
-        return trim(implode(' ', $parts));
+        if (! empty($product->brand_name)) {
+            $parts[] = "Marca: {$product->brand_name}";
+        }
+
+        if (! empty($product->sub_category_name)) {
+            $parts[] = "Subcategoria: {$product->sub_category_name}";
+        }
+
+        if (! empty($product->line_name)) {
+            $parts[] = "Linha: {$product->line_name}";
+        }
+
+        $packages = $product->packages
+            ->pluck('sku_package_name')
+            ->filter()
+            ->unique()
+            ->values();
+
+        if ($packages->isNotEmpty()) {
+            $parts[] = 'Embalagens disponíveis: '.$packages->implode('; ');
+        }
+
+        return trim(implode("\n", $parts));
     }
 
     public function buildAndStore(CatalogProduct $product): void

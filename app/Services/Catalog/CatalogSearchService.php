@@ -11,7 +11,7 @@ use Pgvector\Laravel\Distance;
 
 class CatalogSearchService
 {
-    public function search(string $query, int $tenantId, int $limit = 5): Collection
+    public function search(string $query, int $tenantId, int $limit = 15): Collection
     {
         if (trim($query) === '') {
             throw new InvalidArgumentException('Query string cannot be empty.');
@@ -19,17 +19,18 @@ class CatalogSearchService
 
         $response = Embeddings::for([$query])->dimensions(1536)->generate(Lab::OpenAI, model: 'text-embedding-3-small');
 
-
         $vector = $response->embeddings[0];
 
-        return CatalogProduct::where('tenant_id', $tenantId)
-            ->nearestNeighbors('embedding', $vector, Distance::Cosine)
+        return CatalogProduct::query()
+            ->where('tenant_id', $tenantId)
+            ->whereNotNull('embedding')
+            ->whereVectorSimilarTo('embedding', $vector, minSimilarity: 0.4)
             ->limit($limit)
             ->with('packages')
             ->get();
     }
 
-    public function searchAsRagContext(string $query, int $tenantId, int $limit = 5): array
+    public function searchAsRagContext(string $query, int $tenantId, int $limit = 15): array
     {
         $results = $this->search($query, $tenantId, $limit);
 
@@ -37,10 +38,12 @@ class CatalogSearchService
             return [];
         }
 
+        //dd($results);
+
         return $results->map(fn (CatalogProduct $product) => [
             'codigo_padrao' => $product->codigo_padrao,
             'product_name' => $product->product_name,
-            'product_description' => $product->product_description,
+            // 'product_description' => $product->product_description,
             'brand_name' => $product->brand_name,
             'category_name' => $product->category_name,
             'sub_category_name' => $product->sub_category_name,
