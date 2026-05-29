@@ -1,0 +1,6 @@
+phase-01-data-structure.md|Phase 1 — Data Structure
+phase-02-xls-import-and-data-quality.md|Phase 2 — XLS Import and Data Quality
+phase-03-searchable-text-and-embeddings.md|Phase 3 — Searchable Text and Embeddings
+phase-04-semantic-search-and-rag.md|Phase 4 — Semantic Search and RAG
+phase-05-pipeline-infrastructure.md|Phase 5 — Pipeline Infrastructure
+phase-06-operational-monitoring.md|Phase 6 — Operational Monitoring

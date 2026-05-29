@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\GenerateRecipeChunks;
+use App\Jobs\GenerateRecipeEmbedding;
 use App\Models\Allergen;
 use App\Models\Content;
 use App\Models\Cuisine;
@@ -215,8 +217,8 @@ class RecipeController extends Controller
 
         // Queue embedding and chunk generation to avoid blocking request
         Bus::chain([
-            new \App\Jobs\GenerateRecipeEmbedding($recipe->id),
-            new \App\Jobs\GenerateRecipeChunks($recipe->id),
+            new GenerateRecipeEmbedding($recipe->id),
+            new GenerateRecipeChunks($recipe->id),
         ])->dispatch();
 
         return null;
