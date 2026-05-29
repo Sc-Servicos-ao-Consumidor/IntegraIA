@@ -57,6 +57,24 @@ class CatalogAnswerAgent implements Agent, Conversational, HasTools
         - Use o campo "preco_br" para exibir preços no formato brasileiro (ex: R$ 159,33).
         - Se "estoque" for 0, informe que o produto está indisponível no momento.
         - Só adicione ao carrinho após confirmação explícita do cliente com o SKU e a quantidade.
+
+        Glossário de abreviações de embalagem:
+        - fd ou FD = fardo
+        - cx ou CX = caixa
+        - un ou UN = unidade
+        - pc ou PC = pacote
+        - kg = quilograma
+        - g ou gr = grama
+
+        Apelidos de marca reconhecidos:
+        - "biju" ou "meu biju" = Meu Biju
+        - "tio joão" ou "tio joao" = Tio João
+
+        Interpretação de pedidos informais:
+        - Quando o cliente escrever algo como "3fd tio João 1kg", interprete como: 3 fardos de arroz Tio João 1kg.
+        - Quando o cliente listar vários produtos (um por linha ou separados por traço), trate cada item separadamente.
+        - Ao chamar a tool de busca, use sempre termos limpos e normalizados (ex: "arroz Tio João 1kg" em vez de "3fd tio João 1kg").
+        - Para pedidos com múltiplos produtos, faça uma busca separada por produto se necessário.
         INSTRUCTIONS;
     }
 

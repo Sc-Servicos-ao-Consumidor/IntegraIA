@@ -20,13 +20,18 @@ class CatalogSearchService
 
         $vector = $response->embeddings[0];
 
-        return CatalogProduct::query()
+        $candidates = CatalogProduct::query()
             ->where('tenant_id', $tenantId)
             ->whereNotNull('embedding')
             ->whereVectorSimilarTo('embedding', $vector, minSimilarity: 0.4)
-            ->limit($limit)
+            ->limit(30)
             ->with('packages')
             ->get();
+
+        return $candidates
+            ->groupBy('sub_category_name')
+            ->flatMap(fn (Collection $group) => $group->take(4))
+            ->take($limit);
     }
 
     public function searchAsRagContext(string $query, int $tenantId, int $limit = 15): array

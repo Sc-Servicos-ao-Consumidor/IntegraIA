@@ -39,7 +39,7 @@ class RunCatalogAgentJob implements ShouldQueue
                 vendasProductService: $vendasProductService,
                 tenantId: $request->tenant_id,
                 contactId: $request->contact_id,
-                sessionId: $request->session_id ?? '',
+                sessionId: $request->session_id,
                 catalogRequestId: $request->id,
             );
 
