@@ -37,7 +37,11 @@ class CatalogPipelineController extends Controller
         WhatsAppTypingJob::dispatch($validated['contact_id']);
 
         $jobs = isset($validated['audio_url'])
-            ? [new TranscribeAudioJob($catalogRequest->id), new RunCatalogAgentJob($catalogRequest->id), new SendWhatsAppMessageJob($catalogRequest->id)]
+            ? [
+                new TranscribeAudioJob($catalogRequest->id),
+                new RunCatalogAgentJob($catalogRequest->id),
+                new SendWhatsAppMessageJob($catalogRequest->id),
+            ]
             : [new RunCatalogAgentJob($catalogRequest->id), new SendWhatsAppMessageJob($catalogRequest->id)];
 
         Bus::chain($jobs)->dispatch();
