@@ -2,6 +2,7 @@
 
 namespace App\Jobs\Catalog;
 
+use App\Models\CatalogProduct;
 use App\Models\CatalogRequest;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
@@ -49,7 +50,18 @@ class TranscribeAudioJob implements ShouldQueue
                 throw new RuntimeException('ffmpeg conversion failed: '.$result->errorOutput());
             }
 
-            $transcript = Transcription::fromPath($mp3Path)->language('pt')->generate();
+            // O prompt orienta o Whisper a reconhecer marcas do catálogo do tenant,
+            // evitando transcrições erradas como "Supraxol" no lugar de "SupraSoy".
+            $brands = CatalogProduct::where('tenant_id', $request->tenant_id)
+                ->whereNotNull('brand_name')
+                ->distinct()
+                ->pluck('brand_name')
+                ->implode(', ');
+
+            $transcript = Transcription::fromPath($mp3Path)
+                ->language('pt')
+                ->providerOptions(['prompt' => "Marcas: {$brands}. Termos: fardo, caixa, unidade, arroz, feijão, parboilizado, integral."])
+                ->generate();
 
             $request->update(['question' => (string) $transcript]);
         } finally {
