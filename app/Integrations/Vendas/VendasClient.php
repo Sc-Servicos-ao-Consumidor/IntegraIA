@@ -23,6 +23,7 @@ class VendasClient
      */
     public function getProductPrices(int $tenantId, array $packageSkus): array
     {
+        
         return $this->request()
             ->withHeaders(['tenant' => $tenantId])
             ->post("/store/product-price/{$tenantId}", ['package_skus' => $packageSkus])
