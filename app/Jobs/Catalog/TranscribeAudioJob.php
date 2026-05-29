@@ -8,8 +8,8 @@ use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Storage;
 use Laravel\Ai\Transcription;
+use RuntimeException;
 
 class TranscribeAudioJob implements ShouldQueue
 {
@@ -29,26 +29,26 @@ class TranscribeAudioJob implements ShouldQueue
             return;
         }
 
-        $tempPath = 'catalog-audio/'.uniqid().'.'.$this->extensionFrom($request->audio_url);
+        $id = uniqid('audio_');
+        $inputPath = sys_get_temp_dir()."/{$id}_input";
+        $mp3Path = sys_get_temp_dir()."/{$id}.mp3";
 
         try {
             $audioContent = Http::timeout(30)->get($request->audio_url)->body();
-            Storage::put($tempPath, $audioContent);
+            file_put_contents($inputPath, $audioContent);
 
-            $transcript = Transcription::fromStorage($tempPath)
-                ->language('pt')
-                ->generate();
+            exec("ffmpeg -y -i {$inputPath} -ar 16000 -ac 1 -b:a 64k {$mp3Path} 2>&1", $output, $code);
+
+            if ($code !== 0) {
+                throw new RuntimeException('ffmpeg conversion failed: '.implode("\n", $output));
+            }
+
+            $transcript = Transcription::fromPath($mp3Path)->language('pt')->generate();
 
             $request->update(['question' => (string) $transcript]);
         } finally {
-            Storage::delete($tempPath);
+            @unlink($inputPath);
+            @unlink($mp3Path);
         }
-    }
-
-    private function extensionFrom(string $url): string
-    {
-        $path = parse_url($url, PHP_URL_PATH);
-
-        return pathinfo($path, PATHINFO_EXTENSION) ?: 'ogg';
     }
 }
