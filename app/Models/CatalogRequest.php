@@ -15,6 +15,7 @@ class CatalogRequest extends Model
         'catalog_pipeline_status_id',
         'contact_id',
         'session_id',
+        'audio_url',
         'question',
         'search_results',
         'ai_answer',
