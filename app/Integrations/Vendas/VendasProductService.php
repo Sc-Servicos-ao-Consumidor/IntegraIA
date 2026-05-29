@@ -31,4 +31,28 @@ class VendasProductService
             ];
         }
     }
+
+    public function addToCart(int $tenantId, array $packageSkus): array
+    {
+        try {
+            $data = $this->client->addToCart($tenantId, $packageSkus);
+
+            if (! ($data['sucesso'] ?? false)) {
+                return [
+                    'sucesso' => false,
+                    'mensagem' => $data['mensagem'] ?? 'Erro ao criar o carrinho.',
+                ];
+            }
+
+            return [
+                'sucesso' => true,
+                'dados' => $data['dados'] ?? [],
+            ];
+        } catch (RequestException $e) {
+            return [
+                'sucesso' => false,
+                'mensagem' => 'Falha na conexão com a API Vendas: '.$e->getMessage(),
+            ];
+        }
+    }
 }

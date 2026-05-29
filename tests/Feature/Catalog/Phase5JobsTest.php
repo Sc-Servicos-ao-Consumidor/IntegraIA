@@ -72,7 +72,6 @@ it('CatalogAnswerAgent messages() returns empty array when no previous session h
     $agent = new CatalogAnswerAgent(
         vendasProductService: makeVendasService(),
         tenantId: $request->tenant_id,
-        contactId: $request->contact_id,
         sessionId: $request->session_id,
         catalogRequestId: $request->id,
     );
@@ -97,7 +96,6 @@ it('CatalogAnswerAgent messages() loads previous answered requests as history', 
     $agent = new CatalogAnswerAgent(
         vendasProductService: makeVendasService(),
         tenantId: $current->tenant_id,
-        contactId: $current->contact_id,
         sessionId: $sessionId,
         catalogRequestId: $current->id,
     );
@@ -123,7 +121,6 @@ it('CatalogAnswerAgent messages() does not include the current request in histor
     $agent = new CatalogAnswerAgent(
         vendasProductService: makeVendasService(),
         tenantId: $current->tenant_id,
-        contactId: $current->contact_id,
         sessionId: $sessionId,
         catalogRequestId: $current->id,
     );
@@ -155,7 +152,6 @@ it('CatalogAnswerAgent messages() limits history to 7 messages', function () {
     $agent = new CatalogAnswerAgent(
         vendasProductService: makeVendasService(),
         tenantId: $current->tenant_id,
-        contactId: $current->contact_id,
         sessionId: $sessionId,
         catalogRequestId: $current->id,
     );

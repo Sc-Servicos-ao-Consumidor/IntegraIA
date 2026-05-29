@@ -29,4 +29,19 @@ class VendasClient
             ->throw()
             ->json();
     }
+
+    /**
+     * @throws RequestException
+     */
+    public function addToCart(int $tenantId, array $packageSkus): array
+    {
+        return $this->request()
+            ->withHeaders(['tenant' => $tenantId])
+            ->post("/store/cart-link/{$tenantId}", [
+                'loja_id' => $tenantId,
+                'package_skus' => $packageSkus,
+            ])
+            ->throw()
+            ->json();
+    }
 }

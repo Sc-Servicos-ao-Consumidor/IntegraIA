@@ -38,7 +38,6 @@ class RunCatalogAgentJob implements ShouldQueue
             $agent = new CatalogAnswerAgent(
                 vendasProductService: $vendasProductService,
                 tenantId: $request->tenant_id,
-                contactId: $request->contact_id,
                 sessionId: $request->session_id,
                 catalogRequestId: $request->id,
             );

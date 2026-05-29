@@ -33,7 +33,6 @@ class CatalogAnswerAgent implements Agent, Conversational, HasTools
     public function __construct(
         private readonly VendasProductService $vendasProductService,
         private readonly int $tenantId,
-        private readonly string $contactId,
         private readonly string $sessionId,
         private readonly int $catalogRequestId,
     ) {}
@@ -56,7 +55,8 @@ class CatalogAnswerAgent implements Agent, Conversational, HasTools
         - Apresente os produtos com nome, marca, embalagens disponíveis, preço e estoque.
         - Use o campo "preco_br" para exibir preços no formato brasileiro (ex: R$ 159,33).
         - Se "estoque" for 0, informe que o produto está indisponível no momento.
-        - Só adicione ao carrinho após confirmação explícita do cliente com o SKU e a quantidade.
+        - Só adicione ao carrinho após confirmação explícita do cliente com os SKUs desejados.
+        - Agrupe todos os SKUs confirmados em uma única chamada da tool de carrinho.
 
         Glossário de abreviações de embalagem:
         - fd ou FD = fardo
@@ -106,7 +106,7 @@ class CatalogAnswerAgent implements Agent, Conversational, HasTools
         return [
             new SearchProductsTool($this->tenantId),
             new GetProductPricesTool($this->vendasProductService, $this->tenantId),
-            new AddToCartTool($this->tenantId, $this->contactId),
+            new AddToCartTool($this->vendasProductService, $this->tenantId),
         ];
     }
 }
